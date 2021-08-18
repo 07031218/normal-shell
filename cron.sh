@@ -1,9 +1,9 @@
 #bin/bash
 echo "开始进行解锁"
-bash <(curl -L -s https://git.io/JR7RH)
+wget -O /root/refresh-dns.sh https://git.io/JR7RH && bash /root/refresh-dns.sh
 echo "开始添加定时任务"
 crontab -l 2>/dev/null > /root/crontab_test 
-echo '*/5 * * * * bash <(curl -L -s https://git.io/JR7RH)' >> /root/crontab_test 
+echo '*/5 * * * * bash /root/refresh-dns.sh' >> /root/crontab_test 
 crontab /root/crontab_test 
 crontask=$(crontab -l)
 
