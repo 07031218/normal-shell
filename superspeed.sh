@@ -107,11 +107,12 @@ speed_test(){
 }
 
 preinfo() {
-	echo "———————————————————SuperSpeed 全面测速版——————————————————"
-	echo "       bash <(curl -Lso- https://git.io/superspeed)"
+	echo "———————————————————SuperSpeed 全面测速版——————————————————————"
+	echo "       脚本基于https://git.io/superspeed修正，感谢原作者的付出
+	echo "       bash <(curl -Lso- https://git.io/J0Dvn)"
 	echo "       全部节点列表:  https://git.io/superspeedList"
-	echo "       节点更新: 2020/04/09  | 脚本更新: 2020/04/09"
-	echo "——————————————————————————————————————————————————————————"
+	echo "       节点更新: 2021/04/09  | 脚本更新: 2021/08/19"
+	echo "—————————————————————————————————————————————————————————————"
 }
 
 selecttest() {
