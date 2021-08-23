@@ -12,4 +12,4 @@ echo "解锁dns服务器IP地址是 ${IP}"
 
 echo "开始修改DNS服务器地址"
 chattr -i /etc/resolv.conf && echo -e "nameserver $IP\nnameserver 8.8.8.8 > /etc/resolv.conf && chattr +i /etc/resolv.conf
-echo "修改DNS服务器地址完成，开始畅游Netflix吧^_^"
+echo "修改DNS服务器地址完成，开始畅游Netflix吧"
