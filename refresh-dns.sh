@@ -3,9 +3,9 @@ HOST="nf"
 DOMAIN="20120714.xyz"
 URL=${HOST}.${DOMAIN}
 #IP=`ping ${URL} -c 1 |awk 'NR==2 {print $4}' |awk -F ':' '{print $1}'`
-#IP=`ping ${URL} -c 1 |awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp"`
+IP=`ping ${URL} -c 1 |awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp"`
 #如果安装了dig也可以这样
-IP=`dig ${URL} @114.114.114.114 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
+#IP=`dig ${URL} @114.114.114.114 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
 echo "解锁dns服务器IP地址是 ${IP}"
 
 
