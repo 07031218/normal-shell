@@ -1,3 +1,13 @@
+#/usr/bin/env bash
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE="\033[0;35m"
+CYAN='\033[0;36m'
+PLAIN='\033[0m'
 #安装dig命令
 yum install bind-utils -y  2> /dev/null || apt-get install dnsutils  -y 
 #定义变量
@@ -12,6 +22,6 @@ echo "解锁dns服务器IP地址是 ${IP}"
 
 
 
-echo "开始修改DNS服务器地址"
+echo "${YELLOW}开始修改本机DNS服务器地址${PLAIN}"
 chattr -i /etc/resolv.conf && echo -e "nameserver $IP\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
-echo "修改DNS服务器地址完成，开始畅游Netflix吧^_^"
+echo "${GREEN}修改DNS服务器地址完成，开始畅游Netflix吧^_^${PLAIN}"
