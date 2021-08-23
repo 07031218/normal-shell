@@ -1,4 +1,3 @@
-#/bin/sh
 yum install bind-utils -y  2> /dev/null || apt-get install dnsutils  -y 
 HOST="nf"
 DOMAIN="20120714.xyz"
