@@ -1,11 +1,13 @@
+#安装dig命令
 yum install bind-utils -y  2> /dev/null || apt-get install dnsutils  -y 
+#定义变量
 HOST="nf"
 DOMAIN="20120714.xyz"
 URL=${HOST}.${DOMAIN}
 #IP=`ping ${URL} -c 1 |awk 'NR==2 {print $4}' |awk -F ':' '{print $1}'`
 #IP=`ping ${URL} -c 1 |awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp"`
-#如果安装了dig也可以这样
-IP=`dig ${URL} @1.1.1.1 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
+#dig命令获取域名的ip地址
+IP=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
 echo "解锁dns服务器IP地址是 ${IP}"
 
 
