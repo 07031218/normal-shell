@@ -25,5 +25,5 @@ echo -e "${BLUE}解锁dns服务器IP地址是 ${IP} ${PLAIN}"
 
 
 echo -e "${YELLOW}开始修改本机DNS服务器地址${PLAIN}"
-chattr -i /etc/resolv.conf && echo -e "nameserver $IP\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
+chattr -i /etc/resolv.conf && echo "nameserver $IP\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
 echo -e "${GREEN}修改DNS服务器地址完成，开始畅游Netflix吧^_^ ${PLAIN}"
