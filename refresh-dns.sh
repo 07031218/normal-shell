@@ -10,6 +10,8 @@ CYAN='\033[0;36m'
 PLAIN='\033[0m'
 #安装dig命令
 yum install bind-utils -y  2> /dev/null || apt-get install dnsutils  -y 
+#检测dig命令是否安装成功
+hash dig 2> /dev/null || { echo -e >&2 "${RED}出现异常 dnsutils 没有安装成功，脚本无法继续，将自动退出...${PLAIN}"; exit 1; }
 #定义变量
 HOST="nf"
 DOMAIN="20120714.xyz"
