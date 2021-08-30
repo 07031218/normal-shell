@@ -20,7 +20,7 @@ echo -e "${GREEN}本机当前IP是：${hostIp}${PLAIN}"
 echo -e "${GREEN}----------------------------${PLAIN}"
         if [ "${hostIp}" = "${record}" ]; then
                 echo -e "${GREEN}----------------------------${PLAIN}"
-                echo -e "${GREEN}IP一致，无需做修改, current IP: ${hostIp}${PLAIN}"dnsmasq.sh
+                echo -e "${GREEN}IP一致，无需做修改, current IP: ${hostIp}${PLAIN}"
                 echo -e "${GREEN}----------------------------${PLAIN}"
                 exit
         else   
