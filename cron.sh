@@ -4,7 +4,7 @@ wget -O /root/refresh-dns.sh https://git.io/JR7RH && chmod +x /root/refresh-dns.
 echo "开始添加定时任务"
 bashsrc=$(which bash)
 crontab -l 2>/dev/null > /root/crontab_test 
-echo '*/5 * * * * ${bashsrc} /root/refresh-dns.sh' >> /root/crontab_test 
+echo -e "*/5 * * * * ${bashsrc} /root/refresh-dns.sh" >> /root/crontab_test 
 crontab /root/crontab_test 
 crontask=$(crontab -l)
 
