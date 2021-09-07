@@ -9,19 +9,19 @@ CYAN='\033[0;36m'
 PLAIN='\033[0m'
 record=$(sed -n '6p' /root/netflix-proxy/dnsmasq.conf | grep 'address=\/akadns.net\/'| sed 's/^.*address=\/akadns.net\///g')
 hostIp=$(curl ip.sb)
-echo -e "${GREEN}----------------------------${PLAIN}"
+echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
 echo -e "${GREEN}开始检测${PLAIN}"
-echo -e "${GREEN}----------------------------${PLAIN}"
+echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
 hostIp=$(curl ip.sb)
-echo -e "${GREEN}----------------------------${PLAIN}"
+echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
 echo -e "${GREEN}获取到dnsmasq的配置是：${record}${PLAIN}"
-echo -e "${GREEN}----------------------------${PLAIN}"
+echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
 echo -e "${GREEN}本机当前IP是：${hostIp}${PLAIN}"
-echo -e "${GREEN}----------------------------${PLAIN}"
+echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
         if [ "${hostIp}" = "${record}" ]; then
-                echo -e "${GREEN}----------------------------${PLAIN}"
+                echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
                 echo -e "${GREEN}IP一致，无需做修改, current IP: ${hostIp}${PLAIN}"
-                echo -e "${GREEN}----------------------------${PLAIN}"
+                echo -e "${GREEN}------------------------------------------------------------------------------${PLAIN}"
                 exit
         else   
         echo -e "${GREEN}IP有更新，开始替换更新dnsmasq配置文件${PLAIN}"
