@@ -34,7 +34,7 @@ cp /root/netflix-proxy/dnsmasq.conf.template /root/netflix-proxy/dnsmasq.conf &>
     done
         echo -e "${GREEN}dnsmasq配置文件替换完毕，开始准备重启dnsmasq容器${PLAIN}"
 
-docker restart dnsmasq
+docker restart dnsmasq > /dev/null 2>&1
 fi
 echo -e "${GREEN}脚本执行完毕，退出。${PLAIN}"
 exit
