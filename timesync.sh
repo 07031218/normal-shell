@@ -11,7 +11,8 @@ PLAIN='\033[0m'
 apt install sudo -y >>/dev/null 2>&1 && sudo timedatectl set-ntp no
 echo -e "${BLUE}开始获取京东服务器时间${PLAIN}"
 Time=$(curl -s "https://api.m.jd.com/client.action?functionId=queryMaterialProducts&client=wh5" | grep '{"currentTime":'| sed 's/^.*"currentTime"://g' | sed 's/,"currentTime2":.*//g' | sed 's/\"//g' )
-sudo timedatectl set-time "${Time}"
+sudo timedatectl set-time "$(curl -s "https://api.m.jd.com/client.action?functionId=queryMaterialProducts&client=wh5" | grep '{"currentTime":'| sed 's/^.*"currentTime"://g' | sed 's/,"currentTime2":.*//g' | sed 's/\"//g' )"
+#sudo timedatectl set-time "${Time}"
 echo -e "${BLUE}当前京东服务器时间为${PLAIN}${RED}${Time}${PLAIN}"
 echo -e "${BLUE}开始进行时间同步${PLAIN}"
 echo -e "${BLUE}时间同步完成，脚本将自动退出。${PLAIN}"
