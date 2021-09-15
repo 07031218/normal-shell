@@ -107,7 +107,7 @@ speed_test(){
 }
 
 preinfo() {
-	echo "———————————————————SuperSpeed 全面测速版——————————————————————————————————————————————————————————————————————"
+	echo "————————————————————————————————————————SuperSpeed 全面测速版——————————————————————————————————————————————————"
 	echo "       本脚本借鉴修改自https://github.com/ernisn/superspeed，感谢原作者的付出"
 	echo "       bash <(curl -Lso- https://raw.githubusercontent.com/07031218/normal-shell/main/superspeed.sh)"
 	echo "       全部节点列表:  https://git.io/superspeedList"
