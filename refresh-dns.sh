@@ -27,9 +27,10 @@ record=$(sed -n '1p' /etc/resolv.conf | grep 'nameserver'| sed 's/^.*nameserver/
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
                 exit
         else
-echo -e "${YELLOW}解锁服务器IP有变化，开始修改本机DNS服务器地址${PLAIN}"
+echo -e "${YELLOW}解锁服务器IP有变化，开始获取DNS服务器最新IP地址${PLAIN}"
 chattr -i /etc/resolv.conf && echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf && chattr +i /etc/resolv.conf 
 IP1=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
+echo -e "${YELLOW}解锁服务器IP获取完成，开始修改本机DNS服务器地址${PLAIN}"
 chattr -i /etc/resolv.conf && echo -e "nameserver ${IP1}\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
 echo -e "${GREEN}修改DNS服务器地址完成，开始畅游Netflix吧^_^ ${PLAIN}"
 fi
