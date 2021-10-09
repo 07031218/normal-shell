@@ -21,7 +21,7 @@ IP=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $
 
 echo -e "${BLUE}当前设定的解锁dns服务器IP地址是 ${IP} ${PLAIN}"
 record=$(sed -n '1p' /etc/resolv.conf | grep 'nameserver'| sed 's/^.*nameserver//g' | sed 's/\"//g' | sed 's/\,//g' | sed 's/ //g')
-        if [[ -n "${record}" ]] && [["${IP}" = "${record}"]]; then
+        if [[ -n "$record" ]] && [[ "${IP}" = "${record}" ]]; then
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
                 echo -e "${GREEN}DNS解锁服务器地址无变化，无需修改, current IP: ${IP}${PLAIN}"
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
