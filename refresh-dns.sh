@@ -19,7 +19,7 @@ URL=nf.20120714.xyz
 #dig命令获取域名的ip地址
 IP=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
 
-echo -e "${BLUE}当前设定的解锁dns服务器IP地址是 ${IP} ${PLAIN}"
+echo -e "${BLUE}当前解锁服务器IP地址是 ${IP} ${PLAIN}"
 record=$(sed -n '1p' /etc/resolv.conf | grep 'nameserver'| sed 's/^.*nameserver//g' | sed 's/\"//g' | sed 's/\,//g' | sed 's/ //g')
         if [[ -n "$record" ]] && [[ "${IP}" = "${record}" ]]; then
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
