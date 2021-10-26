@@ -8,7 +8,7 @@ apt -y install unzip >> /dev/null 2>&1 || yum install  unzip -y >> /dev/null 2>&
 rm besttrace*
 # install besttrace
 if [ ! -f "besttrace" ]; then
-    wget http://aria2.xun-da.com/besttrace4linux.zip
+    wget https://cdn.ipip.net/17mon/besttrace4linux.zip
     unzip besttrace4linux.zip
     rm besttrace4linux.zip
 fi
