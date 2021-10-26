@@ -6,6 +6,7 @@ bashsrc=$(which bash)
 crontab -l 2>/dev/null > /root/crontab_test 
 echo -e "*/5 * * * * ${bashsrc} /root/refresh-dns.sh" >> /root/crontab_test 
 crontab /root/crontab_test 
+rm /root/crontab_test
 crontask=$(crontab -l)
 
 echo -------------------------------------------------------
