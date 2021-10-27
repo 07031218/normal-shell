@@ -34,6 +34,6 @@ ip_addr=(武汉电信 广州电信 上海电信 厦门电信 重庆联通 成都
 for i in {0..8}
 do
 	echo ${ip_addr[$i]}
-	./worsttrace -q 1 ${ip_list[$i]}
+	./worsttrace  ${ip_list[$i]}
 	next
 done
