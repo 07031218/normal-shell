@@ -15,8 +15,8 @@ arch=$(arch)
 if [[ $arch == "x86_64" || $arch == "x64" || $arch == "amd64" ]]; then
   chmod +x worsttrace
 else
+  rm worsttrace  
   echo -e "${red}暂不支持aarch64和arm64架构，脚本退出${plain}"
-  rm worsttrace
   exit
 fi
 ## start to use WorstTrace
