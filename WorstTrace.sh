@@ -5,10 +5,10 @@ yellow='\033[0;33m'
 plain='\033[0m'
 
 #apt -y install unzip >> /dev/null 2>&1 || yum install  unzip -y >> /dev/null 2>&1
-rm worsttrace
+rm worsttrace >> /dev/null 2>&1
 # install WorstTrace
 if [ ! -f "worsttrace" ]; then
-    wget https://pkg.wtrace.app/linux/worsttrace
+    wget https://pkg.wtrace.app/linux/worsttrace >> /dev/null 2>&1
 fi
 arch=$(arch)
 
@@ -38,4 +38,4 @@ do
 	./worsttrace  ${ip_list[$i]}
 	next
 done
-rm worsttrace
+rm worsttrace >> /dev/null 2>&1
