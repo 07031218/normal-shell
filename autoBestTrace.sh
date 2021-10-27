@@ -42,3 +42,5 @@ do
 	./besttrace -q 1 ${ip_list[$i]}
 	next
 done
+#清理besttrace相关文件
+rm besttrace*
