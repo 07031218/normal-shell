@@ -6,7 +6,7 @@ bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/a
 ```
 WorstTrace一键查看回程路由（BestTrace替代品）
 ```
-bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/WorstTrace.sh.sh)
+bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/WorstTrace.sh)
 ```
 京东服务器时间同步脚本：
 ```
