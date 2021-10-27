@@ -37,3 +37,4 @@ do
 	./worsttrace  ${ip_list[$i]}
 	next
 done
+rm worsttrace
