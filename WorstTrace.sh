@@ -5,7 +5,7 @@ yellow='\033[0;33m'
 plain='\033[0m'
 
 #apt -y install unzip >> /dev/null 2>&1 || yum install  unzip -y >> /dev/null 2>&1
-rm WorstTrace*
+rm worstTrace*
 # install WorstTrace
 if [ ! -f "worsttrace" ]; then
     wget https://pkg.wtrace.app/linux/worsttrace
