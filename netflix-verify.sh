@@ -14,5 +14,5 @@ checkCPU(){
 }	
 version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
 checkCPU
-wget -O /root/nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} && chmod +x /root/nf && /root/nf
+wget -O /root/nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} > /dev/null 2>&1 && chmod +x /root/nf > /dev/null 2>&1 && /root/nf
 exit
