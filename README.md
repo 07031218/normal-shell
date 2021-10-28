@@ -32,7 +32,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
 ```
 bash <(curl -L -s https://git.io/JRw8R)
 ```
-流媒体解锁一键检测脚本（sjlleo版本,仅支持检测NF，脚本兼容ARM和AMD架构）
+流媒体解锁一键检测脚本（sjlleo版本,仅支持检测NF，脚本兼容linux ARM和AMD，以及MacOS 非M1版）
 ```
 bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/main/netflix-verify.sh)
 ```
