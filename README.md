@@ -20,3 +20,7 @@ bash <(curl -Lso- https://raw.githubusercontent.com/07031218/normal-shell/main/s
 ```
 bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/net/tools.sh)
 ```
+甲骨文一键DD到Debian 11 脚本（兼容甲骨文AMD和ARM架构,DD完默认密码password，经测试同样适用腾讯云、Do、Azure）
+```
+bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') -d 11 -v 64 -p password
+```
