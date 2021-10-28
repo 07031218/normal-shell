@@ -1,4 +1,20 @@
 #!/bin/bash
+checkos(){
+	ifTermux=$(echo $PWD | grep termux)
+	ifMacOS=$(uname -a | grep Darwin)
+	if [ -n "$ifTermux" ];then
+		os_version=Termux
+	elif [ -n "$ifMacOS" ];then
+		os_version=MacOS	
+	else	
+		os_version=$(grep 'VERSION_ID' /etc/os-release | cut -d '"' -f 2 | tr -d '.')
+	fi
+	
+	if [[ "$os_version" == "2004" ]] || [[ "$os_version" == "10" ]] || [[ "$os_version" == "11" ]];then
+		ssll="-k --ciphers DEFAULT@SECLEVEL=1"
+	fi
+}
+checkos	
 
 checkCPU(){
 	CPUArch=$(uname -m)
