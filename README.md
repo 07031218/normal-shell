@@ -24,3 +24,16 @@ bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/net/tool
 ```
 bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') -d 11 -v 64 -p password
 ```
+x-ui一键安装脚本
+```
+bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
+```
+流媒体解锁一键检测脚本（lmc999版本）
+```
+bash <(curl -L -s https://git.io/JRw8R)
+```
+流媒体解锁一键检测脚本（sjlleo版本,仅支持检测NF，脚本兼容ARM和AMD架构）
+```
+bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/main/netflix-verify.sh)
+```
+
