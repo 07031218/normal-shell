@@ -24,11 +24,11 @@ checkCPU(){
 		arch=linux_386
 	elif [[ "$CPUArch" == "arm" ]];then
 		arch=linux_arm
-	elif [[ "$CPUArch" == "x86_64" ]];then
-		arch=linux_amd64
 	elif [[ "$CPUArch" == "x86_64" ]] && [ -n "$ifMacOS" ];then
 		arch=darwin_amd64
 		brew install wget > /dev/null 2>&1 
+	elif [[ "$CPUArch" == "x86_64" ]];then
+		arch=linux_amd64		
 	fi
 }	
 version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
