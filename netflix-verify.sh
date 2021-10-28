@@ -26,13 +26,32 @@ checkCPU(){
 		arch=linux_arm
 	elif [[ "$CPUArch" == "x86_64" ]] && [ -n "$ifMacOS" ];then
 		arch=darwin_amd64
-		brew install wget > /dev/null 2>&1 
 	elif [[ "$CPUArch" == "x86_64" ]];then
 		arch=linux_amd64		
 	fi
-}	
+}
+check_dependencies(){
+
+	os_detail=$(cat /etc/os-release 2> /dev/null)
+	if_debian=$(echo $os_detail | grep 'ebian')
+	if_redhat=$(echo $os_detail | grep 'rhel')
+	if [ -n "$if_debian" ];then
+		InstallMethod="apt"
+	elif [ -n "$if_redhat" ] && [[ "$os_version" -lt 8 ]];then
+		InstallMethod="yum"
+	elif [[ "$os_version" == "MacOS" ]];then
+		InstallMethod="brew"	
+	fi
+}
 version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
 checkCPU
+wgetsrc=$(which wget)
+if [ ! -n "$wgetsrc" ]; then
+echo -e "检测到系统未安装wget，开始安装wget"
+    $InstallMethod install wget -y 
+fi
+    
+  
 #下载检测程序
 wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} > /dev/null 2>&1 
 chmod +x nf > /dev/null 2>&1 
