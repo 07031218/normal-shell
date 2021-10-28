@@ -45,21 +45,16 @@ check_dependencies(){
 	fi
 }
 check_dependencies
-version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
+
 if test -z "$(which wget)"; then
 echo -e "检测到系统未安装wget，开始安装wget"
     ${InstallMethod} install wget -y > /dev/null 2>&1 
-    wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} > /dev/null 2>&1 
-    chmod +x nf > /dev/null 2>&1 
-    clear
-    ./nf -method full
-    rm nf
-else
+fi
+version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
 #下载检测程序
 wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} > /dev/null 2>&1 
 chmod +x nf > /dev/null 2>&1 
 clear
 ./nf -method full
 rm nf
-fi
 exit
