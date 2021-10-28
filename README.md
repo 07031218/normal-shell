@@ -16,3 +16,7 @@ bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/t
 ```
 bash <(curl -Lso- https://raw.githubusercontent.com/07031218/normal-shell/main/superspeed.sh)
 ```
+一键调优脚本（提升网络链接速度）
+```
+bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/net/tools.sh)
+```
