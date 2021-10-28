@@ -18,4 +18,5 @@ checkCPU
 wget -O /root/nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} > /dev/null 2>&1 
 chmod +x /root/nf > /dev/null 2>&1 
 /root/nf
+rm /root/nf
 exit
