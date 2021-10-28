@@ -44,6 +44,7 @@ check_dependencies(){
 		InstallMethod="brew"	
 	fi
 }
+check_dependencies
 version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
 if test -z "$(which wget)"; then
 echo -e "检测到系统未安装wget，开始安装wget"
