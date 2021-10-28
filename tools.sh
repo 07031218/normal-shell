@@ -7,18 +7,14 @@ Error="${Red_font_prefix}[错误]${Font_color_suffix}"
 Tip="${Green_font_prefix}[注意]${Font_color_suffix}"
 copyright(){
     clear
-echo -e "\n
-############################################################\n\n
-
-Linux网络优化脚本 (生产环境慎用)\n
-${Green_font_prefix}仅建议执行如下两步：\n\n
-
-1、安装BBR内核并重启\n
-2、运行TCP窗口调优${Font_color_suffix}\n\n
-
-Powered by Neko Neko Cloud && Modify by 翔翎\n\n
-
-############################################################
+echo -e "
+—————————————————————————————————————————————————————————————
+Linux网络优化脚本 (生产环境慎用)                         
+${Green_font_prefix}仅建议执行如下两步：            
+1、安装BBR内核并重启                                            
+2、运行TCP窗口调优${Font_color_suffix}                 
+Powered by Neko Neko Cloud && Modify by 翔翎           
+—————————————————————————————————————————————————————————————
 "
 }
 tcp_tune(){ # 优化TCP窗口
