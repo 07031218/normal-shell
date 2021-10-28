@@ -48,14 +48,17 @@ checkCPU
 wgetsrc=$(which wget)
 if [ ! -n "$wgetsrc" ]; then
 echo -e "检测到系统未安装wget，开始安装wget"
-    $InstallMethod install wget -y 
+    $InstallMethod install wget -y
+    checksteam
+else
+    checksteam
 fi
-    
-  
+checksteam(){  
 #下载检测程序
 wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch} > /dev/null 2>&1 
 chmod +x nf > /dev/null 2>&1 
 clear
 ./nf -method full
 rm nf
+}
 exit
