@@ -8,7 +8,7 @@ plain='\033[0m'
 rm worsttrace >> /dev/null 2>&1
 # install WorstTrace
 if [ ! -f "worsttrace" ]; then
-    wget https://pkg.wtrace.app/linux/worsttrace >> /dev/null 2>&1
+    wget https://wtrace.app/packages/linux/worsttrace >> /dev/null 2>&1
 fi
 arch=$(arch)
 
