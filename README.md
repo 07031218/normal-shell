@@ -8,9 +8,13 @@ WorstTrace一键查看回程路由（BestTrace替代品）
 ```shell
 bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/WorstTrace.sh)
 ```
-京东服务器时间同步脚本：
+京东服务器时间同步脚本【For Linux】：
 ```shell
 bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/timesync.sh)
+```
+京东服务器时间同步脚本【For Synology】：
+```shell
+bash <(curl -L -s https://raw.githubusercontent.com/07031218/normal-shell/main/timesync-for-synology.sh)
 ```
 一键测速脚本（兼容ARM架构）：
 ```shell
