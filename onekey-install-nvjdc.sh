@@ -221,7 +221,7 @@ log_action_begin_msg "开始创建nvjdc容器"
 docker run   --name nvjdc -p ${jdcport}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
 -v "$(pwd)"/.local-chromium:/app/.local-chromium  \
 -it --privileged=true  nolanhzy/nvjdc:latest
-
+docker update --restart=always nvjdc
 log_action_end_msg $?
 baseip=$(curl -s ipip.ooo)  > /dev/null
 
@@ -238,6 +238,7 @@ docker pull nolanhzy/nvjdc:latest
 docker run   --name nvjdc -p ${portinfo}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
 -v "$(pwd)"/.local-chromium:/app/.local-chromium  \
 -it --privileged=true  nolanhzy/nvjdc:latest
+docker update --restart=always nvjdc
 echo -e "${green}nvjdc更新完毕，脚本自动退出。${plain}"
 echo -e "${green}面板访问地址：http://${baseip}:${portinfo}${plain}"
 exit 0
