@@ -11,9 +11,7 @@ clear
 CWD=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 [ -e "${CWD}/scripts/globals" ] && . ${CWD}/scripts/globals
 
-# import functions
-[ -e "/lib/lsb/init-functions" ] && . /lib/lsb/init-functions
-[ -e "${CWD}/scripts/functions" ] && . ${CWD}/scripts/functions
+
 
 checkos(){
   ifTermux=$(echo $PWD | grep termux)
@@ -212,17 +210,17 @@ echo -e "检测到系统未安装docker，开始安装docker"
 fi
 
 #拉取nvjdc镜像
-log_action_begin_msg "开始拉取nvjdc镜像文件，nvjdc镜像比较大，请耐心等待"
+echo -e  "${green}开始拉取nvjdc镜像文件，nvjdc镜像比较大，请耐心等待${plain}"
 docker pull nolanhzy/nvjdc:latest
-log_action_end_msg $?
+
 
 #创建并启动nvjdc容器
-log_action_begin_msg "开始创建nvjdc容器"
+echo -e "${green}开始创建nvjdc容器${plain}"
 docker run   --name nvjdc -p ${jdcport}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
 -v "$(pwd)"/.local-chromium:/app/.local-chromium  \
 -it --privileged=true  nolanhzy/nvjdc:latest
 docker update --restart=always nvjdc
-log_action_end_msg $?
+
 baseip=$(curl -s ipip.ooo)  > /dev/null
 
 echo -e "${green}安装完毕,面板访问地址：http://${baseip}:${jdcport}${plain}"
