@@ -240,7 +240,7 @@ exit 0
 menu() {
   echo -e "\
 ${green}0.${plain} 退出脚本
-${green}1.${plain} 开始安装nvjdc
+${green}1.${plain} 安装nvjdc
 ${green}2.${plain} 卸载nvjdc
 "
 get_system_info
