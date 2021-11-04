@@ -213,20 +213,34 @@ fi
 
 #拉取nvjdc镜像
 log_action_begin_msg "开始拉取nvjdc镜像文件，nvjdc镜像比较大，请耐心等待"
-docker pull nolanhzy/nvjdc:0.4
+docker pull nolanhzy/nvjdc:latest
 log_action_end_msg $?
 
 #创建并启动nvjdc容器
 log_action_begin_msg "开始创建nvjdc容器"
 docker run   --name nvjdc -p ${jdcport}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
 -v "$(pwd)"/.local-chromium:/app/.local-chromium  \
--it --privileged=true  nolanhzy/nvjdc:0.4 
+-it --privileged=true  nolanhzy/nvjdc:latest
 
 log_action_end_msg $?
 baseip=$(curl -s ipip.ooo)  > /dev/null
 
 echo -e "${green}安装完毕,面板访问地址：http://${baseip}:${jdcport}${plain}"
 echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.me/farmercoin${plain}"
+}
+
+update_nvjdc(){
+  cd /root/nvjdc
+portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
+baseip=$(curl -s ipip.ooo)  > /dev/null
+docker rm -f nvjdc
+docker pull nolanhzy/nvjdc:latest
+docker run   --name nvjdc -p ${portinfo}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
+-v "$(pwd)"/.local-chromium:/app/.local-chromium  \
+-it --privileged=true  nolanhzy/nvjdc:latest
+echo -e "${green}nvjdc更新完毕，脚本自动退出。${plain}"
+echo -e "${green}面板访问地址：http://${baseip}:${portinfo}${plain}"
+exit 0
 }
 
 uninstall_nvjdc(){
@@ -241,7 +255,8 @@ menu() {
   echo -e "\
 ${green}0.${plain} 退出脚本
 ${green}1.${plain} 安装nvjdc
-${green}2.${plain} 卸载nvjdc
+${green}2.${plain} 升级nvjdc
+${green}3.${plain} 卸载nvjdc
 "
 get_system_info
 echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virtual${Font_color_suffix} $arch ${Green_font_prefix}$kern${Font_color_suffix}
@@ -256,8 +271,11 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
     install_nvjdc
     ;;
   2)
-    uninstall_nvjdc
+    update_nvjdc
     ;;
+  3)
+    uninstall_nvjdc
+    ;;    
   *)
   clear
     echo -e "${Error}:请输入正确数字 [0-2]"
