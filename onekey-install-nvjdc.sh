@@ -244,7 +244,7 @@ exit 0
 
 uninstall_nvjdc(){
 docker rm -f nvjdc
-docker rmi -f nolanhzy/nvjdc:0.4
+docker rmi -f nolanhzy/nvjdc:latest
 rm -rf nvjdc
 echo -e "${green}nvjdc面板已卸载，脚本自动退出。${plain}"
 exit 0
