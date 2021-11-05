@@ -305,7 +305,7 @@ menu() {
   echo -e "\
 ${green}0.${plain} 退出脚本
 ${green}1.${plain} 安装nvjdc
-${green}2. 更新对接XDD，【提示】：仅需执行一次，后续升级选择第3项{plain}
+${red}2. 更新对接XDD，【提示】仅需执行一次，后续升级选择第3项${plain}
 ${green}3.${plain} 升级nvjdc
 ${green}4.${plain} 卸载nvjdc
 "
