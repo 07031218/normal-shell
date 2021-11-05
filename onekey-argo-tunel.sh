@@ -37,7 +37,7 @@ check_dependencies(){
 ${InstallMethod} install  wget -y > /dev/null 2>&1 
 
 #开始拉取argo tunnel
-wget -O cloudflared https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}
+wget -O cloudflared https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch} > /dev/null
 chmod +x cloudflared && cp cloudflared /usr/bin
 
 #安装argo tunnel
