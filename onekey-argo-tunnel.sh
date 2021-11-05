@@ -33,6 +33,9 @@ check_dependencies(){
     InstallMethod="brew"
   fi
 }
+quit(){
+exit 0
+}
 #安装argo tunnel
 install_cloudflared(){
 checkCPU
