@@ -85,7 +85,8 @@ read -p "请输入要删除的argo穿透任务对应的conf配置文件名，文
 rm /etc/supervisor/conf.d/${filename}
 /etc/init.d/supervisor restart > /dev/null
 echo -e "${green}期望删除的argo穿透任务已成功删除·········${plain}"
-sleep  5s
+sleep  3s
+copyright
 menu
 
 }
