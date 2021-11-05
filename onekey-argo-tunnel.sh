@@ -71,7 +71,7 @@ EOF
 
 /etc/init.d/supervisor restart > /dev/null
 echo -e "${green}argo tunnel部署完成，脚本退出·········${plain}"
-echo -e "${green}argo tunnel你选择可以通过${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
+echo -e "${green}argo tunnel你现在可以通过${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
 }
 uninstall_cloudflared(){
@@ -117,7 +117,7 @@ ${green}2.${plain} 删除指定的argo穿透任务
     ;;  	
   *)
   clear
-    echo -e "${Error}:请输入正确数字 [0-1]"
+    echo -e "${Error}:请输入正确数字 [0-2]"
     sleep 5s
     menu
     ;;
