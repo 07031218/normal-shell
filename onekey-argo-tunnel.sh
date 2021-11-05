@@ -33,14 +33,12 @@ check_dependencies(){
     InstallMethod="brew"
   fi
 }
-#安装wget
-${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
-
-
-
 #安装argo tunnel
 install_cloudflared(){
 checkCPU
+check_dependencies
+#安装wget supervisor
+${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
 #开始拉取argo tunnel
 wget  "https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
 chmod +x cloudflared && cp cloudflared /usr/bin
