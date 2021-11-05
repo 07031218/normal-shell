@@ -277,7 +277,7 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
     ;;    
   *)
   clear
-    echo -e "${Error}:请输入正确数字 [0-2]"
+    echo -e "${Error}:请输入正确数字 [0-3]"
     sleep 5s
     menu
     ;;
