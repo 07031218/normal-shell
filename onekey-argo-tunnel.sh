@@ -17,7 +17,7 @@ checkCPU(){
   elif [[ "$CPUArch" == "x86_64" ]] && [ -n "$ifMacOS" ];then
     arch=darwin-amd64
   elif [[ "$CPUArch" == "x86_64" ]];then
-    arch=linuxam-d64    
+    arch=linux-amd64
   fi
 }
 check_dependencies(){
@@ -30,19 +30,22 @@ check_dependencies(){
   elif [ -n "$if_redhat" ] && [[ "$os_version" -lt 8 ]];then
     InstallMethod="yum"
   elif [[ "$os_version" == "MacOS" ]];then
-    InstallMethod="brew"  
+    InstallMethod="brew"
   fi
 }
 #安装wget
 ${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
 
-#开始拉取argo tunnel
-wget -O cloudflared https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch} > /dev/null
-chmod +x cloudflared && cp cloudflared /usr/bin
+
 
 #安装argo tunnel
 install_cloudflared(){
-if [ ! -d "/root/.cloudflared" ]; then
+checkCPU
+#开始拉取argo tunnel
+wget  "https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
+chmod +x cloudflared && cp cloudflared /usr/bin
+file="/root/.cloudflared/cert.pem"
+if [ ! -f "$file" ]; then
 echo -e "${green}请点击或者复制下方生成的授权链接，进入CF管理面板进行授权操作。${plain}"
 cloudflared login
 echo -e "${green}授权完成，请按照指令提示继续${plain}"
@@ -86,12 +89,12 @@ copyright(){
     clear
 echo -e "
 —————————————————————————————————————————————————————————————
-        argo tunnel一键部署脚本                         
- ${green}                
+        argo tunnel一键部署脚本
+ ${green}
         本脚本仅适合域名已经托管在cloudflare的用户使用
-        
-        Powered  by 翔翎   
-${plain}   
+
+        Powered  by 翔翎
+${plain}
 —————————————————————————————————————————————————————————————
 "
 }
@@ -112,7 +115,7 @@ ${green}2.${plain} 删除指定的argo穿透任务
     ;;
   2)
     uninstall_cloudflared
-    ;;  	
+    ;;
   *)
   clear
     echo -e "${Error}:请输入正确数字 [0-2]"
