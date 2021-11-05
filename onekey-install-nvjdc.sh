@@ -168,40 +168,68 @@ rm  -f chrome-linux.zip > /dev/null 2>&1
 
 cd .. && cd ..
 read -p "请输入青龙服务器在web页面中显示的名称: " QLName && printf "\n"
+read -p "请输入nvjdc面板希望使用的端口号: " jdcport && printf "\n"
+read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin  如不启用直接回车: " XDD-url && printf "\n"
+read -p "请输入XDD面板Token（如不启用直接回车）: " XDD-Token && printf "\n"
+read -p "nvjdc是否对接青龙，输入y或者n " jdcqinglong && printf "\n"
+ if [[ "$jdcqinglong" == "y" ]];then
 read -p "请输入青龙OpenApi Client ID: " ClientID && printf "\n"
 read -p "请输入青龙OpenApi Client Secret: " ClientSecret && printf "\n"
 read -p "请输入青龙服务器的url地址（类似http://192.168.2.2:5700）: " QLurl && printf "\n"
-read -p "请输入nvjdc面板希望使用的端口号: " jdcport && printf "\n"
 cat >> Config.json << EOF
 {
-  ///最大支持几个网页
+  ///浏览器最多几个网页
   "MaxTab": "4",
   //网站标题
   "Title": "NolanJDCloud",
   //网站公告
-  "Announcement": "本项目脚本收集于互联网，为了您的财产安全，请关闭京东免密支付。",
-  ///多青龙配置
+  "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
+  ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
+  "XDDurl": "${XDD-url}",
+  ///xddToken
+  "XDDToken": "${XDD-Token}",
+  ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": [
     {
-      //序号必须从1开始
+      //序号必填从1 开始
       "QLkey": 1,
       //服务器名称
       "QLName": "${QLName}",
-      //青龙url
+      //青龙地址
       "QLurl": "${QLurl}",
       //青龙2,9 OpenApi Client ID
       "QL_CLIENTID": "${ClientID}",
       //青龙2,9 OpenApi Client Secret
       "QL_SECRET": "${ClientSecret}",
-      //青龙面包最大ck容量
-      "QL_CAPACITY": 45,
-      //消息推送二维码
-      "QRurl":""
+      //CK最大数量
+      "QL_CAPACITY": 40,
+      "QRurl": ""
     }
   ]
 
 }
 EOF
+else
+cat >> Config.json << EOF
+{
+  ///浏览器最多几个网页
+  "MaxTab": "4",
+  //网站标题
+  "Title": "NolanJDCloud",
+  //网站公告
+  "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
+  ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
+  "XDDurl": "${XDD-url}",
+  ///xddToken
+  "XDDToken": "${XDD-Token}",
+  ///青龙配置 注意 如果不要青龙  Config :[]
+  "Config": []
+
+}
+EOF
+fi
+
+
 #判断机器是否安装docker
 if test -z "$(which docker)"; then
 echo -e "检测到系统未安装docker，开始安装docker"
@@ -230,6 +258,13 @@ echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.
 update_nvjdc(){
   cd /root/nvjdc
 portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
+read -p "是否要对接XDD，输入y或者n: " XDD && printf "\n"
+if [[ "$XDD" == "y" ]];then
+read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin : " XDDurl && printf "\n"
+read -p "请输入XDD面板Token: " XDDToken && printf "\n"
+sed -i "7a \          \"XDDurl\": \"${XDDurl}\"," /root/nvjdc/Config.json
+sed -i "7a \        \"XDDToken\": \"${XDDToken}\"," /root/nvjdc/Config.json
+fi
 baseip=$(curl -s ipip.ooo)  > /dev/null
 docker rm -f nvjdc
 docker pull nolanhzy/nvjdc:latest
