@@ -74,6 +74,15 @@ echo -e "${green}argo tunnel部署完成，脚本退出·········${plain
 echo -e "${green}argo tunnel你选择可以通过${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
 }
+uninstall_cloudflared(){
+read -p "请输入要删除的argo穿透任务对应的conf配置文件名，文件位于/etc/supervisor/conf.d目录下" filename && printf "\n"
+rm /etc/supervisor/conf.d/${filename}
+/etc/init.d/supervisor restart > /dev/null
+echo -e "${green}期望删除的argo穿透任务已成功删除·········${plain}"
+sleep  5s
+menu
+
+}
 copyright(){
     clear
 echo -e "
@@ -90,6 +99,7 @@ menu() {
   echo -e "\
 ${green}0.${plain} 退出脚本
 ${green}1.${plain} 部署argo tunnel
+${green}2.${plain} 删除指定的argo穿透任务
 "
 
 
@@ -100,7 +110,10 @@ ${green}1.${plain} 部署argo tunnel
     ;;
   1)
     install_cloudflared
-    ;;  
+    ;;
+  2)
+    uninstall_cloudflared
+    ;;  	
   *)
   clear
     echo -e "${Error}:请输入正确数字 [0-1]"
