@@ -50,9 +50,11 @@ echo -e "${green}授权完成，请按照指令提示继续${plain}"
 fi
 read -p "请输入计划启用argo tunnel穿透的域名: " httpurl && printf "\n"
 read -p "请输入本地web服务的url地址: " localurl && printf "\n"
+read -p "请输入supervisor值守的任务名称: " taskname && printf "\n"
 read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如argo.conf:" filename && printf "\n"
+
 cat >> /etc/supervisor/conf.d/${filename} << EOF
-[program:nvjdc-cf-tunnel]
+[program:${taskname}]
 
 command=cloudflared tunnel --hostname  ${httpurl} --url localurl} --no-tls-verify
 
