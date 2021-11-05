@@ -160,6 +160,7 @@ exit
 
 install_nvjdc(){
 echo -e "${red}开始进行安装,请根据命令提示操作${plain}"
+rm -rf /root/nvjdc
 mkdir nvjdc && cd nvjdc 
 mkdir -p  .local-chromium/Linux-884014 && cd .local-chromium/Linux-884014
 wget https://mirrors.huaweicloud.com/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip > /dev/null 2>&1 
@@ -169,8 +170,8 @@ rm  -f chrome-linux.zip > /dev/null 2>&1
 cd .. && cd ..
 read -p "请输入青龙服务器在web页面中显示的名称: " QLName && printf "\n"
 read -p "请输入nvjdc面板希望使用的端口号: " jdcport && printf "\n"
-read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin  如不启用直接回车: " XDD-url && printf "\n"
-read -p "请输入XDD面板Token（如不启用直接回车）: " XDD-Token && printf "\n"
+read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin  如不启用直接回车: " XDDurl && printf "\n"
+read -p "请输入XDD面板Token（如不启用直接回车）: " XDDToken && printf "\n"
 read -p "nvjdc是否对接青龙，输入y或者n " jdcqinglong && printf "\n"
  if [[ "$jdcqinglong" == "y" ]];then
 read -p "请输入青龙OpenApi Client ID: " ClientID && printf "\n"
@@ -185,9 +186,9 @@ cat >> Config.json << EOF
   //网站公告
   "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
   ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
-  "XDDurl": "${XDD-url}",
+  "XDDurl": "${XDDurl}",
   ///xddToken
-  "XDDToken": "${XDD-Token}",
+  "XDDToken": "${XDDToken}",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": [
     {
