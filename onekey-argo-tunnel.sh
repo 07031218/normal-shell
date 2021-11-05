@@ -34,7 +34,7 @@ check_dependencies(){
   fi
 }
 #安装wget
-${InstallMethod} install  wget -y > /dev/null 2>&1 
+${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
 
 #开始拉取argo tunnel
 wget -O cloudflared https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch} > /dev/null
@@ -42,7 +42,6 @@ chmod +x cloudflared && cp cloudflared /usr/bin
 
 #安装argo tunnel
 install_cloudflared(){
-
 if [ ! -d "/root/.cloudflared" ]; then
 echo -e "${green}请点击或者复制下方生成的授权链接，进入CF管理面板进行授权操作。${plain}"
 cloudflared login
