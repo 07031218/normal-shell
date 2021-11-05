@@ -40,11 +40,14 @@ exit 0
 install_cloudflared(){
 checkCPU
 check_dependencies
+file1="/usr/bin/cloudflared"
 #安装wget supervisor
 ${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
 #开始拉取argo tunnel
+if [ ! -f "$file1" ]; then
 wget  "https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
 chmod +x cloudflared && cp cloudflared /usr/bin
+fi
 file="/root/.cloudflared/cert.pem"
 if [ ! -f "$file" ]; then
 echo -e "${green}请点击或者复制下方生成的授权链接，进入CF管理面板进行授权操作。${plain}"
