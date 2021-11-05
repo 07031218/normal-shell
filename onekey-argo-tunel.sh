@@ -50,7 +50,7 @@ echo -e "${green}授权完成，请按照指令提示继续${plain}"
 fi
 read -p "请输入计划启用argo tunnel穿透的域名: " httpurl && printf "\n"
 read -p "请输入本地web服务的url地址: " localurl && printf "\n"
-read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如：argo.conf" filename && printf "\n"
+read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如argo.conf:" filename && printf "\n"
 cat >> /etc/supervisor/conf.d/${filename} << EOF
 [program:nvjdc-cf-tunnel]
 
@@ -69,6 +69,7 @@ EOF
 
 /etc/init.d/supervisor restart > /dev/null
 echo -e "${green}argo tunnel部署完成，脚本退出·········${plain}"
+echo -e "${green}argo tunnel你选择可以通过${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
 }
 copyright(){
