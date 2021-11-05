@@ -56,7 +56,7 @@ read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 
 cat >> /etc/supervisor/conf.d/${filename} << EOF
 [program:${taskname}]
 
-command=cloudflared tunnel --hostname  ${httpurl} --url localurl} --no-tls-verify
+command=cloudflared tunnel --hostname  ${httpurl} --url ${localurl} --no-tls-verify
 
 autorestart=true
 startsecs=10
