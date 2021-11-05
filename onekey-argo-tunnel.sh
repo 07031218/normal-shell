@@ -102,7 +102,6 @@ ${green}1.${plain} 部署argo tunnel
 ${green}2.${plain} 删除指定的argo穿透任务
 "
 
-
   read -p "请输入数字 :" num
   case "$num" in
   0)
