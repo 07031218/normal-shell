@@ -21,16 +21,20 @@ IP=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $
 
 echo -e "${BLUE}当前解锁服务器IP地址是 ${IP} ${PLAIN}"
 record=$(sed -n '1p' /etc/resolv.conf | grep 'nameserver'| sed 's/^.*nameserver//g' | sed 's/\"//g' | sed 's/\,//g' | sed 's/ //g')
-        if [[ -n "$record" ]] && [[ "${IP}" = "${record}" ]]; then
+        if [[ -n "${record}" ]] && [[ "${IP}" = "${record}" ]]; then
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
                 echo -e "${GREEN}DNS解锁服务器地址无变化，无需修改, current IP: ${IP}${PLAIN}"
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
                 exit
+        elif [ ! -n "${record}" ]; then
+        echo -e "${red}DNS服务器出现空白bug，开始修正{PLAIN}"
+        #chattr -i /etc/resolv.conf && echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf && chattr +i /etc/resolv.conf
+        #IP1=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
+        #echo -e "${YELLOW}解锁服务器IP获取完成，开始修改本机DNS服务器地址${PLAIN}"
+        chattr -i /etc/resolv.conf && echo -e "nameserver ${IP}\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
+        echo -e "${GREEN}错误修正完成，开始畅游Netflix吧^_^ ${PLAIN}"     
         else
-echo -e "${YELLOW}解锁服务器IP有变化，开始获取DNS服务器最新IP地址${PLAIN}"
-chattr -i /etc/resolv.conf && echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf && chattr +i /etc/resolv.conf 
-IP1=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
-echo -e "${YELLOW}解锁服务器IP获取完成，开始修改本机DNS服务器地址${PLAIN}"
-chattr -i /etc/resolv.conf && echo -e "nameserver ${IP1}\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
-echo -e "${GREEN}修改DNS服务器地址完成，开始畅游Netflix吧^_^ ${PLAIN}"
-fi
+        echo -e "${YELLOW}解锁服务器IP有变化，开始修改DNS服务器地址${PLAIN}"
+        chattr -i /etc/resolv.conf && echo -e "nameserver ${IP}\nnameserver 8.8.8.8" > /etc/resolv.conf && chattr +i /etc/resolv.conf
+        echo -e "${GREEN}修改DNS服务器地址完成，开始畅游Netflix吧^_^ ${PLAIN}"
+        fi
