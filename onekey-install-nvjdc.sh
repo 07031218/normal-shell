@@ -220,9 +220,9 @@ cat >> Config.json << EOF
   //网站公告
   "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
   ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
-  "XDDurl": "${XDD-url}",
+  "XDDurl": "${XDDurl}",
   ///xddToken
-  "XDDToken": "${XDD-Token}",
+  "XDDToken": "${XDDToken}",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": []
 
