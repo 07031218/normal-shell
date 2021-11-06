@@ -27,7 +27,7 @@ record=$(sed -n '1p' /etc/resolv.conf | grep 'nameserver'| sed 's/^.*nameserver/
                 echo -e "${GREEN}-----------------------------------------------------------------------------${PLAIN}"
                 exit
         elif [ ! -n "${record}" ]; then
-        echo -e "${red}DNS服务器出现空白bug，开始修正{PLAIN}"
+        echo -e "${red}DNS服务器出现空白bug，开始修正${PLAIN}"
         #chattr -i /etc/resolv.conf && echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" > /etc/resolv.conf && chattr +i /etc/resolv.conf
         #IP1=`dig ${URL} @223.5.5.5 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}'`
         #echo -e "${YELLOW}解锁服务器IP获取完成，开始修改本机DNS服务器地址${PLAIN}"
