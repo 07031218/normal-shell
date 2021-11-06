@@ -256,9 +256,11 @@ echo -e "${green}安装完毕,面板访问地址：http://${baseip}:${jdcport}${
 echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.me/farmercoin${plain}"
 }
 
-update_nvjdc-forxdd(){
+update_nvjdc(){
   cd /root/nvjdc
 portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
+condition=$(cat /root/nvjdc/Config.json | grep -o '"XDDurl": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
+if [ ! -n "$condition" ]; then
 read -p "是否要对接XDD，输入y或者n: " XDD && printf "\n"
 if [[ "$XDD" == "y" ]];then
 read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin : " XDDurl && printf "\n"
@@ -266,21 +268,7 @@ read -p "请输入XDD面板Token: " XDDToken && printf "\n"
 sed -i "7a \          \"XDDurl\": \"${XDDurl}\"," /root/nvjdc/Config.json
 sed -i "7a \        \"XDDToken\": \"${XDDToken}\"," /root/nvjdc/Config.json
 fi
-baseip=$(curl -s ipip.ooo)  > /dev/null
-docker rm -f nvjdc
-docker pull nolanhzy/nvjdc:latest
-docker run   --name nvjdc -p ${portinfo}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
--v "$(pwd)"/.local-chromium:/app/.local-chromium  \
--it --privileged=true  nolanhzy/nvjdc:latest
-docker update --restart=always nvjdc
-echo -e "${green}nvjdc更新完毕，脚本自动退出。${plain}"
-echo -e "${green}面板访问地址：http://${baseip}:${portinfo}${plain}"
-echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.me/farmercoin${plain}"
-exit 0
-}
-update_nvjdc(){
-  cd /root/nvjdc
-portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
+fi
 baseip=$(curl -s ipip.ooo)  > /dev/null
 docker rm -f nvjdc
 docker pull nolanhzy/nvjdc:latest
@@ -306,9 +294,8 @@ menu() {
   echo -e "\
 ${green}0.${plain} 退出脚本
 ${green}1.${plain} 安装nvjdc
-${red}2. 更新对接XDD，【提示】仅需执行一次，后续升级选择第3项${plain}
-${green}3.${plain} 升级nvjdc
-${green}4.${plain} 卸载nvjdc
+${green}2.${plain} 升级nvjdc
+${green}3.${plain} 卸载nvjdc
 "
 get_system_info
 echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virtual${Font_color_suffix} $arch ${Green_font_prefix}$kern${Font_color_suffix}
@@ -323,12 +310,9 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
     install_nvjdc
     ;;
   2)
-    update_nvjdc-forxdd
-    ;;
-  3)
     update_nvjdc
     ;;	
-  4)
+  3)
     uninstall_nvjdc
     ;;    
   *)
