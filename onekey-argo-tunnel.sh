@@ -57,7 +57,7 @@ fi
 read -p "请输入计划启用argo tunnel穿透的域名: " httpurl && printf "\n"
 read -p "请输入本地web服务的url地址: " localurl && printf "\n"
 read -p "请输入supervisor值守的任务名称: " taskname && printf "\n"
-read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如argo.conf:" filename && printf "\n"
+read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如argo.conf :" filename && printf "\n"
 
 cat >> /etc/supervisor/conf.d/${filename} << EOF
 [program:${taskname}]
@@ -81,10 +81,10 @@ echo -e "${green}你现在可以通过${httpurl}来访问本服务器穿透过�
 exit 0
 }
 uninstall_cloudflared(){
-read -p "请输入要删除的argo穿透任务对应的conf配置文件名，文件位于/etc/supervisor/conf.d目录下" filename && printf "\n"
+read -p "请输入要删除的argo穿透任务对应的conf配置文件名，文件位于/etc/supervisor/conf.d目录下 :" filename && printf "\n"
 rm /etc/supervisor/conf.d/${filename}
 /etc/init.d/supervisor restart > /dev/null
-echo -e "${green}期望删除的argo穿透任务已成功删除·········${plain}"
+echo -e "${green}指定的argo穿透任务已成功删除·········${plain}"
 sleep  3s
 copyright
 menu
