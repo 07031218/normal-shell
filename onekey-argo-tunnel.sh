@@ -124,7 +124,8 @@ ${green}2.${plain} 删除指定的argo穿透任务
   *)
   clear
     echo -e "${Error}:请输入正确数字 [0-2]"
-    sleep 5s
+    sleep 3s
+    copyright
     menu
     ;;
   esac
