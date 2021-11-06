@@ -220,9 +220,9 @@ cat >> Config.json << EOF
   //网站公告
   "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
   ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
-  "XDDurl": "${XDD-url}",
+  "XDDurl": "${XDDurl}",
   ///xddToken
-  "XDDToken": "${XDD-Token}",
+  "XDDToken": "${XDDToken}",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": []
 
@@ -265,8 +265,22 @@ read -p "是否要对接XDD，输入y或者n: " XDD && printf "\n"
 if [[ "$XDD" == "y" ]];then
 read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin : " XDDurl && printf "\n"
 read -p "请输入XDD面板Token: " XDDToken && printf "\n"
-sed -i "7a \          \"XDDurl\": \"${XDDurl}\"," /root/nvjdc/Config.json
-sed -i "7a \        \"XDDToken\": \"${XDDToken}\"," /root/nvjdc/Config.json
+cat >> Config.json << EOF
+{
+  ///浏览器最多几个网页
+  "MaxTab": "4",
+  //网站标题
+  "Title": "NolanJDCloud",
+  //网站公告
+  "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
+  ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
+  "XDDurl": "${XDDurl}",
+  ///xddToken
+  "XDDToken": "${XDDToken}",
+  ///青龙配置 注意 如果不要青龙  Config :[]
+  "Config": []
+}
+EOF
 fi
 fi
 baseip=$(curl -s ipip.ooo)  > /dev/null
