@@ -160,11 +160,10 @@ exit
 
 install_nvjdc(){
 echo -e "${red}开始进行安装,请根据命令提示操作${plain}"
-echo -e "${green}正在拉取chromium-browser-snapshots,体积100多M，请耐心等待下一步命令提示···${plain}"
 rm -rf /root/nvjdc
 mkdir nvjdc && cd nvjdc 
 mkdir -p  .local-chromium/Linux-884014 && cd .local-chromium/Linux-884014
-wget http://npm.taobao.org/mirrors/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip > /dev/null 2>&1 
+wget https://mirrors.huaweicloud.com/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip > /dev/null 2>&1 
 unzip chrome-linux.zip > /dev/null 2>&1 
 rm  -f chrome-linux.zip > /dev/null 2>&1 
 
@@ -190,8 +189,6 @@ cat >> Config.json << EOF
   "XDDurl": "${XDDurl}",
   ///xddToken
   "XDDToken": "${XDDToken}",
-  ///输出日志，启用这个功能才能抓取短信验证的错误日志，凭日志到群里反馈问题 
-  "Debug":"true",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": [
     {
@@ -226,8 +223,6 @@ cat >> Config.json << EOF
   "XDDurl": "${XDDurl}",
   ///xddToken
   "XDDToken": "${XDDToken}",
-  ///输出日志，启用这个功能才能抓取短信验证的错误日志，凭日志到群里反馈问题 
-  "Debug":"true",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": []
 
@@ -265,7 +260,6 @@ update_nvjdc(){
   cd /root/nvjdc
 portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
 condition=$(cat /root/nvjdc/Config.json | grep -o '"XDDurl": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
-Debug=$(cat /root/nvjdc/Config.json | grep -o '"Debug": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
 if [ ! -n "$condition" ]; then
 read -p "是否要对接XDD，输入y或者n: " XDD && printf "\n"
 if [[ "$XDD" == "y" ]];then
@@ -274,9 +268,6 @@ read -p "请输入XDD面板Token: " XDDToken && printf "\n"
 sed -i "7a \          \"XDDurl\": \"${XDDurl}\"," /root/nvjdc/Config.json
 sed -i "7a \        \"XDDToken\": \"${XDDToken}\"," /root/nvjdc/Config.json
 fi
-fi
-if [ ! -n "$Debug" ]; then
-sed -i "7a \          \"Debug\": \"true\"," /root/nvjdc/Config.json
 fi
 baseip=$(curl -s ipip.ooo)  > /dev/null
 docker rm -f nvjdc
@@ -334,4 +325,5 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
 }
 
 copyright
+
 menu
