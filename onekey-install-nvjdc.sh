@@ -272,10 +272,10 @@ read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/s
 read -p "请输入XDD面板Token: " XDDToken && printf "\n"
 sed -i "7a \          \"XDDurl\": \"${XDDurl}\"," /root/nvjdc/Config.json
 sed -i "7a \        \"XDDToken\": \"${XDDToken}\"," /root/nvjdc/Config.json
+fi
+fi
 if [ ! -n "$Debug" ]; then
 sed -i "7a \          \"Debug\": \"true\"," /root/nvjdc/Config.json
-fi
-fi
 fi
 baseip=$(curl -s ipip.ooo)  > /dev/null
 docker rm -f nvjdc
