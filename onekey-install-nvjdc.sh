@@ -189,6 +189,8 @@ cat >> Config.json << EOF
   "XDDurl": "${XDDurl}",
   ///xddToken
   "XDDToken": "${XDDToken}",
+  ///输出日志，启用这个功能才能抓取短信验证的错误日志，凭日志到群里反馈问题 
+  "Debug":"true",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": [
     {
@@ -223,6 +225,8 @@ cat >> Config.json << EOF
   "XDDurl": "${XDDurl}",
   ///xddToken
   "XDDToken": "${XDDToken}",
+  ///输出日志，启用这个功能才能抓取短信验证的错误日志，凭日志到群里反馈问题 
+  "Debug":"true",
   ///青龙配置 注意 如果不要青龙  Config :[]
   "Config": []
 
@@ -260,6 +264,7 @@ update_nvjdc(){
   cd /root/nvjdc
 portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
 condition=$(cat /root/nvjdc/Config.json | grep -o '"XDDurl": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
+Debug=$(cat /root/nvjdc/Config.json | grep -o '"Debug": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
 if [ ! -n "$condition" ]; then
 read -p "是否要对接XDD，输入y或者n: " XDD && printf "\n"
 if [[ "$XDD" == "y" ]];then
@@ -267,6 +272,9 @@ read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/s
 read -p "请输入XDD面板Token: " XDDToken && printf "\n"
 sed -i "7a \          \"XDDurl\": \"${XDDurl}\"," /root/nvjdc/Config.json
 sed -i "7a \        \"XDDToken\": \"${XDDToken}\"," /root/nvjdc/Config.json
+if [ ! -n "$Debug" ]; then
+sed -i "7a \          \"Debug\": \"true\"," /root/nvjdc/Config.json
+fi
 fi
 fi
 baseip=$(curl -s ipip.ooo)  > /dev/null
