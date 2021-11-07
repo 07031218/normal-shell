@@ -333,5 +333,4 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
 }
 
 copyright
-
 menu
