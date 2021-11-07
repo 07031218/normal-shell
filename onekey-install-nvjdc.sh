@@ -160,10 +160,11 @@ exit
 
 install_nvjdc(){
 echo -e "${red}开始进行安装,请根据命令提示操作${plain}"
+echo -e "${green}正在拉取chromium-browser-snapshots,体积100多M，请耐心等待下一步命令提示···${plain}"
 rm -rf /root/nvjdc
 mkdir nvjdc && cd nvjdc 
 mkdir -p  .local-chromium/Linux-884014 && cd .local-chromium/Linux-884014
-wget https://mirrors.huaweicloud.com/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip > /dev/null 2>&1 
+wget http://npm.taobao.org/mirrors/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip > /dev/null 2>&1 
 unzip chrome-linux.zip > /dev/null 2>&1 
 rm  -f chrome-linux.zip > /dev/null 2>&1 
 
