@@ -50,7 +50,4 @@ Argo Tunnel一键部署脚本
 ```shell
 bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/net/onekey-argo-tunnel.sh)
 ```
-nvjdc面板一键安装脚本
-```shell
-bash <(curl -sL https://git.io/JP7D5) 
-```
+
