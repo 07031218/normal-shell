@@ -84,7 +84,7 @@ update_supervisor(){
 read -p "请输入supervisor Web服务的用户名: " username && printf "\n"
 read -p "请输入supervisor Web服务的用户密码：" passwd && printf "\n"
 
-cat > etc/supervisor/supervisord.conf << EOF
+cat > /etc/supervisor/supervisord.conf << EOF
 
 [supervisord]
 http_port=127.0.0.1:9001  ; (alternately, ip_address:port specifies AF_INET)
@@ -113,7 +113,7 @@ files = /etc/supervisor/conf.d/*.conf
 
 EOF
 /etc/init.d/supervisor restart > /dev/null
-baseip=$(curl -s ipip.ooo) > dev/null
+baseip=$(curl -s ipip.ooo) > /dev/null
 echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:9001来进行进程守护${plain}（${green}重启、停止、启动、日志查看${plain}）${green}管理·········${plain}"
 }
 
