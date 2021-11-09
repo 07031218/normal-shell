@@ -80,6 +80,43 @@ echo -e "${green}argo tunnel部署完成，脚本退出·········${plain
 echo -e "${green}你现在可以通过${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
 }
+update_supervisor(){
+read -p "请输入supervisor Web服务的用户名: " username && printf "\n"
+read -p "请输入supervisor Web服务的用户密码：" passwd && printf "\n"
+
+cat > etc/supervisor/supervisord.conf << EOF
+
+[supervisord]
+http_port=127.0.0.1:9001  ; (alternately, ip_address:port specifies AF_INET)
+logfile=/var/log/supervisor/supervisord.log ; (main log file;default $CWD/supervisord.log)
+logfile_maxbytes=50MB       ; (max main logfile bytes b4 rotation;default 50MB)
+logfile_backups=10          ; (num of main logfile rotation backups;default 10)
+loglevel=info               ; (logging level;default info; others: debug,warn)
+pidfile=/var/run/supervisord.pid ; (supervisord pidfile;default supervisord.pid)
+nodaemon=false              ; (start in foreground if true;default false)
+minfds=1024                 ; (min. avail startup file descriptors;default 1024)
+minprocs=200                ; (min. avail process descriptors;default 200)
+
+[supervisorctl]
+serverurl=http://127.0.0.1:9001 ; use an http:// url to specify an inet socket
+username=${username}              ; should be same as http_username if set
+password=${passwd}              ; should be same as http_password if set
+prompt=mysupervisor         ; cmd line prompt (default "supervisor")
+
+[inet_http_server] 
+port=0.0.0.0:9001
+username=${username}      
+password=${passwd}
+
+[include]
+files = /etc/supervisor/conf.d/*.conf
+
+EOF
+/etc/init.d/supervisor restart > /dev/null
+baseip=$(curl -s ipip.ooo) > dev/null
+echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:9001来进行进程守护${plain}（${green}重启、停止、启动、日志查看${plain}）${green}管理·········${plain}"
+}
+
 uninstall_cloudflared(){
 read -p "请输入要删除的argo穿透任务对应的conf配置文件名，文件位于/etc/supervisor/conf.d目录下 :" filename && printf "\n"
 rm /etc/supervisor/conf.d/${filename}
@@ -108,6 +145,7 @@ menu() {
 ${green}0.${plain} 退出脚本
 ${green}1.${plain} 部署argo tunnel
 ${green}2.${plain} 删除指定的argo穿透任务
+${green}3.${plain} supervisor启用web服务
 "
 
   read -p "请输入数字 :" num
@@ -121,9 +159,12 @@ ${green}2.${plain} 删除指定的argo穿透任务
   2)
     uninstall_cloudflared
     ;;
+  3)
+    update_supervisor
+    ;;	
   *)
   clear
-    echo -e "错误:请输入正确数字 [0-2]"
+    echo -e "错误:请输入正确数字 [0-3]"
     sleep 3s
     copyright
     menu
