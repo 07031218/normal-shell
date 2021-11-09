@@ -114,7 +114,7 @@ files = /etc/supervisor/conf.d/*.conf
 EOF
 /etc/init.d/supervisor restart > /dev/null
 baseip=$(curl -s ipip.ooo) > /dev/null
-echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:9001来进行进程守护${plain}（${red}重启、停止、启动、日志查看${plain}）${green}管理·········${plain}"
+echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:9001 来进行进程守护${plain}（${red}重启、停止、启动、日志查看${plain}）${green}管理·········${plain}"
 }
 
 uninstall_cloudflared(){
