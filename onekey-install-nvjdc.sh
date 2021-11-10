@@ -160,15 +160,15 @@ exit
 
 install_nvjdc(){
 echo -e "${red}开始进行安装,请根据命令提示操作${plain}"
-rm -rf /root/nvjdc
-mkdir nvjdc && cd nvjdc 
+if [ ! -d "/root/nvjdc/.local-chromium/Linux-884014" ]; then
+mkdir nvjdc && cd nvjdc
 echo -e "${green}正在拉取chromium-browser-snapshots,体积100多M，请耐心等待下一步命令提示···${plain}"
 mkdir -p  .local-chromium/Linux-884014 && cd .local-chromium/Linux-884014
 wget http://npm.taobao.org/mirrors/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip > /dev/null 2>&1 
 unzip chrome-linux.zip > /dev/null 2>&1 
 rm  -f chrome-linux.zip > /dev/null 2>&1 
-
-cd .. && cd ..
+fi
+cd /root
 read -p "请输入计划安装的nvjdc版本号(如0.8，需要安装最新版请直接回车): " version && printf "\n"
 if [ ! -n "${version}" ];then
    ${version} = "latest"
