@@ -168,19 +168,10 @@ wget http://npm.taobao.org/mirrors/chromium-browser-snapshots/Linux_x64/884014/c
 unzip chrome-linux.zip > /dev/null 2>&1 
 rm  -f chrome-linux.zip > /dev/null 2>&1 
 fi
-cd /root
-read -p "请输入计划安装的nvjdc版本号(如0.8，需要安装最新版请直接回车): " version && printf "\n"
-if [ ! -n "${version}" ];then
-   ${version} = "latest"
-   fi
+cd /root/nvjdc
 read -p "请输入青龙服务器在web页面中显示的名称: " QLName && printf "\n"
+read -p "请输入nvjdc面板标题: " title && printf "\n"
 read -p "请输入nvjdc面板希望使用的端口号: " jdcport && printf "\n"
-read -p "请输入自动滑块次数 直接回车默认5次后手动滑块 输入0为默认手动滑块: " AutoCaptcha && printf "\n"
-if [ ! -n "$AutoCaptcha" ];then
-	"${AutoCaptcha}"="5"
-else
-	"${AutoCaptcha}"="${AutoCaptcha}"
-fi
 read -p "请输入XDD面板地址，格式如http://192.168.2.2:6666/api/login/smslogin  如不启用直接回车: " XDDurl && printf "\n"
 read -p "请输入XDD面板Token（如不启用直接回车）: " XDDToken && printf "\n"
 read -p "nvjdc是否对接青龙，输入y或者n " jdcqinglong && printf "\n"
@@ -188,16 +179,14 @@ read -p "nvjdc是否对接青龙，输入y或者n " jdcqinglong && printf "\n"
 read -p "请输入青龙OpenApi Client ID: " ClientID && printf "\n"
 read -p "请输入青龙OpenApi Client Secret: " ClientSecret && printf "\n"
 read -p "请输入青龙服务器的url地址（类似http://192.168.2.2:5700）: " QLurl && printf "\n"
-cat >> Config.json << EOF
+cat > /root/nvjdc/Config.json << EOF
 {
   ///浏览器最多几个网页
   "MaxTab": "4",
   //网站标题
-  "Title": "NolanJDCloud",
+  "Title": "${title}",
   //网站公告
   "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
-  ///自动滑块次数5次 5次后手动滑块 可设置为0默认手动滑块
-  "AutoCaptchaCount": "${AutoCaptcha}",
   ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
   "XDDurl": "${XDDurl}",
   ///xddToken
@@ -224,16 +213,14 @@ cat >> Config.json << EOF
 }
 EOF
 else
-cat >> Config.json << EOF
+cat > /root/nvjdc/Config.json << EOF
 {
   ///浏览器最多几个网页
   "MaxTab": "4",
   //网站标题
-  "Title": "NolanJDCloud",
+  "Title": "${title}",
   //网站公告
   "Announcement": "本项目脚本收集于互联网。为了您的财产安全，请关闭京东免密支付。",
-  ///自动滑块次数5次 5次后手动滑块 可设置为0默认手动滑块
-  "AutoCaptchaCount": "${AutoCaptcha}",
   ///XDD PLUS Url  http://IP地址:端口/api/login/smslogin
   "XDDurl": "${XDDurl}",
   ///xddToken
@@ -243,6 +230,18 @@ cat >> Config.json << EOF
 
 }
 EOF
+fi
+read -p "请输入自动滑块次数 直接回车默认5次后手动滑块 输入0为默认手动滑块: " AutoCaptcha && printf "\n"
+	if [ ! -n "$AutoCaptcha" ];then
+    sed -i "5a \        \"AutoCaptchaCount\": \"5\"," /root/nvjdc/Config.json
+else
+    sed -i "5a \        \"AutoCaptchaCount\": \"${AutoCaptcha}\"," /root/nvjdc/Config.json
+fi
+read -p "请输入要安装的nvjdc版本，如安装最新版直接回车: " version && printf "\n"
+	if [ ! -n "${version}" ];then
+    version1=latest 
+else
+    version1=${version}
 fi
 
 
@@ -255,14 +254,14 @@ fi
 
 #拉取nvjdc镜像
 echo -e  "${green}开始拉取nvjdc镜像文件，nvjdc镜像比较大，请耐心等待${plain}"
-docker pull nolanhzy/nvjdc:${version}
+docker pull nolanhzy/nvjdc:${version1}
 
 
 #创建并启动nvjdc容器
 echo -e "${green}开始创建nvjdc容器${plain}"
 docker run   --name nvjdc -p ${jdcport}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
 -v "$(pwd)"/.local-chromium:/app/.local-chromium  \
--it --privileged=true  nolanhzy/nvjdc:${version}
+-it --privileged=true  nolanhzy/nvjdc:${version1}
 docker update --restart=always nvjdc
 
 baseip=$(curl -s ipip.ooo)  > /dev/null
@@ -309,9 +308,8 @@ exit 0
 
 uninstall_nvjdc(){
 docker rm -f nvjdc
-docker rmi -f nolanhzy/nvjdc:latest
 rm -rf /root/nvjdc
-echo -e "${green}nvjdc面板已卸载，脚本自动退出。${plain}"
+echo -e "${green}nvjdc面板已卸载，脚本自动退出，请手动删除nvjdc的镜像。${plain}"
 exit 0
 }
 
