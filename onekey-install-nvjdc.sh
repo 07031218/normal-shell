@@ -169,6 +169,10 @@ unzip chrome-linux.zip > /dev/null 2>&1
 rm  -f chrome-linux.zip > /dev/null 2>&1 
 
 cd .. && cd ..
+read -p "请输入计划安装的nvjdc版本号(如0.8，需要安装最新版请直接回车): " version && printf "\n"
+if [ ! -n "${version}" ];then
+   ${version} = "latest"
+   fi
 read -p "请输入青龙服务器在web页面中显示的名称: " QLName && printf "\n"
 read -p "请输入nvjdc面板希望使用的端口号: " jdcport && printf "\n"
 read -p "请输入自动滑块次数 直接回车默认5次后手动滑块 输入0为默认手动滑块: " AutoCaptcha && printf "\n"
@@ -251,14 +255,14 @@ fi
 
 #拉取nvjdc镜像
 echo -e  "${green}开始拉取nvjdc镜像文件，nvjdc镜像比较大，请耐心等待${plain}"
-docker pull nolanhzy/nvjdc:latest
+docker pull nolanhzy/nvjdc:${version}
 
 
 #创建并启动nvjdc容器
 echo -e "${green}开始创建nvjdc容器${plain}"
 docker run   --name nvjdc -p ${jdcport}:80 -d  -v  "$(pwd)"/Config.json:/app/Config/Config.json:ro \
 -v "$(pwd)"/.local-chromium:/app/.local-chromium  \
--it --privileged=true  nolanhzy/nvjdc:latest
+-it --privileged=true  nolanhzy/nvjdc:${version}
 docker update --restart=always nvjdc
 
 baseip=$(curl -s ipip.ooo)  > /dev/null
