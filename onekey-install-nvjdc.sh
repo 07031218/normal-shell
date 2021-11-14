@@ -274,6 +274,7 @@ echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.
 }
 
 update_nvjdc(){
+  portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
   docker stop nvjdc
   apt install git -y || yum install git -y > /dev/null 
   if [ ! -d "/root/nolanjdc" ];then
@@ -291,7 +292,6 @@ if [ ! -d "/root/nvjdc/.local-chromium" ];then
 else
   cd /root/nolanjdc &&  mv /root/nvjdc/.local-chromium /root/nolanjdc/.local-chromium
 fi
-portinfo=$(docker port nvjdc | head -1  | sed 's/ //g' | sed 's/80\/tcp->0.0.0.0://g')
 condition=$(cat /root/nolanjdc/Config/Config.json | grep -o '"XDDurl": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
 AutoCaptcha1=$(cat /root/nolanjdc/Config/Config.json | grep -o '"AutoCaptchaCount": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
 if [ ! -n "$condition" ]; then
