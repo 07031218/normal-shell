@@ -319,7 +319,7 @@ baseip=$(curl -s ipip.ooo)  > /dev/null
 #-v /etc/localtime:/etc/localtime:ro \
 #-it --privileged=true  nolanhzy/nvjdc:latest
 #docker update --restart=always nvjdc
-docker start nvjdc
+docker restart nvjdc
 echo -e "${green}nvjdc更新完毕，脚本自动退出。${plain}"
 echo -e "${green}面板访问地址：http://${baseip}:${portinfo}${plain}"
 echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.me/farmercoin${plain}"
