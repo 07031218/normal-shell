@@ -312,7 +312,7 @@ else
     sed -i "5a \        \"AutoCaptchaCount\": \"${AutoCaptcha}\"," /root/nolanjdc/Config/Config.json
 fi
 fi
-#baseip=$(curl -s ipip.ooo)  > /dev/null
+baseip=$(curl -s ipip.ooo)  > /dev/null
 
 #docker pull nolanhzy/nvjdc:latest
 #docker run   --name nvjdc -p ${portinfo}:80 -d -v  "$(pwd)":/app \
