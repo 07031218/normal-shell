@@ -173,6 +173,7 @@ rm  -f chrome-linux.zip
 fi
 cd /root/nolanjdc
 mkdir /root/nolanjdc/Config
+clear
 read -p "请输入青龙服务器在web页面中显示的名称: " QLName && printf "\n"
 read -p "请输入nvjdc面板标题: " title && printf "\n"
 read -p "请输入nvjdc面板希望使用的端口号: " jdcport && printf "\n"
