@@ -240,7 +240,7 @@ cat > /root/nolanjdc/Config/Config.json << EOF
 EOF
 fi
 read -p "请输入自动滑块次数 直接回车默认5次后手动滑块 输入0为默认手动滑块: " AutoCaptcha && printf "\n"
-	if [ ! -n "$AutoCaptcha" ];then
+  if [ ! -n "$AutoCaptcha" ];then
     sed -i "7a \        \"AutoCaptchaCount\": \"5\"," /root/nolanjdc/Config/Config.json
 else
     sed -i "7a \        \"AutoCaptchaCount\": \"${AutoCaptcha}\"," /root/nolanjdc/Config/Config.json
@@ -289,8 +289,14 @@ fi
 fi
 if [ ! -d "/root/nvjdc/.local-chromium" ];then
   cd /root/nolanjdc
-else
-  cd /root/nolanjdc &&  mv /root/nvjdc/.local-chromium /root/nolanjdc/.local-chromium
+  else  
+  cd /root/nolanjdc && mkdir -p /root/nolanjdc/.local-chromium &&  mv /root/nvjdc/.local-chromium /root/nolanjdc/.local-chromium
+fi
+if [ ! -d "/root/nolanjdc/.local-chromium" ];then
+  mkdir -p /root/nolanjdc/.local-chromium/Linux-884014  && cd /root/nolanjdc/.local-chromium/Linux-884014
+  wget http://npm.taobao.org/mirrors/chromium-browser-snapshots/Linux_x64/884014/chrome-linux.zip
+  unzip chrome-linux.zip
+  rm  -f chrome-linux.zip
 fi
 condition=$(cat /root/nolanjdc/Config/Config.json | grep -o '"XDDurl": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
 AutoCaptcha1=$(cat /root/nolanjdc/Config/Config.json | grep -o '"AutoCaptchaCount": .*' | awk -F":" '{print $1}' | sed 's/\"//g')
@@ -305,8 +311,8 @@ fi
 fi
 
 if [ ! -n "$AutoCaptcha1" ];then
-	read -p "请输入自动滑块次数 直接回车默认5次后手动滑块 输入0为默认手动滑块: " AutoCaptcha && printf "\n"
-	if [ ! -n "$AutoCaptcha" ];then
+  read -p "请输入自动滑块次数 直接回车默认5次后手动滑块 输入0为默认手动滑块: " AutoCaptcha && printf "\n"
+  if [ ! -n "$AutoCaptcha" ];then
     sed -i "5a \        \"AutoCaptchaCount\": \"5\"," /root/nolanjdc/Config/Config.json
 else
     sed -i "5a \        \"AutoCaptchaCount\": \"${AutoCaptcha}\"," /root/nolanjdc/Config/Config.json
@@ -341,7 +347,7 @@ ${green}2.${plain} 升级nvjdc
 ${green}3.${plain} 卸载nvjdc
 "
 get_system_info
-echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virtual${Font_color_suffix} $arch ${Green_font_prefix}$kern${Font_color_suffix}
+echo -e "当前系统信息: ${green}$opsy $virtual $arch $kern${plain}
 "
 
   read -p "请输入数字 :" num
@@ -354,7 +360,7 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
     ;;
   2)
     update_nvjdc
-    ;;	
+    ;;  
   3)
     uninstall_nvjdc
     ;;    
@@ -366,7 +372,5 @@ echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virt
     ;;
   esac
 }
-
 copyright
-
 menu
