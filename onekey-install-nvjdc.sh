@@ -160,9 +160,8 @@ exit
 
 install_nvjdc(){
 echo -e "${red}开始进行安装,请根据命令提示操作${plain}"
-if [ ! -d "/root/nolanjdc" ]; then
-mkdir /root/nolanjdc
-fi
+apt install git -y || yum install git -y > /dev/null 
+git clone https://ghproxy.com/https://github.com/NolanHzy/nvjdcdocker.git /root/nolanjdc
 if [ ! -d "/root/nolanjdc/.local-chromium/Linux-884014" ]; then
 cd nolanjdc
 echo -e "${green}正在拉取chromium-browser-snapshots,体积100多M，请耐心等待下一步命令提示···${plain}"
