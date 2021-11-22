@@ -11,7 +11,7 @@ PLAIN='\033[0m'
 #安装dig命令
 yum install bind-utils -y > /dev/null 2>&1 || apt-get install dnsutils  -y > /dev/null 2>&1
 #检测dig命令是否安装成功
-hash dig 2> /dev/null || { echo -e >&2 "${RED}出现异常 dnsutils 没有安装成功，脚本无法继续，将自动退出...${PLAIN}"; exit 1; }
+#hash dig 2> /dev/null || { echo -e >&2 "${RED}出现异常 dnsutils 没有安装成功，脚本无法继续，将自动退出...${PLAIN}"; exit 1; }
 #定义变量
 URL=nf.20120714.xyz
 #IP=`ping ${URL} -c 1 |awk 'NR==2 {print $4}' |awk -F ':' '{print $1}'`
