@@ -77,7 +77,7 @@ gclone_install
 docker_install
 
 # 下载配置资源文件
-download_res
+#download_res
 
 # 启动Docker Compose
 #echo -e "\n| Docker Compose Starting ... "
