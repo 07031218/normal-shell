@@ -50,4 +50,12 @@ Argo Tunnel一键部署脚本
 ```shell
 bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/net/onekey-argo-tunnel.sh)
 ```
+plex一键部署脚本 for amd64
+```shell
+wget https://github.com/07031218/normal-shell/raw/main/plex/plex && chmod 777 plex && cp plex /usr/bin && plex
+```
+plex一键部署脚本 for arm64
+```shell
+wget https://github.com/07031218/normal-shell/raw/main/plex/plex-arm64 -O plex && chmod 777 plex && cp plex /usr/bin && plex
+```
 
