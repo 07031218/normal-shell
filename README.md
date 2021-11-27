@@ -52,7 +52,7 @@ bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/net/onek
 ```
 plex一键部署脚本 for amd64
 ```shell
-wget https://github.com/07031218/normal-shell/raw/main/plex/plex && chmod 777 plex && cp plex /usr/bin && plex
+wget https://github.com/07031218/normal-shell/raw/main/plex/plex -O plex && chmod 777 plex && cp plex /usr/bin && plex
 ```
 plex一键部署脚本 for arm64
 ```shell
