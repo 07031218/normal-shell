@@ -29,7 +29,7 @@ TIME() {
 echo
 echo
 echo
-Time r "本脚本基于FlechazoPh大佬脚本修改而来，感谢FlechazoPh的贡献·····"
+TIME r "本脚本基于FlechazoPh大佬脚本修改而来，感谢FlechazoPh的贡献·····"
 TIME l "安装依赖..."
 echo
 TIME y "安装依赖需要时间，请耐心等待!"
