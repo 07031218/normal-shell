@@ -30,6 +30,14 @@ checkos(){
 }
 checkos 
 
+CountRunTimes(){
+RunTimes=$(curl -s --max-time 10 "https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fghproxy.com%2Fhttps%3A%2F%2Fraw.githubusercontent.com%2F07031218%2Fnormal-shell%2Fmain%2Fonekey-install-nvjdc.sh&count_bg=%2379C83D&title_bg=%2300B1FF&icon=&icon_color=%23E7E7E7&title=script+run+times&edge_flat=false" > ~/couting.txt)
+TodayRunTimes=$(cat ~/couting.txt | tail -3 | head -n 1 | awk '{print $5}')
+TotalRunTimes=$(cat ~/couting.txt | tail -3 | head -n 1 | awk '{print $7}')
+rm -rf ~/couting.txt
+}
+
+CountRunTimes
 checkCPU(){
   CPUArch=$(uname -m)
   if [[ "$CPUArch" == "aarch64" ]];then
@@ -271,6 +279,7 @@ baseip=$(curl -s ipip.ooo)  > /dev/null
 
 echo -e "${green}安装完毕,面板访问地址：http://${baseip}:${jdcport}${plain}"
 echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.me/farmercoin${plain}"
+echo -e "${green}检测脚本当天运行次数：${TodayRunTimes}; 共计运行次数：${TotalRunTimes} ${plain}"
 }
 
 update_nvjdc(){
@@ -329,6 +338,7 @@ docker restart nvjdc
 echo -e "${green}nvjdc更新完毕，脚本自动退出。${plain}"
 echo -e "${green}面板访问地址：http://${baseip}:${portinfo}${plain}"
 echo -e "${green}京豆羊毛脚本仓库监控频道：${plain}${red}https://t.me/farmercoin${plain}"
+echo -e "${green}检测脚本当天运行次数：${TodayRunTimes}; 共计运行次数：${TotalRunTimes} ${plain}"
 exit 0
 }
 
@@ -336,6 +346,7 @@ uninstall_nvjdc(){
 docker rm -f nvjdc
 rm -rf /root/nolanjdc
 echo -e "${green}nvjdc面板已卸载，脚本自动退出，请手动删除nvjdc的镜像。${plain}"
+echo -e "${green}检测脚本当天运行次数：${TodayRunTimes}; 共计运行次数：${TotalRunTimes} ${plain}"
 exit 0
 }
 
