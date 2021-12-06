@@ -58,4 +58,7 @@ plex一键部署脚本 for arm64
 ```shell
 wget https://github.com/07031218/normal-shell/raw/main/plex/plex-arm64 -O plex && chmod 777 plex && cp plex /usr/bin && plex
 ```
-
+一键安装nginx并部署签发SSL
+```shell
+bash <(curl -s https://raw.githubusercontent.com/07031218/one-key-for-let-s-Encrypt/main/run.sh) 
+```
