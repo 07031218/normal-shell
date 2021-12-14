@@ -17,7 +17,7 @@ URL=armsgp.20120714.xyz
 #IP=`ping ${URL} -c 1 |awk 'NR==2 {print $4}' |awk -F ':' '{print $1}'`
 #IP=`ping ${URL} -c 1 |awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp"`
 #dig命令获取域名的ip地址
-IP=$(ping nf.20120714.xyz -c 1 |awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp")
+IP=$(ping armsgp.20120714.xyz -c 1 |awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp")
 
 echo -e "${BLUE}当前解锁服务器IP地址是 ${IP} ${PLAIN}"
 record=$(sed -n '1p' /etc/resolv.conf | grep 'nameserver'| sed 's/^.*nameserver//g' | sed 's/\"//g' | sed 's/\,//g' | sed 's/ //g')
