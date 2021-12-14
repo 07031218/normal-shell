@@ -145,7 +145,7 @@ menu() {
 ${green}0.${plain} 退出脚本
 ${green}1.${plain} 部署argo tunnel
 ${green}2.${plain} 删除指定的argo穿透任务
-${green}3.${plain} supervisor启用web服务
+${green}3.${plain} 开启Argo Tunnel进程守护
 "
 
   read -p "请输入数字 :" num
