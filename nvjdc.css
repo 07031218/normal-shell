@@ -1,0 +1,335 @@
+* { 
+  /*
+     _    ___  ____    _    ____ ___  ____  _____ 
+    / \  / _ \| __ )  / \  / ___/ _ \|  _ \| ____|
+   / _ \| | | |  _ \ / _ \| |  | | | | |_) |  _|  
+  / ___ \ |_| | |_) / ___ \ |__| |_| |  _ <| |___ 
+ /_/   \_\___/|____/_/   \_\____\___/|_| \_\_____|
+                                                  
+  Author: aobacore
+  Version: 1.1
+  Date: 15:22:32, November 8, 2021
+  This CSS is only for personal use. 
+  It may be revoked or modified without notice at any time. Please be informed.
+  Character drawing generation: http://patorjk.com/software/taag Style: Standard
+  */  
+  
+  /*Baidu HM*/ 
+  var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?d7aaea180f9da3780cf1ef0c1036b7b4";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();                     
+
+}   
+    .card {
+    background: #fff;
+    background-size: contain;
+    text-align: center;
+    padding: 1em;
+  }
+  
+  .card h1 {
+    font-size: 22px;
+    margin: -20px auto 0;
+    letter-spacing: 1px;
+  }
+  .card h2 {
+    font-size: 18px;
+    color: #DC143C;
+    margin: 5px auto 0;
+    letter-spacing: 1px;
+  }
+  .card h3 {
+    font-size: 22px;
+    margin: 5px auto 0;
+    letter-spacing: 1px;
+  }
+  .card red20 {
+    margin: auto;
+    color: #da0000;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card red18 {
+    margin: auto;
+    color: #da0000;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card red16 {
+    margin: auto;
+    color: #da0000;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card rde14 {
+    margin: auto;
+    color: #da0000;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card blue20 {
+    margin: auto;
+    color: #1E90FF;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card blue18 {
+    margin: auto;
+    color: #1E90FF;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card blue16 {
+    margin: auto;
+    color: #1E90FF;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card blue14 {
+    margin: auto;
+    color: #1E90FF;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card yellow20 {
+    margin: auto;
+    color: #FFD700;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card yellow18 {
+    margin: auto;
+    color: #FFD700;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card yellow16 {
+    margin: auto;
+    color: #FFD700;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card yellow14 {
+    margin: auto;
+    color: #FFD700;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card green20 {
+    margin: auto;
+    color: #00e626;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card green18 {
+    margin: auto;
+    color: #00e626;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card green16 {
+    margin: auto;
+    color: #00e626;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card green14 {
+    margin: auto;
+    color: #00e626;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card orange20 {
+    margin: auto;
+    color: #ff8800;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card orange18 {
+    margin: auto;
+    color: #ff8800;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card orange16 {
+    margin: auto;
+    color: #ff8800;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card orange14 {
+    margin: auto;
+    color: #ff8800;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card LightCoral20 {
+    margin: auto;
+    color: #F08080;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card LightCoral18 {
+    margin: auto;
+    color: #F08080;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card LightCoral16 {
+    margin: auto;
+    color: #F08080;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card LightCoral14 {
+    margin: auto;
+    color: #F08080;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card DimGray20 {
+    margin: auto;
+    color: #696969;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card DimGray18 {
+    margin: auto;
+    color: #696969;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card DimGray16 {
+    margin: auto;
+    color: #696969;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card DimGray14 {
+    margin: auto;
+    color: #696969;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card Violet20 {
+    margin: auto;
+    color: #EE82EE;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card Violet18 {
+    margin: auto;
+    color: #EE82EE;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card Violet16 {
+    margin: auto;
+    color: #EE82EE;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card Violet14 {
+    margin: auto;
+    color: #EE82EE;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card Pink20 {
+    margin: auto;
+    color: #FFC0CB;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card Pink18 {
+    margin: auto;
+    color: #FFC0CB;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card Pink16 {
+    margin: auto;
+    color: #FFC0CB;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card Pink14 {
+    margin: auto;
+    color: #FFC0CB;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card Crimson20 {
+    margin: auto;
+    color: #DC143C;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card Crimson18 {
+    margin: auto;
+    color: #DC143C;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card Crimson16 {
+    margin: auto;
+    color: #DC143C;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card Crimson14 {
+    margin: auto;
+    color: #DC143C;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card text20 {
+    margin: auto;
+    color: #000000;
+    font-weight: 300;
+    font-size: 20px;
+  }
+  .card text18 {
+    margin: auto;
+    color: #000000;
+    font-weight: 300;
+    font-size: 18px;
+  }
+  .card text16 {
+    margin: auto;
+    color: #000000;
+    font-weight: 300;
+    font-size: 16px;
+  }
+  .card text14 {
+    margin: auto;
+    color: #000000;
+    font-weight: 300;
+    font-size: 14px;
+  }
+  .card .button {
+    display: block;
+    text-decoration: none;
+    background: #666CD9;
+    color: #f9f9f9;
+    padding: 6px;
+    border: none;
+    border-radius: 25px;
+    margin-top: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 200px;
+    transition: 0.2s;
+  }
+  .card .button span {
+    font-size: 20px;
+    line-height: 1;
+    vertical-align: top;
+  }
+  .card .button:hover {
+    background: #5D4AD9;
+  }
