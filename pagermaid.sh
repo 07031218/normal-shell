@@ -16,7 +16,7 @@ fi
 CWD=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 [ -e "${CWD}/scripts/globals" ] && . ${CWD}/scripts/globals
 CountRunTimes(){
-RunTimes=$(curl -s --max-time 10 "https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=http%3A%2F%2Faria2.xun-da.com%2FautoBestTrace.sh&count_bg=%2379C83D&title_bg=%2300B1FF&icon=&icon_color=%23E7E7E7&title=script+run+times&edge_flat=false" > ~/couting.txt)
+RunTimes=$(curl -s --max-time 10 "https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fraw.githubusercontent.com%2F07031218%2Fnormal-shell%2Fmain%2Fpagermaid.sh&count_bg=%2379C83D&title_bg=%2300B1FF&icon=&icon_color=%23E7E7E7&title=script+run+times&edge_flat=false" > ~/couting.txt)
 TodayRunTimes=$(cat ~/couting.txt | tail -3 | head -n 1 | awk '{print $5}')
 TotalRunTimes=$(cat ~/couting.txt | tail -3 | head -n 1 | awk '{print $7}')
 rm -rf ~/couting.txt
@@ -90,4 +90,4 @@ else
 	exit 0
 fi
 }
-install_pagermaid 
+install_pagermaid
