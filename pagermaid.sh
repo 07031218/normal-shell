@@ -32,8 +32,7 @@ ${green}#                                                         #${plain}
 ${green}###########################################################${plain}"
 }
 Goodbye(){
-    echo -e "================================================"
-    echo -e "${red}该脚本执行密码发布地址:${plain} ${blue}https://t.me/beeforbean ${plain}"    
+    echo -e "================================================" 
     echo -e "${green}脚本执行已结束，感谢使用此脚本 ${plain}";
     echo -e "${yellow}检测脚本当天运行次数：${plain}${red}${TodayRunTimes}次; ${plain}${yellow}脚本共计运行次数：${plain}${red}${TotalRunTimes}次 ${plain}"
     echo -e "================================================"
