@@ -62,8 +62,8 @@ install_pagermaid(){
 	read apiid
 	echo -e "${yellow}请输入TG的api_hash:${plain}"
 	read apihash
-	sed -i 's/api_key: \"\"/api_key: \"${apiid}\"/g' /var/lib/pagermaid/config.yml
-	sed -i 's/api_key: \"\"/api_hash: \"${apihash}\"/g' /var/lib/pagermaid/config.yml
+	sed -i 's/ID_HERE/$apiid/g' /var/lib/pagermaid/config.yml
+	sed -i 's/HASH_HERE/$apihash/g' /var/lib/pagermaid/config.yml
 	echo -e "${yellow}5秒后将首次启动pagermaid，请按照命令行提示完成账号的首次登录操作以获取session···${plain}"
 	echo -e "${yellow}获取session成功后按Ctrl+C退出程序，来进行下一步，对pagermaid进行开机自启动设置···${plain}"
 	sleep 3s
