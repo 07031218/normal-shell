@@ -37,11 +37,78 @@ Goodbye(){
     echo -e "${yellow}检测脚本当天运行次数：${plain}${red}${TodayRunTimes}次; ${plain}${yellow}脚本共计运行次数：${plain}${red}${TotalRunTimes}次 ${plain}"
     echo -e "================================================"
 }
+login_screen() {
+    screen -S userbot -X quit >>/dev/null 2>&1
+    screen -dmS userbot
+    sleep 1
+    screen -x -S userbot -p 0 -X stuff "cd /var/lib/pagermaid && python3 -m pagermaid"
+    screen -x -S userbot -p 0 -X stuff $'\n'
+    sleep 3
+    if [ "$(ps -def | grep [p]agermaid | grep -v grep)" == "" ]; then
+        echo "PagerMaid 运行时发生错误，错误信息："
+        cd /var/lib/pagermaid && python3 -m pagermaid >err.log
+        cat err.log
+        screen -S userbot -X quit >>/dev/null 2>&1
+        exit 1
+    fi
+    while :; do
+        read -p "请输入您的 Telegram 手机号码（带国际区号 如 +8618888888888）: " phonenum
+
+        if [ "$phonenum" == "" ]; then
+            continue
+        fi
+
+        screen -x -S userbot -p 0 -X stuff "$phonenum"
+        screen -x -S userbot -p 0 -X stuff $'\n'
+
+        sleep 2
+        
+        if [ "$(ps -def | grep [p]agermaid | grep -v grep)" == "" ]; then
+            echo "手机号输入错误！请确认您是否带了区号（中国号码为 +86 如 +8618888888888）"
+            screen -x -S userbot -p 0 -X stuff "cd /var/lib/pagermaid && python3 -m pagermaid"
+            screen -x -S userbot -p 0 -X stuff $'\n'
+            continue
+        fi
+
+        sleep 1
+        if [ "$(ps -def | grep [p]agermaid | grep -v grep)" == "" ]; then
+            echo "PagerMaid 运行时发生错误，可能是因为发送验证码失败，请检查您的 API_ID 和 API_HASH"
+            exit 1
+        fi
+
+        read -p "请输入您的登录验证码: " checknum
+        if [ "$checknum" == "" ]; then
+            read_checknum
+            break
+        fi
+
+        read -p "请再次输入您的登录验证码：" checknum2
+        if [ "$checknum" != "$checknum2" ]; then
+            echo "两次验证码不一致！请重新输入您的登录验证码"
+            read_checknum
+            break	
+        else
+            screen -x -S userbot -p 0 -X stuff "$checknum"
+            screen -x -S userbot -p 0 -X stuff $'\n'
+        fi
+        read -p "有没有二次登录验证码？ [Y/n]" choi
+        if [ "$choi" == "y" ] || [ "$choi" == "Y" ]; then
+            read -p "请输入您的二次登录验证码: " twotimepwd
+            screen -x -S userbot -p 0 -X stuff "$twotimepwd"
+            screen -x -S userbot -p 0 -X stuff $'\n'
+            break
+        else
+        	break
+        fi
+    done
+    sleep 5
+    screen -S userbot -X quit >>/dev/null 2>&1
+}
 install_pagermaid(){
 	copyright
 	echo -e "${red}即将开始安装pagermaid，${plain}${red}本脚本仅支持Debian 11${plain}"
 	echo -e "${blue}脚本基于ARM64版本撰写，未测试AMD64,理论同样可行。${plain}"
-	echo -e "是否继续执行脚本，如需要继续请输入y，如不继续，请按Ctrl+C退出脚本···${plain}"
+	echo -e -n "${green}是否继续执行脚本，如需要继续请输入y，如不继续，请按Ctrl+C退出脚本···${plain}"
 	read go
 	if [[ "$go" == "y" ]] || [[ "$go" == "Y" ]];then
 
@@ -58,16 +125,16 @@ install_pagermaid(){
 	sleep 10s
 	apt-get install imagemagick -y && apt-get install software-properties-common -y && apt-get update && sudo apt-get install neofetch -y && apt-get install libzbar-dev -y && sudo apt-get install tesseract-ocr tesseract-ocr-all -y &&  apt-get install redis-server -y && pip3 install -r requirements.txt && cp config.gen.yml config.yml
 	echo -e "${red}开始配置TG的api_id和api_hash，请按照命令行提示操作···${plain}"
-	echo -e "${yellow}请输入TG的api_id:${plain}"
-	read apiid
-	echo -e "${yellow}请输入TG的api_hash:${plain}"
-	read apihash
-	sed -i 's/ID_HERE/$apiid/g' /var/lib/pagermaid/config.yml
-	sed -i 's/HASH_HERE/$apihash/g' /var/lib/pagermaid/config.yml
+    echo -e "${yellow}请输入TG的api_id:${plain}"
+    read apiid
+    echo -e "${yellow}请输入TG的api_hash:${plain}"
+    read apihash
+    sed -i "s/ID_HERE/$apiid/" /var/lib/pagermaid/config.yml
+    sed -i "s/HASH_HERE/$apihash/" /var/lib/pagermaid/config.yml
 	echo -e "${yellow}5秒后将首次启动pagermaid，请按照命令行提示完成账号的首次登录操作以获取session···${plain}"
-	echo -e "${yellow}获取session成功后按Ctrl+C退出程序，来进行下一步，对pagermaid进行开机自启动设置···${plain}"
 	sleep 3s
-	python3 -m pagermaid
+	login_screen
+	echo -e "${yellow}开始对pagermaid进行开机自启动设置···${plain}"	
 	cat <<'TEXT' > /etc/systemd/system/pagermaid.service
 [Unit]
 Description=PagerMaid-Modify telegram utility daemon
