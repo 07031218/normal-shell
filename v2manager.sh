@@ -90,15 +90,19 @@ install_v2raym(){
   echo -e "${yellowb}开始下载v2ray···${end}"
   if [[ $arch == "linux_arm64" ]]; then
     wget "$url_cdn/https://github.com/v2fly/v2ray-core/releases/download/v4.31.0/v2ray-linux-arm64-v8a.zip" && unzip v2ray-linux-arm64-v8a.zip
+    echo -e "${yellowb}v2ray下载完成，开始进行v2ray和v2raym程序部署···${end}"
+      mkdir -p /usr/bin/v2ray/ && cp /root/v2ray/v2ctl /usr/bin/v2ray/ && cp /root/v2ray/v2ray /usr/bin/v2ray/ && cp /root/v2ray/geosite.dat /usr/bin/v2ray/
+  iptables -F && $InstallMethod install supervisor -y && rm -f /etc/supervisor/supervisord.conf && cd /etc/supervisor && wget http://aria2.xun-da.com/supervisord.conf && cd /etc/supervisor/conf.d && wget http://aria2.xun-da.com/v2manager.conf  && service supervisor restart &&  chmod +x /usr/local/bin/v2ray && chmod +x /usr/local/bin/v2ctl  && service supervisor restart 
+  echo -e "${yellowb}程序部署完成。。。${end}"
   elif [[ $arch == "linux_amd64" ]]; then
     wget "$url_cdn/https://github.com/v2fly/v2ray-core/releases/download/v4.31.0/v2ray-linux-64.zip" && unzip v2ray-linux-64.zip
+    echo -e "${yellowb}v2ray下载完成，开始进行v2ray和v2raym程序部署···${end}"
+    cp /root/v2ray/v2ctl /usr/local/bin/ && cp /root/v2ray/v2ray /usr/local/bin/ && cp /root/v2ray/geosite.dat /usr/local/bin/
+  iptables -F && $InstallMethod install supervisor -y && rm -f /etc/supervisor/supervisord.conf && cd /etc/supervisor && wget http://aria2.xun-da.com/supervisord.conf && cd /etc/supervisor/conf.d && wget http://aria2.xun-da.com/v2manager.conf  && service supervisor restart &&  chmod +x /usr/local/bin/v2ray && chmod +x /usr/local/bin/v2ctl  && service supervisor restart 
+  echo -e "${yellowb}程序部署完成。。。${end}"
   else
     echo -e "${red}不支持当前系统架构，程序自动退出${end}" && exit 1
   fi
-  echo -e "${yellowb}v2ray下载完成，开始进行v2ray和v2raym程序部署···${end}"
-  cp /root/v2ray/v2ctl /usr/local/bin/ && cp /root/v2ray/v2ray /usr/local/bin/ && cp /root/v2ray/geosite.dat /usr/local/bin/
-  iptables -F && $InstallMethod install supervisor -y && rm -f /etc/supervisor/supervisord.conf && cd /etc/supervisor && wget http://aria2.xun-da.com/supervisord.conf && cd /etc/supervisor/conf.d && wget http://aria2.xun-da.com/v2manager.conf  && service supervisor restart &&  chmod +x /usr/local/bin/v2ray && chmod +x /usr/local/bin/v2ctl  && service supervisor restart 
-  echo -e "${yellowb}程序部署完成。。。${end}"
 }
 uninstall_v2raym(){
   echo -n -e "${red}注意：即将开始卸载v2manager····,请确认是否继续，[Y/N]:${end}"
