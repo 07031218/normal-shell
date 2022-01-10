@@ -1,0 +1,95 @@
+{
+  "api": {
+    "services": [
+      "HandlerService",
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "stats": {
+  },
+  "inbound": {
+    "port": 443,
+    "protocol": "vmess",
+    "settings": {
+      "clients": []
+    },
+  "streamSettings": {
+    "network": "ws",
+    "security": "tls",
+    "tlsSettings": {
+      "allowInsecure": false,
+      "certificates": [
+        {
+          "certificateFile": "/root/V2Ray/v2ray.crt",
+          "keyFile": "/root/V2Ray/v2ray.key"
+        }
+      ]
+    },
+    "wsSettings": {
+      "path": "/v2"
+    }
+  },                                                                                                                                                       
+    "tag": "proxy"                                                                                                                                                  
+  },                                                                                                                                                                
+  "inboundDetour": [{                                                                                                                                               
+    "listen": "0.0.0.0",                                                                                                                                            
+    "port": 8301,                                                                                                                                                   
+    "protocol": "dokodemo-door",                                                                                                                                    
+    "settings": {                                                                                                                                                   
+      "address": "0.0.0.0"                                                                                                                                          
+    },                                                                                                                                                              
+    "tag": "api"                                                                                                                                                    
+  }],                                                                                                                                                                                                                                                                                                                           
+  "outbounds": [{                                                                                                                                                   
+    "protocol": "freedom",                                                                                                                                          
+    "settings": {}                                                                                                                                                  
+  },{                                                                                                                                                               
+      "protocol": "blackhole",                                                                                                                                      
+      "settings": {},                                                                                                                                               
+      "tag": "blocked"                                                                                                                                              
+    }                                                                                                                                                               
+  ],                                                                                                                                                                
+  "routing": {                                                                                                                                                      
+    "settings": {                                                                                                                                                   
+      "rules": [{                                                                                                                                                   
+        "outboundTag": "blocked",                                                                                                                                   
+        "protocol": [                                                                                                                                               
+          "bittorrent"                                                                                                                                              
+        ],                                                                                                                                                          
+        "type": "field"                                                                                                                                             
+      },                                                                                                                                                            
+        {                                                                                                                                                           
+          "inboundTag": [                                                                                                                                           
+            "api"                                                                                                                                                   
+          ],                                                                                                                                                        
+          "outboundTag": "api",                                                                                                                                     
+          "type": "field"                                                                                                                                           
+        },                                                                                                                                                          
+        {                                                                                                                                                           
+          "domain": [                                                                                                                                               
+            "regexp:(api|ps|sv|offnavi|newvector|ulog\\.imap|newloc)(\\.map|)\\.(baidu|n\\.shifen)\\.com",                                                          
+            "regexp:(.+\\.|^)(360|so)\\.(cn|com)",                                                                                                                  
+            "regexp:(.?)(xunlei|sandai|Thunder|XLLiveUD)(.)",                                                                                                       
+            "regexp:(.*.||)(dafahao|minghui|dongtaiwang|epochtimes|ntdtv|falundafa|wujieliulan).(org|com|net)"                                                      
+          ],                                                                                                                                                        
+          "outboundTag": "blocked",                                                                                                                                 
+          "type": "field"                                                                                                                                           
+        }                                                                                                                                                           
+      ]                                                                                                                                                             
+    },                                                                                                                                                              
+    "strategy": "rules"                                                                                                                                             
+  },                                                                                                                                                                
+  "policy": {                                                                                                                                                       
+    "levels": {                                                                                                                                                     
+      "1": {                                                                                                                                                        
+        "handshake": 1,                                                                                                                                             
+        "connIdle": 30,                                                                                                                                             
+        "uplinkOnly": 0,                                                                                                                                            
+        "downlinkOnly": 0,                                                                                                                                          
+        "statsUserUplink": true,                                                                                                                                    
+        "statsUserDownlink": true                                                                                                                                   
+      }                                                                                                                                                             
+    }                                                                                                                                                               
+  }  
+ }  

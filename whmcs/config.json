@@ -1,0 +1,16 @@
+{
+    "Mysql_Host": "8.8.8.8",
+    "Mysql_Port": 3306,
+    "Mysql_User": "v2",
+    "Mysql_Password": "y5cLKWKGsmHKHHWk",
+    "Mysql_Db": "v2",
+    "Mysql_TLS": "false",
+    "Mysql_MaxOpenConns": 100,
+    "Mysql_MaxIdleConns": 10,
+    "V2rayClientAddr": "127.0.0.1:8301",
+    "V2rayTag": "proxy",
+    "Email": "@test.com",
+    "AlterID": 1,
+    "Level": 1,
+    "CheckRate": 64
+}
