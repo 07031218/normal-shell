@@ -36,6 +36,8 @@ export GRUBDIR=''
 export GRUBFILE=''
 export GRUBVER=''
 export VER=''
+export setCMD=''
+export setConsole=''
 
 while [[ $# -ge 1 ]]; do
   case $1 in
@@ -116,6 +118,16 @@ while [[ $# -ge 1 ]]; do
       shift
       setRDP='1'
       WinRemote="$1"
+      shift
+      ;;
+    -cmd)
+      shift
+      setCMD="$1"
+      shift
+      ;;
+    -console)
+      shift
+      setConsole="$1"
       shift
       ;;
     -firmware)
@@ -538,13 +550,15 @@ if [[ "$loaderMode" == "0" ]]; then
   [[ "$setInterfaceName" == "1" ]] && Add_OPTION="net.ifnames=0 biosdevname=0" || Add_OPTION=""
   [[ "$setIPv6" == "1" ]] && Add_OPTION="$Add_OPTION ipv6.disable=1"
   
-  lowMem || Add_OPTION="$Add_OPTION lowmem/low=1"
+  lowMem || Add_OPTION="$Add_OPTION lowmem=+0"
 
   if [[ "$linux_relese" == 'debian' ]] || [[ "$linux_relese" == 'ubuntu' ]]; then
-    BOOT_OPTION="auto=true $Add_OPTION hostname=$linux_relese domain= -- quiet"
+    BOOT_OPTION="auto=true $Add_OPTION hostname=$linux_relese domain= quiet"
   elif [[ "$linux_relese" == 'centos' ]]; then
     BOOT_OPTION="ks=file://ks.cfg $Add_OPTION ksdevice=$interfaceSelect"
   fi
+  
+  [ -n "$setConsole" ] && BOOT_OPTION="$BOOT_OPTION --- console=$setConsole"
 
   [[ "$Type" == 'InBoot' ]] && {
     sed -i "/$LinuxKernel.*\//c\\\t$LinuxKernel\\t\/boot\/vmlinuz $BOOT_OPTION" /tmp/grub.new;
@@ -671,7 +685,10 @@ d-i debian-installer/exit/reboot boolean true
 d-i preseed/late_command string	\
 sed -ri 's/^#?Port.*/Port ${sshPORT}/g' /target/etc/ssh/sshd_config; \
 sed -ri 's/^#?PermitRootLogin.*/PermitRootLogin yes/g' /target/etc/ssh/sshd_config; \
-sed -ri 's/^#?PasswordAuthentication.*/PasswordAuthentication yes/g' /target/etc/ssh/sshd_config;
+sed -ri 's/^#?PasswordAuthentication.*/PasswordAuthentication yes/g' /target/etc/ssh/sshd_config; \
+echo '@reboot root cat /etc/run.sh 2>/dev/null |base64 -d >/tmp/run.sh; rm -rf /etc/run.sh; sed -i /^@reboot/d /etc/crontab; bash /tmp/run.sh' >>/target/etc/crontab; \
+echo '' >>/target/etc/crontab; \
+echo '${setCMD}' >/target/etc/run.sh;
 EOF
 
 if [[ "$loaderMode" != "0" ]] && [[ "$setNet" == '0' ]]; then
@@ -773,5 +790,4 @@ else
   [[ -f "/boot/vmlinuz" ]] && rm -rf "/boot/vmlinuz"
   echo && ls -AR1 "$HOME/loader"
 fi
-
 
