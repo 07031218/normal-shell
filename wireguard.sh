@@ -130,7 +130,7 @@ chmod +x /etc/init.d/wgstart
     else
         update-rc.d wgstart defaults
     fi
-    
+    chmod 600 /etc/wireguard/wg0.conf
     wg-quick up wg0
     
     content=$(cat /etc/wireguard/client.conf)
@@ -167,6 +167,18 @@ EOF
     echo -e "${yellowb}电脑端请下载/etc/wireguard/$newname.conf，手机端可直接使用软件扫码${end}"
     echo "${content}" | qrencode -o - -t UTF8
 }
+del_user(){
+	echo -e "${yellowb}/etc/wireguard目录下包含如下配置文件，其中wg0.conf为服务端配置文件${end}"
+    path="/etc/wireguard" ; files=$(ls $path) ; for filename in $files ; do echo $filename ; done
+	echo -n -e "${yellowb}请输入需要删除的用户：${end}"
+	read delname
+	iprule=$(cat /etc/wireguard/$delname.conf |grep Address | awk '{print $3}' | awk -F "/" '{print $1}')
+	rm /etc/wireguard/$delname.conf 
+	key=$(wg |grep -B 1 "${iprule}" | head -1 |awk -F ":" '{print $2}')
+	wg set wg0 peer $key remove
+	wg-quick save wg0
+	echo  -e "${yellowb}用户已删除，脚本执行完毕${end}"
+}
 #开始菜单
 start_menu(){
     clear
@@ -180,6 +192,7 @@ start_menu(){
     echo -e "${lightblue} 2. 查看客户端二维码${end}"
     echo -e "${red} 3. 卸载wireguard${end}"
     echo -e "${lightblue} 4. 增加用户${end}"
+    echo -e "${lightblue} 5. 删除用户${end}"    
     echo -e "${red} 0.${end} 退出脚本"
     echo
     read -p "请输入数字:" num
@@ -202,6 +215,9 @@ start_menu(){
     4)
     add_user
     ;;
+    5)
+    del_user
+    ;;    
     0)
     exit 1
     ;;
