@@ -101,10 +101,10 @@ media(){
 	fi
 }
 media-verify(){
-	bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/main/netflix-verify.sh)
+	bash <(curl -sL https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/normal-shell/main/netflix-verify.sh)
 }
 speedtest(){
-	bash <(curl -Lso- https://raw.githubusercontent.com/07031218/normal-shell/main/superspeed.sh)
+	bash <(curl -Lso- https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/normal-shell/main/superspeed.sh)
 }
 menu() {
   echo -e "
