@@ -84,18 +84,18 @@ onekey-nginx-ssl(){
 }
 ql-nvjdc(){
 	if [[ $arch == "linux_arm64" ]];then
-		wget https://ghproxy.fsou.cc/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK-arm -O OK && chmod +x OK && ./OK
+		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK-arm -O OK && chmod +x OK && ./OK
 	elif [[ $arch == "linux_amd64" ]];then
-		wget https://ghproxy.fsou.cc/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK -O OK && chmod +x OK && ./OK
+		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK -O OK && chmod +x OK && ./OK
 	else
 		echo -e "${red}错误：${end}${lightblue}不支持当前系统架构，脚本退出···${end}";exit 1
 	fi
 }
 media(){
 	if [[ $arch == "linux_arm64" ]];then
-		wget https://ghproxy.fsou.cc/https://github.com/07031218/normal-shell/blob/main/oracle/oracle-arm -O oracle && chmod 777 oracle && ./oracle
+		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/oracle/oracle-arm -O oracle && chmod 777 oracle && ./oracle
 	elif [[ $arch == "linux_amd64" ]];then
-		wget https://ghproxy.fsou.cc/https://github.com/07031218/normal-shell/blob/main/oracle/oracle -O oracle && chmod 777 oracle && ./oracle
+		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/oracle/oracle -O oracle && chmod 777 oracle && ./oracle
 	else
 		echo -e "${red}错误：${end}${lightblue}不支持当前系统架构，脚本退出···${end}";exit 1	
 	fi
