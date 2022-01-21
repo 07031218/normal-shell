@@ -32,7 +32,7 @@ bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/07031
 【调用国内镜像源版】甲骨文一键DD到Debian 11 脚本（兼容甲骨文AMD和ARM架构,DD完默认密码password，经测试同样适用腾讯云、Do、Azure）
 
 ```shell
-bash <(wget --no-check-certificate -qO- 'https://cdn.jsdelivr.net/gh/07031218/normal-shell@main/InstallNET.sh') -d 11 -v 64 -p password --mirror 'https://mirrors.huaweicloud.com/debian/'
+bash <(wget --no-check-certificate -qO- 'https://cdn.jsdelivr.net/gh/07031218/normal-shell@main/InstallNET.sh') -d 11 -v 64 -p password --mirror 'https://mirrors.aliyun.com/debian/'
 ```
 x-ui一键安装脚本
 ```shell
