@@ -1,6 +1,6 @@
 #bin/bash
 echo "开始进行解锁"
-wget -O /root/refresh-dns.sh https://ghproxy.20120714.cyx/gh/07031218/normal-shell@main/refresh-dns1.sh && chmod +x /root/refresh-dns.sh && bash /root/refresh-dns.sh
+wget -O /root/refresh-dns.sh https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/refresh-dns1.sh && chmod +x /root/refresh-dns.sh && bash /root/refresh-dns.sh
 echo "开始添加定时任务"
 bashsrc=$(which bash)
 crontab -l 2>/dev/null > /root/crontab_test 
