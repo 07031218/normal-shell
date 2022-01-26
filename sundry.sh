@@ -71,7 +71,7 @@ reinstall_os(){
 	fi	
 }
 install_clash-ui(){
-	bash <(curl -sL https://gh.xlj.workers.dev/https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/c-m/main/install)
+	bash <(curl -sL https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/c-m/main/install)
 }
 install_x-ui(){
 	bash <(curl -Ls https://gh.xlj.workers.dev/https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
