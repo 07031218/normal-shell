@@ -57,7 +57,7 @@ checkos(){
 }
 checkCPU
 wireguard(){
-	bash <(curl -sL https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/wireguard.sh)
+	bash <(curl -sL https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/blob/main/wireguard.sh)
 }
 reinstall_os(){
 	echo -n -e "${lightblue}脚本兼容Azure、腾讯云、Oracle Cloud、AWS${end}，${yellowb}请设置DD后系统的ROOT密码：${end}"
@@ -65,46 +65,46 @@ reinstall_os(){
 	echo -n -e "${red}请输入 Y 确认开始DD系统：${end}"
 	read yn
 	if [[ $yn == "Y" ]]||[[ $yn == "y" ]]; then
-		bash <(wget --no-check-certificate -qO- 'https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/normal-shell/main/InstallNET.sh') -d 11 -v 64 -p $password --mirror 'https://mirrors.huaweicloud.com/debian/'
+		bash <(wget --no-check-certificate -qO- 'https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/InstallNET.sh') -d 11 -v 64 -p $password --mirror 'https://mirrors.huaweicloud.com/debian/'
 	else
 		echo -e "${red}取消DD系统，程序退出···${end}"
 	fi	
 }
 install_clash-ui(){
-	bash <(curl -sL https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/c-m/main/install)
+	bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/c-m/main/install)
 }
 install_x-ui(){
 	bash <(curl -Ls https://gh.xlj.workers.dev/https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
 }
 argo-tunnel(){
-	bash <(curl -sL https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/normal-shell/net/onekey-argo-tunnel.sh)
+	bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/net/onekey-argo-tunnel.sh)
 }
 onekey-nginx-ssl(){
-	bash <(curl -s https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/one-key-for-let-s-Encrypt/main/run.sh) 
+	bash <(curl -s https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/one-key-for-let-s-Encrypt/main/run.sh) 
 }
 ql-nvjdc(){
 	if [[ $arch == "linux_arm64" ]];then
-		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK-arm -O OK && chmod +x OK && ./OK
+		wget https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK-arm -O OK && chmod +x OK && ./OK
 	elif [[ $arch == "linux_amd64" ]];then
-		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK -O OK && chmod +x OK && ./OK
+		wget https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/blob/main/nvjdc/OK -O OK && chmod +x OK && ./OK
 	else
 		echo -e "${red}错误：${end}${lightblue}不支持当前系统架构，脚本退出···${end}";exit 1
 	fi
 }
 media(){
 	if [[ $arch == "linux_arm64" ]];then
-		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/oracle/oracle-arm -O oracle && chmod 777 oracle && ./oracle
+		wget https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/blob/main/oracle/oracle-arm -O oracle && chmod 777 oracle && ./oracle
 	elif [[ $arch == "linux_amd64" ]];then
-		wget https://gh.xlj.workers.dev/https://github.com/07031218/normal-shell/blob/main/oracle/oracle -O oracle && chmod 777 oracle && ./oracle
+		wget https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/blob/main/oracle/oracle -O oracle && chmod 777 oracle && ./oracle
 	else
 		echo -e "${red}错误：${end}${lightblue}不支持当前系统架构，脚本退出···${end}";exit 1	
 	fi
 }
 media-verify(){
-	bash <(curl -sL https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/normal-shell/main/netflix-verify.sh)
+	bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/netflix-verify.sh)
 }
 speedtest(){
-	bash <(curl -Lso- https://gh.xlj.workers.dev/https://raw.githubusercontent.com/07031218/normal-shell/main/superspeed.sh)
+	bash <(curl -Lso- https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/superspeed.sh)
 }
 menu() {
   echo -e "
