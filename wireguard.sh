@@ -8,7 +8,7 @@ red="\033[0;31m"
 redb="\033[1;31m"
 green="\033[0;32m"
 greenb="\033[1;32m"
-yellow="${lightblue}"
+yellow="\033[0;33m"
 yellowb="\033[1;33m"
 blue="\033[0;34m"
 blueb="\033[1;34m"
@@ -95,12 +95,12 @@ DNS = 8.8.8.8,8.8.4.4
 MTU = 1420
 [Peer]
 PublicKey = $c2
-AllowedIPs = 10.1.1.2/32
+AllowedIPs = 10.10.10.2/32
 EOF
 cat > /etc/wireguard/client.conf <<-EOF
 [Interface]
 PrivateKey = $c1
-Address = 10.1.1.2/24 
+Address = 10.10.10.2/24 
 DNS = 8.8.8.8,8.8.4.4
 MTU = 1420
 [Peer]
@@ -219,7 +219,7 @@ start_menu(){
     del_user
     ;;    
     0)
-    exit 1
+    exit 0
     ;;
     *)
     clear
