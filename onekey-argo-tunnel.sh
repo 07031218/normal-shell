@@ -54,8 +54,8 @@ echo -e "${green}请点击或者复制下方生成的授权链接，进入CF管�
 cloudflared login
 echo -e "${green}授权完成，请按照指令提示继续${plain}"
 fi
-read -p "请输入计划启用argo tunnel穿透的域名: " httpurl && printf "\n"
-read -p "请输入本地web服务的url地址: " localurl && printf "\n"
+read -p "请输入计划启用argo tunnel穿透的域名(不需要输入http://): " httpurl && printf "\n"
+read -p "请输入本地web服务的url地址（需要带http://）: " localurl && printf "\n"
 read -p "请输入supervisor值守的任务名称: " taskname && printf "\n"
 read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如argo.conf :" filename && printf "\n"
 
@@ -77,7 +77,7 @@ EOF
 
 /etc/init.d/supervisor restart > /dev/null
 echo -e "${green}argo tunnel部署完成，脚本退出·········${plain}"
-echo -e "${green}你现在可以通过${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
+echo -e "${green}你现在可以通过http://${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
 }
 update_supervisor(){
