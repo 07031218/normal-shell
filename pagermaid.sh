@@ -120,7 +120,7 @@ install_pagermaid(){
 	apt update && apt-get install libffi-dev libssl-dev -y &&  apt install python3-dev -y &&  apt-get install -y python3 python3-pip && apt install git -y
 	echo -e "${yellow}开始拉取pagermaid项目···${plain}"
 	sleep 10s
-	cd /var/lib && git clone https://github.com/xtaodada/PagerMaid-Modify.git pagermaid && cd pagermaid
+	cd /var/lib && git clone https://gitlab.com/Xtao-Labs/pagermaid-modify.git pagermaid && cd pagermaid
 	echo -e "${yellow}开始安装相关依赖和前置命令···${plain}"
 	sleep 10s
 	apt-get install imagemagick -y && apt-get install software-properties-common -y && apt-get update && sudo apt-get install neofetch -y && apt-get install libzbar-dev -y && sudo apt-get install tesseract-ocr tesseract-ocr-all -y &&  apt-get install redis-server -y && pip3 install -r requirements.txt && cp config.gen.yml config.yml
