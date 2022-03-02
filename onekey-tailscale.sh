@@ -16,8 +16,6 @@ purple="\033[0;35m"
 purpleb="\033[1;35m"
 lightblue="\033[0;36m"
 lightblueb="\033[1;36m"
-set -e
-apt install curl -y  || yum install curl -y 
 webget(){
   if curl --version > /dev/null 2>&1;then
     [ "$3" = "echooff" ] && progress='-s' || progress='-#'
@@ -319,7 +317,7 @@ copyright(){
 echo -e "
 ${green}###########################################################${end}
 ${green}#                                                         #${end}
-${green}#        Tailscale一键部署脚本                            #${end}
+${green}#        tailscale一键部署脚本                            #${end}
 ${green}#        Powered  by 翔翎                                 #${end}
 ${green}#                                                         #${end}
 ${green}###########################################################${end}"
@@ -328,8 +326,8 @@ menu() {
   echo -e "
 ${red}0.${end}  退出脚本
 ${green}———————————————————————————————————————————————————————————${end}
-${green}1.${end}  一键部署Tailscale私有中继服务器
-${green}2.${end}  一键部署Tailscale客户端服务
+${green}1.${end}  一键部署ailscale私有中继服务器
+${green}2.${end}  一键部署ailscale客户端服务
 "
   read -p "请输入数字 :" num
   case "$num" in
