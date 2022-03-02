@@ -69,6 +69,7 @@ install_derper(){
 		go install tailscale.com/cmd/derper@main
 		if [[ $(which derper) == "" ]]; then
 			echo -e "${red}derper安装失败，程序退出${end}"
+			exit 0
 		fi
 	fi
 	echo -e "${yellow}因为tailscale中继服务器需要配合域名和域名证书，请根据命令行提示操作${end}"
