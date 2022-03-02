@@ -67,8 +67,7 @@ install_derper(){
 		install_go
 	else
 		go install tailscale.com/cmd/derper@main
-		s=$(derper -h) >/dev/null
-		if [[ $s == "" ]]; then
+		if [[ $(which derper) == "" ]]; then
 			echo -e "${red}derper安装失败，程序退出${end}"
 		fi
 	fi
