@@ -17,7 +17,6 @@ purpleb="\033[1;35m"
 lightblue="\033[0;36m"
 lightblueb="\033[1;36m"
 set -e
-apt install curl -y >/dev/null || yum install curl -y >/dev/null
 webget(){
   if curl --version > /dev/null 2>&1;then
     [ "$3" = "echooff" ] && progress='-s' || progress='-#'
