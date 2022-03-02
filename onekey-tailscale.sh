@@ -16,7 +16,6 @@ purple="\033[0;35m"
 purpleb="\033[1;35m"
 lightblue="\033[0;36m"
 lightblueb="\033[1;36m"
-set -e
 webget(){
   if curl --version > /dev/null 2>&1;then
     [ "$3" = "echooff" ] && progress='-s' || progress='-#'
@@ -82,6 +81,7 @@ install_go(){
 install_derper(){
 	if [[ $(which go) == "" ]]; then
 		echo -e "${red}检测发现系统未部署Go环境，开始部署Go环境${end}"
+		install_go
 	else
 		go install tailscale.com/cmd/derper@main
 		s=$(derper -h) >/dev/null
