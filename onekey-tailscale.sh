@@ -44,35 +44,35 @@ check_dependencies(){
 check_dependencies
 $InstallMethod install lsof -y >/dev/null
 install_tailscale(){
-	curl -fsSL https://tailscale.com/install.sh | sh
-	echo -e "${yellow}开始配置机器IP转发${end}"
-echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
-echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf
+  curl -fsSL https://tailscale.com/install.sh | sh
+  echo -e "${yellow}开始配置机器IP转发${end}"
+echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.conf
+echo 'net.ipv6.conf.all.forwarding = 1' | tee -a /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
-	echo -n -e "${yellow}请输入你当前机器的IP网段,注意最后一位填写0,比如192.168.2.0,请输入：${end}"
-	read ipduan
+  echo -n -e "${yellow}请输入你当前机器的IP网段,注意最后一位填写0,比如192.168.2.0,请输入：${end}"
+  read ipduan
 tailscale up --advertise-routes=${ipduan}/24 --accept-routes
 echo -e "${green}tailscale客户端部署完毕，如需要打通该设备所处网段其他设备的访问，请进入tailscale官网打开这台设备的转发开关，${end}${red}菜单名称：Edit route settings ${end}，${green}链接：https://login.tailscale.com/admin/machines ${end}"
 }
 install_go(){
-	wget https://golang.google.cn/dl/go1.17.6.${arch}.tar.gz
-	tar -C /usr/local -xzf go1.17.6.${arch}.tar.gz
-	echo -e "export GOROOT=/usr/local/go\nexport GOPATH=/root/goProject\nexport GOBIN=\$GOPATH/bin\nexport PATH=\$PATH:\$GOROOT/bin\nexport PATH=\$PATH:\$GOPATH/bin" >>/etc/profile
-	echo -e "${yellow}Go环境部署完毕，请退出SSH窗口重进一次使变量生效。${end}"
-	exit 0
+  wget http://dpj.xun-da.com/downloads/go1.17.6.${arch}.tar.gz
+  tar -C /usr/local -xzf go1.17.6.${arch}.tar.gz
+  echo -e "export GOROOT=/usr/local/go\nexport GOPATH=/root/goProject\nexport GOBIN=\$GOPATH/bin\nexport PATH=\$PATH:\$GOROOT/bin\nexport PATH=\$PATH:\$GOPATH/bin" >>/etc/profile
+  echo -e "${yellow}Go环境部署完毕，请退出SSH窗口重进一次使变量生效。${end}"
+  exit 0
 }
 install_derper(){
-	if [[ $(which go) == "" ]]; then
-		echo -e "${red}检测发现系统未部署Go环境，开始部署Go环境${end}"
-		install_go
-	else
-		go install tailscale.com/cmd/derper@main
-		if [[ $(which derper) == "" ]]; then
-			echo -e "${red}derper安装失败，程序退出${end}"
-			exit 0
-		fi
-	fi
-	echo -e "${yellow}因为tailscale中继服务器需要配合域名和域名证书，请根据命令行提示操作${end}"
+  if [[ $(which go) == "" ]]; then
+    echo -e "${red}检测发现系统未部署Go环境，开始部署Go环境${end}"
+    install_go
+  else
+    ƒgo install tailscale.com/cmd/derper@main
+    if [[ $(which derper) == "" ]]; then
+      echo -e "${red}derper安装失败，程序退出${end}"
+      exit 0
+    fi
+  fi
+  echo -e "${yellow}因为tailscale中继服务器需要配合域名和域名证书，请根据命令行提示操作${end}"
 echo "=======================Let's Encrypt环境准备======================================="
 if command -v python > /dev/null 2>&1; then
     echo 'python 环境就绪...'
@@ -277,9 +277,9 @@ fi
 echo "1 1 1 * * root bash $web_dir/certificate/renew_cert.bash >> /var/log/renew_cert_error.log 2 >> /var/log/renew_cert.log" >> /etc/crontab
 echo "证书续期定时器添加成功"
 if [[ $(lsof -i:443) != "" ]];then
-		echo -n -e "${red}检测发现443端口已经被占用，derper默认占用443端口，请输入自定义的tls端口号：${end}"
-		read port
-		echo -e "${yellow}开始部署derper进程值守···${end}"
+    echo -n -e "${red}检测发现443端口已经被占用，derper默认占用443端口，请输入自定义的tls端口号：${end}"
+    read port
+    echo -e "${yellow}开始部署derper进程值守···${end}"
 cat > /etc/systemd/system/derper.service <<EOF
 Description=derper
 After=network.target
