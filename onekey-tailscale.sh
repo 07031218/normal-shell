@@ -184,7 +184,7 @@ fi
 echo "1 1 1 * * root bash $web_dir/certificate/renew_cert.bash >> /var/log/renew_cert_error.log 2 >> /var/log/renew_cert.log" >> /etc/crontab
 echo "证书续期定时器添加成功"
 if [[ $(lsof -i:443) != "" ]];then
-		echo -n -e "${red}检测发现443端口已经被占用，derper默认占用443端口，请输入自定义的tls端口号：$(end)"
+		echo -n -e "${red}检测发现443端口已经被占用，derper默认占用443端口，请输入自定义的tls端口号：${end}"
 		read port
 		echo -e "${yellow}开始部署derper进程值守···${end}"
 cat > /etc/systemd/system/derper.service <<EOF
