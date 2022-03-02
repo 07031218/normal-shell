@@ -62,3 +62,7 @@ wget https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/raw/m
 ```shell
 bash <(curl -s https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/one-key-for-let-s-Encrypt/main/run.sh) 
 ```
+一键Tailscale穿透部署
+```shell
+bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/onekey-tailscale.sh)
+```
