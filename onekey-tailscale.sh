@@ -317,7 +317,7 @@ copyright(){
 echo -e "
 ${green}###########################################################${end}
 ${green}#                                                         #${end}
-${green}#        tailscale一键部署脚本                            #${end}
+${green}#        Tailscale一键部署脚本                            #${end}
 ${green}#        Powered  by 翔翎                                 #${end}
 ${green}#                                                         #${end}
 ${green}###########################################################${end}"
@@ -326,8 +326,8 @@ menu() {
   echo -e "
 ${red}0.${end}  退出脚本
 ${green}———————————————————————————————————————————————————————————${end}
-${green}1.${end}  一键部署ailscale私有中继服务器
-${green}2.${end}  一键部署ailscale客户端服务
+${green}1.${end}  一键部署Tailscale私有中继服务器
+${green}2.${end}  一键部署Tailscale客户端服务
 "
   read -p "请输入数字 :" num
   case "$num" in
