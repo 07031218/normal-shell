@@ -79,6 +79,7 @@ install_go(){
 	tar -C /usr/local -xzf go1.17.6.linux-amd64.tar.gz
 	echo -e "export GOROOT=/usr/local/go\nexport GOPATH=/root/goProject\nexport GOBIN=\$GOPATH/bin\nexport PATH=\$PATH:\$GOROOT/bin\nexport PATH=\$PATH:\$GOPATH/bin" >>/etc/profile
 	echo -e "${yellow}Go环境部署完毕，请退出SSH窗口重进一次使变量生效。${end}"
+	exit 0
 }
 install_derper(){
 	if [[ $(which go) == "" ]]; then
