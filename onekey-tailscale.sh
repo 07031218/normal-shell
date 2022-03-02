@@ -16,24 +16,6 @@ purple="\033[0;35m"
 purpleb="\033[1;35m"
 lightblue="\033[0;36m"
 lightblueb="\033[1;36m"
-webget(){
-  if curl --version > /dev/null 2>&1;then
-    [ "$3" = "echooff" ] && progress='-s' || progress='-#'
-    [ -z "$4" ] && redirect='-L' || redirect=''
-    result=$(curl -w %{http_code} --connect-timeout 5 $progress $redirect -ko $1 $2)
-  else
-    if wget --version > /dev/null 2>&1;then
-      [ "$3" = "echooff" ] && progress='-q' || progress='-q --show-progress'
-      [ "$4" = "rediroff" ] && redirect='--max-redirect=0' || redirect=''
-      certificate='--no-check-certificate'
-      timeout='--timeout=3'
-    fi
-    [ "$3" = "echoon" ] && progress=''
-    [ "$3" = "echooff" ] && progress='-q'
-    wget $progress $redirect $certificate $timeout -O $1 $2 
-    [ $? -eq 0 ] && result="200"
-  fi
-}
 checkCPU(){
   CPUArch=$(uname -m)
   if [[ "$CPUArch" == "aarch64" ]];then
@@ -73,7 +55,7 @@ tailscale up --advertise-routes=${ipduan}/24 --accept-routes
 echo -e "${green}tailscale客户端部署完毕，如需要打通该设备所处网段其他设备的访问，请进入tailscale官网打开这台设备的转发开关，${end}${red}菜单名称：Edit route settings ${end}，${green}链接：https://login.tailscale.com/admin/machines ${end}"
 }
 install_go(){
-	webget https://golang.google.cn/dl/go1.17.6.${arch}.tar.gz
+	wget https://golang.google.cn/dl/go1.17.6.${arch}.tar.gz
 	tar -C /usr/local -xzf go1.17.6.${arch}.tar.gz
 	echo -e "export GOROOT=/usr/local/go\nexport GOPATH=/root/goProject\nexport GOBIN=\$GOPATH/bin\nexport PATH=\$PATH:\$GOROOT/bin\nexport PATH=\$PATH:\$GOPATH/bin" >>/etc/profile
 	echo -e "${yellow}Go环境部署完毕，请退出SSH窗口重进一次使变量生效。${end}"
