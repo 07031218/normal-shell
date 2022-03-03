@@ -4,7 +4,7 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 # check root
-[[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
+#[[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
 clear
 checkCPU(){
   CPUArch=$(uname -m)
@@ -36,10 +36,18 @@ check_dependencies(){
 quit(){
 exit 0
 }
-#安装argo tunnel
-install_cloudflared(){
 checkCPU
 check_dependencies
+${InstallMethod} install sudo -y > /dev/null 2>&1 
+#安装argo tunnel
+install_cloudflared(){
+  echo -e "${red}如果你当前是非root用户，请确认已经将当前用户加sudo执行权限，否则脚本将会出错。${plain}"
+  echo -n -e "${yellow}如需继续，请输入Y，否则输入N或者n，是否需要继续<Y/n>：${plain}"
+  read ct
+  if [[ $ct == "" ]]||[[ $ct == "n" ]]||[[ $ct == "N" ]]; then
+    echo -e "${red}程序退出···${plain}"
+    exit 0
+  fi
 file1="/usr/bin/cloudflared"
 #安装wget supervisor
 ${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
@@ -48,7 +56,7 @@ if [ ! -f "$file1" ]; then
 wget  "https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
 chmod +x cloudflared && cp cloudflared /usr/bin
 fi
-file="/root/.cloudflared/cert.pem"
+file="./.cloudflared/cert.pem"
 if [ ! -f "$file" ]; then
 echo -e "${green}请点击或者复制下方生成的授权链接，进入CF管理面板进行授权操作。${plain}"
 cloudflared login
@@ -59,23 +67,23 @@ read -p "请输入本地web服务的url地址（需要带http://）: " localurl 
 read -p "请输入supervisor值守的任务名称: " taskname && printf "\n"
 read -p "请输入supervisor将要值守的conf文件名，后缀需要为.conf 如argo.conf :" filename && printf "\n"
 
-cat >> /etc/supervisor/conf.d/${filename} << EOF
-[program:${taskname}]
+sudo bash -c 'cat >> /etc/supervisor/conf.d/'${filename}' << EOF
+[program:'${taskname}']
 
-command=cloudflared tunnel --hostname  ${httpurl} --url ${localurl} --no-tls-verify
+command=cloudflared tunnel --hostname  '${httpurl}' --url '${localurl}' --no-tls-verify
 
 autorestart=true
 startsecs=10
 startretries=36
 redirect_stderr=true
 
-user=root ; setuid to this UNIX account to run the program
+user='$(whoami)' ; setuid to this UNIX account to run the program
 log_stdout=true ; if true, log program stdout (default true)
 log_stderr=true ; if true, log program stderr (def false)
-logfile=/var/log/jindou cf-tunnel.log ; child log path, use NONE for none; default AUTO
-EOF
+logfile=/var/log/'${taskname}'.log ; child log path, use NONE for none; default AUTO
+EOF'
 
-/etc/init.d/supervisor restart > /dev/null
+sudo /etc/init.d/supervisor restart > /dev/null
 echo -e "${green}argo tunnel部署完成，脚本退出·········${plain}"
 echo -e "${green}你现在可以通过http://${httpurl}来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
@@ -84,7 +92,7 @@ update_supervisor(){
 read -p "请输入supervisor Web服务的用户名: " username && printf "\n"
 read -p "请输入supervisor Web服务的用户密码：" passwd && printf "\n"
 
-cat > /etc/supervisor/supervisord.conf << EOF
+sudo bash -c 'cat > /etc/supervisor/supervisord.conf << EOF
 
 [supervisord]
 http_port=127.0.0.1:9001  ; (alternately, ip_address:port specifies AF_INET)
@@ -99,19 +107,19 @@ minprocs=200                ; (min. avail process descriptors;default 200)
 
 [supervisorctl]
 serverurl=http://127.0.0.1:9001 ; use an http:// url to specify an inet socket
-username=${username}              ; should be same as http_username if set
-password=${passwd}              ; should be same as http_password if set
+username='${username}'              ; should be same as http_username if set
+password='${passwd}'              ; should be same as http_password if set
 prompt=mysupervisor         ; cmd line prompt (default "supervisor")
 
 [inet_http_server] 
 port=0.0.0.0:9001
-username=${username}      
-password=${passwd}
+username='${username}'      
+password='${passwd}'
 
 [include]
 files = /etc/supervisor/conf.d/*.conf
 
-EOF
+EOF'
 /etc/init.d/supervisor restart > /dev/null
 baseip=$(curl -s ipip.ooo) > /dev/null
 echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:9001 来进行进程守护${plain}（${red}重启、停止、启动、日志查看${plain}）${green}管理·········${plain}"
@@ -161,7 +169,7 @@ ${green}3.${plain} 开启Argo Tunnel进程守护
     ;;
   3)
     update_supervisor
-    ;;	
+    ;;  
   *)
   clear
     echo -e "错误:请输入正确数字 [0-3]"
