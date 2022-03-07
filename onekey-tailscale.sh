@@ -66,7 +66,7 @@ install_derper(){
     echo -e "${red}检测发现系统未部署Go环境，开始部署Go环境${end}"
     install_go
   else
-    ƒgo install tailscale.com/cmd/derper@main
+    go install tailscale.com/cmd/derper@main
     if [[ $(which derper) == "" ]]; then
       echo -e "${red}derper安装失败，程序退出${end}"
       exit 0
