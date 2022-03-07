@@ -126,7 +126,7 @@ sign_domain_str=${sign_domain_str:0:${#sign_domain_str}-1}
 echo "$sign_domain_str"
  
 echo "2、站点绝对路径配置，如果未输入或者输入非绝对路径，就默认使用域名为目录配置到/tmp目录下"
-mkdir /certs
+mkdir -p /certs
 read -p "> " web_dir
 if [[ -z "$web_dir" || ! "$web_dir" == /* ]]; then
   web_dir="/certs/"$web_first_domain
