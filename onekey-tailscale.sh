@@ -286,7 +286,7 @@ After=network.target
  
 [Service]
 Type=simple
-ExecStart=/root/goProject/bin/derper -hostname $web_domains -c=derper.conf -a :$port -http-port -1 -certdir /certs/${web_domains}/certificate -certmode manual -stun
+ExecStart=/root/goProject/bin/derper -hostname $web_domains -c=derper.conf -a :$port -http-port -1 -certdir $web_dir/certificate -certmode manual -stun
 ExecStop=/usr/bin/kill -9 \$(ps aux |grep derper|awk '{print $2}'|head -1)
 Restart=on-abort
 User=root
@@ -340,7 +340,7 @@ After=network.target
  
 [Service]
 Type=simple
-ExecStart=/root/goProject/bin/derper -hostname $web_domains -c=derper.conf -a :443 -http-port -1 -certdir /certs/${web_domains}/certificate -certmode manual -stun
+ExecStart=/root/goProject/bin/derper -hostname $web_domains -c=derper.conf -a :443 -http-port -1 -certdir $web_dir/certificate -certmode manual -stun
 ExecStop=/usr/bin/kill -9 \$(ps aux |grep derper|awk '{print $2}'|head -1)
 Restart=on-abort
 User=root
