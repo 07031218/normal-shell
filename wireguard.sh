@@ -65,7 +65,7 @@ wireguard_install(){
         apt-get update -y
         apt-get install -y wireguard curl
     elif [ $os_version == "11" ];then
-    	apt install wireguard -y
+    	apt install wireguard resolvconf -y
     elif [ $os_version == "10" ]; then
     	echo 'deb http://ftp.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/buster-backports.list
     	apt update && apt install wireguard -y
