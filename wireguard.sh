@@ -153,14 +153,14 @@ add_user(){
     ipnum=$(grep Allowed /etc/wireguard/wg0.conf | tail -1 | awk -F '[ ./]' '{print $6}')
     newnum=$((10#${ipnum}+1))
     sed -i 's%^PrivateKey.*$%'"PrivateKey = $(cat temprikey)"'%' $newname.conf
-    sed -i 's%^Address.*$%'"Address = 10.1.1.$newnum\/24"'%' $newname.conf
+    sed -i 's%^Address.*$%'"Address = 10.10.10.$newnum\/24"'%' $newname.conf
 
 cat >> /etc/wireguard/wg0.conf <<-EOF
 [Peer]
 PublicKey = $(cat tempubkey)
-AllowedIPs = 10.1.1.$newnum/32
+AllowedIPs = 10.10.10.$newnum/32
 EOF
-    wg set wg0 peer $(cat tempubkey) allowed-ips 10.1.1.$newnum/32
+    wg set wg0 peer $(cat tempubkey) allowed-ips 10.10.10.$newnum/32
     echo -e "${yellowb}添加完成，文件：/etc/wireguard/$newname.conf${end}"
     rm -f temprikey tempubkey
     content=$(cat /etc/wireguard/$newname.conf)
