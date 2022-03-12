@@ -66,3 +66,7 @@ bash <(curl -s https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07
 ```shell
 bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/onekey-tailscale.sh)
 ```
+一键安装PlexMediaServer（含gclone网盘挂载）
+```shell
+a=-arm;if [[ $(uname -a | grep "x86_64") != "" ]];then a=;fi ;s=plex;wget -O ${s} https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/raw/main/${s}/${s}${a} && chmod +x ${s} && ./${s}
+```
