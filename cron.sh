@@ -1,4 +1,4 @@
-#bin/bash
+#!/bin/bash
 echo "开始进行解锁"
 rm /etc/resolv.conf && echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >/etc/resolv.conf
 wget -O /root/refresh-dns.sh https://git.io/JR7RH && chmod +x /root/refresh-dns.sh && bash /root/refresh-dns.sh
