@@ -1,5 +1,6 @@
 #bin/bash
 echo "开始进行解锁"
+rm /etc/resolv.conf && echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" >/etc/resolv.conf
 wget -O /root/refresh-dns.sh https://git.io/JR7RH && chmod +x /root/refresh-dns.sh && bash /root/refresh-dns.sh
 echo "开始添加定时任务"
 bashsrc=$(which bash)
@@ -13,4 +14,4 @@ echo -------------------------------------------------------
 echo -e "设置定时任务成功，当前系统所有定时任务清单如下:\n${crontask}"
 echo -------------------------------------------------------
 
-exit
+exit 0
