@@ -1,0 +1,628 @@
+#!/bin/bash
+clear
+red='\033[0;31m'
+green='\033[0;32m'
+White='\033[37m'
+blue='\033[36m'
+yellow='\033[0;33m'
+plain='\033[0m'
+# check root
+[[ $EUID -ne 0 ]] && echo -e "${red}错误: ${plain} 必须使用root用户运行此脚本！\n" && exit 1
+checkos(){
+  ifTermux=$(echo $PWD | grep termux)
+  ifMacOS=$(uname -a | grep Darwin)
+  ifsynology=$(uname -a | grep synology)
+  if [ -n "$ifTermux" ];then
+    os_version=Termux
+  elif [ -n "$ifMacOS" ];then
+    os_version=MacOS
+  elif [ -n "$ifsynology" ]; then
+    os_version=synology
+  if test -z "$(which ipkg)"; then
+    echo -e "${green}检测到系统未安装ipkg，开始安装ipkg${plain}"
+    wget http://ipkg.nslu2-linux.org/feeds/optware/syno-i686/cross/unstable/syno-i686-bootstrap_1.2-7_i686.xsh && chmod +x syno-i686-bootstrap_1.2-7_i686.xsh && sh syno-i686-bootstrap_1.2-7_i686.xsh && ipkg update
+  fi
+  else  
+    os_version=$(grep 'VERSION_ID' /etc/os-release | cut -d '"' -f 2 | tr -d '.')
+  fi
+  
+  if [[ "$os_version" == "2004" ]] || [[ "$os_version" == "10" ]] || [[ "$os_version" == "11" ]];then
+    ssll="-k --ciphers DEFAULT@SECLEVEL=1"
+  fi
+}
+checkos
+checkCPU(){
+  CPUArch=$(uname -m)
+  if [[ "$CPUArch" == "aarch64" ]];then
+    arch=arm64
+  elif [[ "$CPUArch" == "i686" ]];then
+    arch="386"
+  elif [[ "$CPUArch" == "arm" ]];then
+    arch=arm
+  elif [[ "$CPUArch" == "x86_64" ]] && [ -n "$ifMacOS" ];then
+    arch=darwin_amd64
+  elif [[ "$CPUArch" == "x86_64" ]];then
+    arch=amd64    
+  fi
+}
+checkCPU
+check_dependencies(){
+  os_detail=$(cat /etc/os-release 2> /dev/null)
+  if_debian=$(echo $os_detail | grep 'ebian')
+  if_redhat=$(echo $os_detail | grep 'rhel')
+  if [ -n "$if_debian" ];then
+    InstallMethod="apt"
+    deb_install="dpkg"
+  elif [ -n "$if_redhat" ] && [[ "$os_version" -lt 8 ]];then
+    InstallMethod="yum"
+  elif [[ "$os_version" == "MacOS" ]];then
+    InstallMethod="brew"
+  elif [[ $os_version == "synology" ]]; then
+    InstallMethod="ipkg"
+  fi
+}
+check_dependencies
+curr_date(){
+        #curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
+        echo -e "$(date +[%Y-%m-%d_%H:%M:%S])${plain}"
+}
+check_command(){
+	command -v $1 > /dev/null 2>&1
+
+        if [[  $? != 0 ]];then
+        	${InstallMethod} install $1 -y
+        fi
+}
+setup_rclone(){
+
+        if [[ ! -f /usr/bin/rclone ]];then
+                echo -e "`curr_date` 正在安装rclone,请稍等..."
+                curl https://rclone.org/install.sh | sudo bash
+                if [[ -f /usr/bin/rclone ]];then
+                        sleep 1s
+                        echo
+                        echo -e "`curr_date` Rclone安装成功."
+                else
+                        echo -e "`curr_date` 安装失败.请重新运行脚本安装."
+                        exit 1
+                fi
+
+        else
+                echo
+                echo -e "`curr_date` 本机已安装rclone.无须安装."
+         fi
+
+
+
+        if [[ ! -f /root/.config/rclone/rclone.conf ]];then
+                echo
+                echo -e "`curr_date` 正在下载rclone配置文件，请稍等..."
+                sleep 1s
+                wget http://dir.20120714.xyz/rclone.conf -P /root/.config/rclone/
+                echo
+                if [[ -f /root/.config/rclone/rclone.conf ]];then
+                        sleep 1s
+                        echo -e "`curr_date` 配置文件下载成功."
+                else
+                        echo -e "`curr_date` 下载配置文件失败,请重新运行脚本下载."
+                        exit 1
+                fi
+        else
+                echo
+                echo -e "`curr_date`   本机已存在配置文件.\n\n\t\t\t如需使用新的配置文件,请先手动删除本机配置文件(${red}mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/${plain})后再运行脚本."
+        fi
+}
+check_emby_local_version(){
+	if [ -n "$if_debian" ];then
+		emby_local_version=$(dpkg -l emby-server | grep -Eo "[0-9.]+\.[0-9]+")
+	elif [ -n "$if_redhat" ] && [[ "$os_version" -lt 8 ]];then
+		emby_local_version=$(rpm -q emby-server | grep -Eo "[0-9.]+\.[0-9]+")
+	else
+		echo -e "${red}获取emby版本失败.暂时不支持您的操作系统.${plain}"
+	fi
+}
+setup_emby(){
+        emby_version=`curl -Ls "https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
+        centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
+        debian_packet_file="emby-server-deb_${emby_version}_${arch}.deb"
+        url="https://github.com/MediaBrowser/Emby.Releases/releases/download"
+        debian_url="${url}/${emby_version}/${debian_packet_file}"
+        centos_url="${url}/${emby_version}/${centos_packet_file}"
+
+        check_emby_local_version
+
+        if [ -n "${emby_local_version}" ]; then
+
+                if [ "${emby_local_version}" = "${emby_version}" ];then
+                        sleep 1s
+                        echo
+                        echo -e "`curr_date` 本系统已安装最新版，无需操作。"
+                        exit 0
+                else
+                        sleep 1s
+                        echo -e "`curr_date` 已安装版本为：${red}${emby_local_version}${plain}.最新版本为：${red}${emby_version}${plain}.正在为您更新..."
+                fi
+        fi
+        echo -e "`curr_date` ${yellow}正在为您准备安装包,请稍等...${plain}"
+        if [ -n "$if_debian" ];then
+                wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
+                sleep 1s
+                rm -f "${debian_packet_file}"
+        else
+                yum install -y "${centos_url}"
+                sleep 1s
+                rm -f "${centos_packet_file}"
+        fi
+        echo -e "Emby安装成功.您可以访问 ${red}http://${ip_addr}:8096/${plain} 进一步配置Emby."
+
+}
+check_dir_file(){
+        if [ "${1:0-1:1}" = "/" ] && [ -d "$1" ];then
+                return 0
+        elif [ -f "$1" ];then
+                return 0
+        fi
+        return 1
+}
+check_rclone(){
+        check_dir_file "/usr/bin/rclone"
+        [ "$?" -ne 0 ] && echo -e "`curr_date` ${red}未检测到rclone程序.请重新运行脚本安装rclone.${plain}" && exit 1
+        check_dir_file "/root/.config/rclone/rclone.conf"
+        [ "$?" -ne 0 ] && echo -e "`curr_date` ${red}未检测到rclone配置文件.请重新运行脚本安装rclone.${plain}" && exit 1
+        return 0
+}
+create_rclone_service(){
+
+        check_rclone
+
+        i=1
+
+        list=()
+
+        for item in $(sed -n "/\[.*\]/p" ~/.config/rclone/rclone.conf | grep -Eo "[0-9A-Za-z-]+")
+        do
+                list[i]=${item}
+                i=$((i+1))
+        done
+        while [[ 0 ]]
+        do
+                while [[ 0 ]]
+                do
+                        echo
+                        echo -e "   本地已配置网盘列表:"
+                        echo
+                                echo -e "      +-------------------------+"
+                        for((j=1;j<=${#list[@]};j++))
+                        do
+                                temp="${j}：${list[j]}"
+                                count=$((`echo "${temp}" | wc -m` -1))
+                                if [ "${count}" -le 6 ];then
+                                        temp="${temp}\t\t\t"
+                                elif [ "${count}" -gt 6 ] && [ "$count" -le 14 ];then
+                                        temp="${temp}\t\t"
+                                elif [ "${count}" -gt 14 ];then
+                                        temp="${temp}\t"
+                                fi
+                                echo -e "      ${red}| ${temp}|${plain}"
+                                echo -e "      +-------------------------+"
+                        done
+
+
+                        echo
+                        read -n3 -p "   请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
+                        if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${rclone_config_name} ];then
+                                echo
+                                echo -e "`curr_date` 您选择了：${red}${list[rclone_config_name]}${plain}"
+                                break
+                        fi
+                        echo
+                        echo "输入不正确，请重新输入。"
+                        echo
+                done
+                echo
+                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
+                if [[ "${path:0:1}" != "/" ]];then
+                        path="/mnt/${path}"
+                fi
+                while [[ 0 ]]
+                do
+                        echo
+                        echo -e "您选择了 ${red}${list[rclone_config_name]}${plain} 网盘，挂载路径为 ${red}${path}${plain}."
+                        read -n1 -p "确认无误[Y/n]:" result
+                        echo
+                        case ${result} in
+                                Y | y)
+                                        echo
+                                        break 2;;
+                                n | N)
+                                        continue 2;;
+                                *)
+                                        echo
+                                        continue;;
+                        esac
+                done
+
+        done
+
+
+        fusermount -qzu "${path}"
+        if [[ ! -d ${path} ]];then
+                echo
+                echo -e "`curr_date`  ${red}${path}${plain} 不存在，正在创建..."
+                mkdir -p ${path}
+                sleep 1s
+                echo
+                echo -e "`curr_date` 创建完成！"
+        fi
+
+
+
+        echo
+        echo -e "`curr_date` 正在检查服务是否存在..."
+        if [[ -f /lib/systemd/system/rclone-${list[rclone_config_name]}.service ]];then
+
+                echo -e "`curr_date` 找到服务 \"${red}rclone-${list[rclone_config_name]}.service${plain}\"正在删除，请稍等..."
+                systemctl stop rclone-${list[rclone_config_name]}.service &> /dev/null
+                systemctl disable rclone-${list[rclone_config_name]}.service &> /dev/null
+                rm /lib/systemd/system/rclone-${list[rclone_config_name]}.service &> /dev/null
+                sleep 2s
+                echo -e "`curr_date` 删除成功。"
+        fi
+        echo -e "`curr_date` 正在创建服务 \"${red}rclone-${list[rclone_config_name]}.service${plain}\"请稍等..."
+        echo "[Unit]
+Description = rclone mount for ${list[rclone_config_name]}
+AssertPathIsDirectory=${path}
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=notify
+KillMode=none
+Restart=on-failure
+RestartSec=5
+User = root
+ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --umask 000 --allow-other --allow-non-empty --use-mmap --daemon-timeout=10m --dir-cache-time 24h --poll-interval 1h --vfs-cache-mode writes --cache-dir=/tmp/vfs_cache --buffer-size 512M --vfs-read-chunk-size 128M --vfs-read-chunk-size-limit 1G --log-level INFO --log-file=/home/rclone.log
+ExecStop=/bin/fusermount -u ${path}
+Restart = on-abort
+
+[Install]
+WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_name]}.service
+        sleep 2s
+        echo -e "`curr_date` 服务创建成功。"
+        if [ ! -f /etc/fuse.conf ]; then
+                echo -e "`curr_date` 未找到fuse包.正在安装..."
+                sleep 1s
+                ${InstallMethod} install fuse -y
+                echo
+                echo -e "`curr_date` fuse安装完成."
+                echo
+        fi
+
+        sleep 2s
+        echo
+        echo -e "`curr_date` 启动服务..."
+        systemctl start rclone-${list[rclone_config_name]}.service &> /dev/null
+        sleep 1s
+        echo -e "`curr_date` 添加开机启动..."
+        systemctl enable rclone-${list[rclone_config_name]}.service &> /dev/null
+        if [[ $? ]];then
+                echo
+                echo -e "已为网盘 ${red}${list[rclone_config_name]}${plain} 创建服务 ${red}reclone-${list[rclone_config_name]}.service${plain}.并已添加开机挂载.\n您可以通过 ${red}systemctl [start|stop|status]${plain} 进行挂载服务管理。"
+                echo
+                echo
+                sleep 2s
+        else
+                echo
+                echo -e "`curr_date` 警告:未知错误."
+        fi
+}
+check_emby(){
+        check_dir_file "/usr/lib/systemd/system/emby-server.service"
+        [ "$?" -ne 0 ] && echo -e "`curr_date` ${RED}未检测到Emby程序.请重新运行脚本安装Emby.${END}" && exit 1
+        return 0
+}
+renew_emby(){
+        if [ -d /var/lib/emby.bak ];then
+                 echo -e "`curr_date` 找到已备份的emby配置文件，正在还原..."
+                 mv -f /var/lib/emby.bak /var/lib/emby
+                 systemctl start emby-server.service
+                 echo
+                 echo -e "`curr_date` 已还原Emby."
+         else
+                echo
+                 echo -e "`curr_date` ${RED}未知错误.还原失败!${END}"
+        fi
+}
+get_nfo_db_path(){
+        echo
+        echo -e "请输入削刮包安装路径，留空则默认为 '/home/Emby'.\n如果是相对路径则是默认在 '/home' 目录下创建输入的目录名称."
+        read -p "请输入路径(例如:/mnt/xg)：" nfo_db_path
+        if [ -d /home/Emby ];then
+                temp_date=`date +%y%m%d%H%M%S`
+                echo
+                echo -e "找到 '/home/Emby' 正备份为 '/home/Emby_${temp_date}.bak'..."
+                sleep 1s
+                mv /home/Emby /home/Emby_${temp_date}.bak
+        fi      
+        if [ "${nfo_db_path}" == "" ];then
+                nfo_db_path="/home/Emby"
+        elif [ "${nfo_db_path:0:1}" != "/" ];then
+                nfo_db_path="/home/${nfo_db_path}"
+                echo -e "正在创建  '${nfo_db_path}' 链接到'/home/Emby'"
+                ln -s "${nfo_db_path}" /home/Emby
+        else
+                ln -s "${nfo_db_path}" /home/Emby
+                echo -e "正在创建 ' ${nfo_db_path}' 链接到 '/home/Emby'"
+        fi
+}
+untar(){
+        total_size=`du -sk $1 | awk '{print $1}'`
+        echo
+        pv -s $((${total_size} * 1020)) $1 | tar -xvf - -C $2
+}
+copy_emby_config(){
+        db_path="/mnt/video/EmbyDatabase/"
+        nfo_db_file="Emby削刮库.tar.gz"
+        opt_file="Emby-server数据库.tar.gz"
+        var_config_file="Emby-VarLibEmby数据库.tar.gz"
+
+
+
+        check_emby
+        get_nfo_db_path
+        if [ -f /usr/lib/systemd/system/emby-server.service ];then
+                echo -e "`curr_date` 停用Emby服务..."
+                systemctl stop emby-server.service
+                sleep 2s
+                echo
+                echo -e "`curr_date` 已停用Emby服务"
+        else
+                sleep 2s
+                echo
+                echo -e "`curr_date` 未找到emby.请重新执行安装脚本安装."
+                exit 1
+        fi
+
+        if [ -d /var/lib/emby ];then
+                echo
+                echo -e "`curr_date` 已找到emby配置文件，正在备份..."
+                mv -f /var/lib/emby /var/lib/emby.bak
+                sleep 2s
+                echo -e "`curr_date` 已将 ${red}/var/lib/emby${plain} 备份到当前目录."
+                echo
+        elif  [ -d /var/lib/emby.bak ];then
+                echo -e "`curr_date` 已备份，无需备份."
+                sleep 2s
+        fi
+        echo -e "`curr_date` 正在安装削刮库到 ${red}${nfo_db_path}${plain} 需要很长时间,请耐心等待..."
+        if [ ! -d "${nfo_db_path}" ];then
+                mkdir ${nfo_db_path}
+        fi
+        if [  -d ${db_path} ];then
+                if [ -f "${db_path}${nfo_db_file}" ];then
+                	${InstallMethod} install rsync -y
+                	rsync -avzuP ${db_path}${nfo_db_file} /root/${nfo_db_file}
+                        untar /root/${nfo_db_file}  ${nfo_db_path}
+                else
+                        echo -e "`curr_date` 未能找到削刮包 ${red}${db_path}${nfo_db_file}${plain} 请确认无误后重新运行脚本."
+                        echo
+                        renew_emby
+                        exit 1
+                fi
+                if [ "$?" -eq 0 ];then
+                        echo -e "`curr_date` Emby削刮包安装完成."
+                else
+                        echo -e "`curr_date` 异常退出.请检查挂载并从新运行脚本."
+                        exit 1
+                fi
+                echo
+
+                sleep 2s
+                echo -e "`curr_date` 正在安装emby配置文件.请稍等..."
+
+                if [ -f ${db_path}${var_config_file} ];then
+                        untar ${db_path}${var_config_file} /var/lib
+                else
+                        echo -e "`curr_date` 未能找到配置文件包 ${red}${db_path}${var_config_file}${plain} 请确认无误后重新运行脚本."
+                        echo
+                        renew_emby
+                        exit 1
+
+                fi
+
+                if [ "$?" -eq 0 ];then
+                        echo -e "`curr_date` Emby程序配置完成."
+                else
+                        echo -e "`curr_date` 异常退出.请检查挂载并从新运行脚本."
+                        exit 1
+                fi
+                echo
+
+        else
+                echo -e "`curr_date` 未找到 ${red}${db_path}${plain},请检查是否正确挂载。确认无误后重新执行脚本."
+                echo
+                renew_emby
+                exit 1
+
+        fi
+
+        echo -e "`curr_date` 启动emby服务..."
+        systemctl start emby-server.service
+
+        sleep 1s
+        echo -e "`curr_date` 配置完成."
+        echo
+        echo -e "访问地址为:${red}http://${ip_addr}:8096。账号：emby 密码为空${plain}"
+}
+swap_menu(){
+        clear
+        echo
+        echo
+        echo -e "   ${green}+-----------------------------------------------+${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}|      欢迎使用一键安装Rclone、Emby脚本         |${plain}"
+		echo -e "   ${green}|    BUG反馈电报群:https://t.me/P11DrivePlus    |${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}+-----------------------------------------------+${plain}"
+        echo
+        echo -e "   ${red}[当前位置:主菜单 >> SWAP配置]：${plain}"
+        echo
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [1]：添加SWAP空间.  |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [2]：删除SWAP空间.  |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [3]：返回主菜单.    |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo
+        read  -p "   请选择输入菜单对应数字开始执行：" select_swap
+	check_vz
+	case "${select_swap}" in
+		1)
+			add_swap;;
+		2)
+			del_swap;;
+		3)
+			menu;;
+		*)
+			echo -e "选择错误，请重新输入！"
+			swap_menu;;
+	esac
+	echo
+	read -n1 -p "是否返回主菜单(按 Y 返回主菜单，其它任意键继续执行SWAP配置)[Y]..." rturn
+	
+	case "${rturn}" in
+		Y | y)
+			menu;;
+		*)
+			swap_menu;;
+	esac
+}
+add_swap(){
+	echo
+	echo -e "${red}请输入需要添加的swap，建议为物理内存的2倍大小\n默认为KB，您也可以输入数字+[KB、MB、GB]的方式！（例如：4GB、4096MB、4194304KB）${plain}"
+	read -p "请输入swap数值(MB):" size
+	echo
+	size=`echo ${size} | tr '[a-z]' '[A-Z]'`
+        size_unit=${size:0-2:2}
+        echo "${size_unit}" | grep -qE '^[0-9]+$'
+        if [ $? -eq 0 ];then
+               size="${size}MB"
+        else
+ 	       if [ "${size_unit}" != "GB" ] && [ "${size_unit}" != "MB" ] && [ "${size_unit}" != "KB" ];then
+		       echo -e "swap大小只能是数字+单位，并且单位只能是KB、MB、GB。请检查后重新输入。"
+                        add_swap
+                fi
+        fi
+	
+	
+	
+	grep -q "swapfile" /etc/fstab
+	if [ $? -ne 0 ];then
+		echo -e "正在创建swapfile..."
+		sleep 2s
+		fallocate -l ${size} /swapfile
+		chmod 600 /swapfile
+		mkswap /swapfile
+		swapon /swapfile
+		echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+		echo -e "${red}swap创建成功，信息如下：${plain}"
+		cat /proc/swaps
+		cat /proc/meminfo | grep swap
+	else
+		echo -e "swapfile已存在，swap设置失败，请先运行脚本删除swap后重新设置！"
+	fi
+}
+del_swap(){
+	grep -q "swapfile" /etc/fstab
+	if [ $? -eq 0 ];then
+		echo
+		echo -e "正在删除SWAP空间..."
+		sleep 2s
+		sed -i '/swapfile/d' /etc/fstab
+		echo "3" > /proc/sys/vm/drop_caches
+		swapoff -a
+		rm -f /wapfile
+		echo
+		echo -e "删除成功！"
+	else
+		echo
+		echo -e "未找到swapfile，删除失败！"
+	fi
+}
+menu_go_on(){
+        echo
+        echo -e "${red}是否继续执行脚本?${plain}"
+        read -n1 -p "Y继续执行，N退出脚本[Y/n]" res
+        echo
+        case "$res" in
+                Y |y)
+                        ;;
+                N | n)
+                        exit 1;;
+                *)
+                        echo "输入错误"
+                        menu_go_on;;
+        esac
+}
+
+menu(){
+        echo
+        echo
+        echo -e "   ${green}+-----------------------------------------------+${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}|      欢迎使用一键安装Rclone、Emby脚本         |${plain}"
+		echo -e "   ${green}|    BUG反馈电报群:https://t.me/P11DrivePlus    |${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}|                                               |${plain}"
+        echo -e "   ${green}+-----------------------------------------------+${plain}"
+        echo
+        echo -e "   ${red}[主菜单]：${plain}"
+        echo
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [1]：安装Rclone.    |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [2]：安装/更新Emby. |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [3]：安装Rclone服务.|${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [4]：复制Emby削刮包.|${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [5]：swap配置.      |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo -e "        ${red}| [6]：退出脚本.      |${plain}"
+        echo -e "        ${red}+---------------------+${plain}"
+        echo
+        read  -p "   请选择输入菜单对应数字开始执行：" select_menu
+        check_command pv
+	check_command tar
+        check_command curl
+        check_command wget
+
+        ip_addr=$(curl -s ifconfig.me)
+        case "${select_menu}" in
+                1)
+                        setup_rclone;;
+                2)
+                        setup_emby;;
+                3)
+                        create_rclone_service;;
+                4)
+                        copy_emby_config;;
+		5)
+			swap_menu;;
+                6)
+                        exit 1;;
+                *)
+                        echo
+                        echo -e "`curr_date` ${red}选择错误，请重新选择。${plain}"
+                        menu;;
+        esac
+        menu_go_on
+        menu
+}
+
+menu
