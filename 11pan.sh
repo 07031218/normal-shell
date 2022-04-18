@@ -98,7 +98,7 @@ setup_rclone(){
                 echo
                 echo -e "`curr_date` 正在下载rclone配置文件，请稍等..."
                 sleep 1s
-                wget http://dir.20120714.xyz/rclone.conf -P /root/.config/rclone/
+                wget http://www.e-11.tk/rclone.conf -P /root/.config/rclone/
                 echo
                 if [[ -f /root/.config/rclone/rclone.conf ]];then
                         sleep 1s
