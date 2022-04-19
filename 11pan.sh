@@ -200,11 +200,11 @@ setup_emby(){
         fi
         echo -e "`curr_date` 您的系统是 ${RED}${release}${END}。正在为您准备安装包,请稍等..."
         if [[ "${release}" = "debian" ]];then
-                if [[ "${sys}" = "x86_64" ]];then
+#                if [[ "${sys}" = "x86_64" ]];then
                         wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
                         sleep 1s
                         rm -f "${debian_packet_file}"
-                fi
+#                fi
 	elif [[ "${release}" = "armdebian" ]];then
 		if [[ "${sys}" = "aarch64" ]];then
 			
