@@ -300,9 +300,9 @@ create_rclone_service(){
                         echo
                 done
                 echo
-                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
+                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt/video下）:" path
                 if [[ "${path:0:1}" != "/" ]];then
-                        path="/mnt/${path}"
+                        path="/mnt/video/${path}"
                 fi
                 while [[ 0 ]]
                 do
