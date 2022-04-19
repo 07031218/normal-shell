@@ -167,7 +167,27 @@ setup_rclone(){
                 echo -e "`curr_date`   本机已存在配置文件.\n\n\t\t\t如需使用新的配置文件,请先手动删除本机配置文件(`red "mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/"`)后再运行脚本."
         fi
 }
+setup_gclone(){
+        if [[ ! -f /usr/bin/gclone ]];then
+                echo -e "`curr_date` 正在安装gclone,请稍等..."
+                bash <(curl -sL https://cdn.jsdelivr.net/gh/07031218/normal-shell@main/gclone.sh )
+                if [[ -f /usr/bin/rclone ]];then
+                        sleep 1s
+                        echo
+                        echo -e "`curr_date` gclone安装成功."
+                else
+                        echo -e "`curr_date` 安装失败.请重新运行脚本安装."
+                        exit 1
+                fi
 
+        else
+                echo
+                echo -e "`curr_date` 本机已安装gclone.无须安装."
+         fi
+         echo -e "`curr_date` ${RED}开始使用gclone来获取Google Api Tkoen，请按照命令行提示操作·····.${END}"
+         gclone config
+         exit 0
+}
 #
 #安装Emby
 #
@@ -648,21 +668,23 @@ menu(){
         echo
         echo -e "   ${RED}[主菜单]：${END}"
         echo
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [1]：安装Rclone.    |${END}"
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [2]：安装/更新Emby. |${END}"
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [3]：安装Rclone服务.|${END}"
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [4]：复制Emby削刮包.|${END}"
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [5]：swap配置.      |${END}"
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [6]：Emby破解.      |${END}"
-        echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [7]：退出脚本.      |${END}"
-        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [1]：安装Rclone.     |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [2]：安装/更新Emby.  |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [3]：Gclone获取Token.|${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [4]：安装Rclone服务. |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [5]：复制Emby削刮包. |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [6]：swap配置.       |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [7]：Emby破解.       |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [8]：退出脚本.       |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
         echo
         read  -p "   请选择输入菜单对应数字开始执行：" select_menu
 	check_root
@@ -679,14 +701,16 @@ menu(){
                 2)
                         setup_emby;;
                 3)
-                        create_rclone_service;;
+                        setup_gclone;;
                 4)
+                        create_rclone_service;;
+                5)
                         copy_emby_config;;
-		5)
+		6)
 			swap_menu;;
-                6)
-                        emby_crack;;
                 7)
+                        emby_crack;;
+                8)
                         exit 1;;
                 *)
                         echo
