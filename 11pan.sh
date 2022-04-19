@@ -591,8 +591,8 @@ swap_menu(){
         echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
-	echo -e "   ${RED_W}|    BUG反馈电报群:https://t.me/P11DrivePlus    |${END}"
-        echo -e "   ${RED_W}|                                               |${END}"
+	echo -e "   ${RED_W}|    BUG反馈电报群:https://t.me/EmbyDrive       |${END}"
+	echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}+-----------------------------------------------+${END}"
         echo
@@ -637,8 +637,8 @@ menu(){
         echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
-	echo -e "   ${RED_W}|    BUG反馈电报群:https://t.me/P11DrivePlus    |${END}"
-        echo -e "   ${RED_W}|                                               |${END}"
+	echo -e "   ${RED_W}|    BUG反馈电报群:https://t.me/EmbyDrive       |${END}"
+	echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}|                                               |${END}"
         echo -e "   ${RED_W}+-----------------------------------------------+${END}"
         echo
