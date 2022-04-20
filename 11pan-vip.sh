@@ -683,7 +683,7 @@ menu(){
         echo -e "        ${RED}+----------------------+${END}"
         echo -e "        ${RED}| [7]：Emby破解.       |${END}"
         echo -e "        ${RED}+----------------------+${END}"
-        echo -e "        ${RED}| [8]：退出脚本.       |${END}"
+        echo -e "        ${RED}|${END} ${while}[0]：退出脚本.${plain}       ${RED}|${END}"
         echo -e "        ${RED}+----------------------+${END}"
         echo
         read  -p "   请选择输入菜单对应数字开始执行：" select_menu
@@ -710,8 +710,8 @@ menu(){
 			swap_menu;;
                 7)
                         emby_crack;;
-                8)
-                        exit 1;;
+                0)
+                        exit 0;;
                 *)
                         echo
                         echo -e "`curr_date` ${RED}选择错误，请重新选择。${END}"
