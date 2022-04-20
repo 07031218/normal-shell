@@ -763,7 +763,7 @@ menu(){
         echo -e "        ${RED}+----------------------+${END}"
         echo -e "        ${RED}| [7]：一键反代Emby.   |${END}"
         echo -e "        ${RED}+----------------------+${END}"
-        echo -e "        ${RED}| [0]：退出脚本.       |${END}"
+        echo -e "        ${RED}|${END} ${while}[0]：退出脚本.${plain}       ${RED}|${END}"
         echo -e "        ${RED}+----------------------+${END}"
         echo
         read  -p "   请选择输入菜单对应数字开始执行：" select_menu
