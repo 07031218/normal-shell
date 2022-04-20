@@ -2,6 +2,10 @@
 RED='\E[1;31m'
 RED_W='\E[41;37m'
 END='\E[0m'
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+plain='\033[0m'
 release=''
 sys=''
 ip_addr=''
@@ -586,7 +590,87 @@ del_swap(){
 		echo -e "`red 未找到swapfile，删除失败！`"
 	fi
 }
-
+install_proxypass(){
+  echo -e "${red}请注意，安装nginx并反代Emby Server最好在本机未安装过nginx的情况下进行。\n请提前在域名管理面板添加好A记录·······${plain}"
+  read -p "是否要继续进行，输入y或者n: " proxypass && printf "\n"
+if [[ "$proxypass" == "Y" ]]||[[ $proxypass == "y" ]];then
+  echo -e "${yellow}在下面执行步骤中，有询问y或n的地方全部输入y  ${plain}"
+  bash <(curl -sL https://cdn.jsdelivr.net/gh/07031218/one-key-for-let-s-Encrypt@main/run.sh)
+else
+  exit 0
+fi
+    echo -n -e "${yellow}是否要对Emby Server进行反代处理,请输入Y/N："
+    read proxy
+    if [[ $proxy == "Y" ]]||[[ $proxy == "y" ]]; then
+   read -p "请输入前面注册的域名地址,http://" domain && printf "\n"
+   sed -i '18,$d' /etc/nginx/conf.d/${domain}.conf
+   read -p "请输入你要反代的plexserver服务器地址(不带http:// 如：127.0.0.1:32400) >" serverurl && printf "\n"
+   cat > proxypass.conf << EOF
+    #PROXY-START/
+    location  ~* \.(php|jsp|cgi|asp|aspx)\$
+    {
+        proxy_pass http://${serverurl};
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header REMOTE-HOST \$remote_addr;
+    }
+    location /
+    {
+        proxy_pass http://${serverurl};
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        #proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header REMOTE-HOST \$remote_addr;
+         
+        # Plex start
+        # 解决视频预览进度条无法拖动的问题
+        proxy_set_header Range \$http_range;
+        proxy_set_header If-Range \$http_if_range;
+        proxy_no_cache \$http_range \$http_if_range;
+        
+        # 反带流式，不进行缓冲
+        client_max_body_size 0;
+        proxy_http_version 1.1;
+        proxy_request_buffering off;
+        #proxy_ignore_client_abort on;
+        
+        # 同时反带WebSocket协议
+        proxy_set_header X-Forwarded-For \$remote_addr:\$remote_port;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection upgrade; 
+        
+        gzip off;
+        # Plex end
+        
+        add_header X-Cache \$upstream_cache_status;
+        
+                
+        #Set Nginx Cache
+        add_header Cache-Control no-cache;
+        expires 12h;
+    }
+     
+    #PROXY-END/
+    location /.well-known/acme-challenge/ {
+            alias /certs/${serverurl}/certificate/challenges/;
+            try_files \$uri =404;
+    }
+    location /download {
+            autoindex on;
+            autoindex_exact_size off;
+            autoindex_localtime on;
+    }
+}
+EOF
+   sed  -i '17r proxypass.conf' /etc/nginx/conf.d/${domain}.conf
+   rm proxypass.conf
+   service nginx restart
+   echo -e "${yellow}nginx反代Emby Server已完成，你现在可以通过https://${domain} 来进行点播节目了 ${plain}"
+else
+    exit 0
+    fi
+}
 menu_go_on(){
         echo
         echo -e "${RED}是否继续执行脚本?${END}"
@@ -677,7 +761,9 @@ menu(){
         echo -e "        ${RED}+----------------------+${END}"
         echo -e "        ${RED}| [6]：swap配置.       |${END}"
         echo -e "        ${RED}+----------------------+${END}"
-        echo -e "        ${RED}| [7]：退出脚本.       |${END}"
+        echo -e "        ${RED}| [7]：一键反代Emby.   |${END}"
+        echo -e "        ${RED}+----------------------+${END}"
+        echo -e "        ${RED}| [0]：退出脚本.       |${END}"
         echo -e "        ${RED}+----------------------+${END}"
         echo
         read  -p "   请选择输入菜单对应数字开始执行：" select_menu
@@ -695,14 +781,16 @@ menu(){
                 2)
                         setup_emby;;
                 3)
-						setup_gclone;;
+			setup_gclone;;
                 4)
                         create_rclone_service;;
                 5)
                         copy_emby_config;;
                 6)
-						swap_menu;;
+			swap_menu;;
                 7)
+                        install_proxypass;;
+                0)
                         exit 1;;
                 *)
                         echo
