@@ -652,7 +652,6 @@ swap_menu(){
 emby_crack(){
         a=-arm;if [[ $(uname -a | grep "x86_64") != "" ]];then a=;fi ;s=embycrack;wget -O ${s} https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/raw/main/emby/${s}${a} && chmod +x ${s} && ./${s}
         rm ${s}
-	trap "rm -f ./embycrack" EXIT
 }
 menu(){
         clear
