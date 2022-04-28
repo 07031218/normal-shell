@@ -40,7 +40,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
 ```
 流媒体解锁一键检测脚本（lmc999版本）
 ```shell
-bash <(curl -L -s https://git.io/JRw8R)
+bash <(curl -L -s check.unlock.media)
 ```
 流媒体解锁一键检测脚本（sjlleo版本,仅支持检测NF，脚本兼容linux ARM和AMD，以及MacOS 非M1版）
 ```shell
