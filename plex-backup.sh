@@ -45,13 +45,13 @@ ${green}2.${plain}  一键还原Plex削刮包、数据库
 	read -p "请输入你要选择的功能：" num
 	case "$num" in
 	  0)
-	    quit
+	    exit 0
 	    ;;
 	  1)
-	    install_ql
+	    backup_plex
 	    ;;
 	  2)
-	    install_depend
+	    restore_config
 	    ;;
 	  *)
 		clear
