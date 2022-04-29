@@ -5,26 +5,28 @@ White='\033[37m'
 blue='\033[36m'
 yellow='\033[0;33m'
 plain='\033[0m'
-databasefile_dir='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/"Plug-in Support"/Databases/'
-plexdir1='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/Cache'
-plexdir2='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/Metadata'
-plexdir3='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/Media'
-plexdir='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/'
+databasefile_dir='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-in Support/Databases/'
+plexdir1='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache'
+plexdir2='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Metadata'
+plexdir3='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Media'
+plexdir='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/'
 # curr_date=`date +%Y-%m-%d`
 backup_plex(){
 	service plexmediaserver stop
-	cd $databasefile_dir
+	cd "$databasefile_dir"
 	tar -czvf /root/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
-	cd $plexdir
-	tar -czvPf /root/plex-xuegua.tar.gz -C ./Metadata ./Cache ./Media
+	cd "$plexdir"
+	tar -czvPf /root/plex-xuegua.tar.gz  ./Metadata ./Cache ./Media
 	service plexmediaserver start
+	rsync -avzuP /root/plexdatabase.tar.gz /nongjiale
+	rsync -avzuP /root/plex-xuegua.tar.gz /nongjiale 
 }
 restore_config(){
 	service plexmediaserver stop
-	cd $databasefile_dir
+	cd "$databasefile_dir"
 	rsync -avzuP /nongjiale/plexdatabase.tar.gz ./
 	tar -xzvf plexdatabase.tar.gz
-	cd $plexdir
+	cd "$plexdir"
 	rsync -avzuP /nongjiale/plex-xuegua.tar.gz ./
 	tar -xzvf plex-xuegua.tar.gz
 }
