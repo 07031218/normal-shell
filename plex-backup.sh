@@ -5,11 +5,11 @@ White='\033[37m'
 blue='\033[36m'
 yellow='\033[0;33m'
 plain='\033[0m'
-databasefile_dir="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-in Support/Databases/"
-plexdir1="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache"
-plexdir2="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Metadata"
-plexdir3="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Media"
-plexdir="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/"
+databasefile_dir='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/"Plug-in Support"/Databases/'
+plexdir1='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/Cache'
+plexdir2='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/Metadata'
+plexdir3='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/Media'
+plexdir='/var/lib/plexmediaserver/Library/"Application Support"/"Plex Media Server"/'
 # curr_date=`date +%Y-%m-%d`
 backup_plex(){
 	service plexmediaserver stop
@@ -45,13 +45,13 @@ ${green}2.${plain}  一键还原Plex削刮包、数据库
 	read -p "请输入你要选择的功能：" num
 	case "$num" in
 	  0)
-	    exit 0
+	    quit
 	    ;;
 	  1)
-	    backup_plex
+	    install_ql
 	    ;;
 	  2)
-	    restore_config
+	    install_depend
 	    ;;
 	  *)
 		clear
