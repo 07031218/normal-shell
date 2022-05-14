@@ -50,7 +50,7 @@ if test -z "$(which wget)"; then
 echo -e "检测到系统未安装wget，开始安装wget"
     ${InstallMethod} install wget -y > /dev/null 2>&1 
 fi
-version=$(curl --silent "https://github.com/sjlleo/netflix-verify/releases/latest" | sed 's#.*tag/\(.*\)".*#\1#')
+version=$(curl -s 'https://api.github.com/repos/sjlleo/netflix-verify/releases'|grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'|head -1)
 #下载检测程序
 wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch}
 chmod +x nf > /dev/null 2>&1 
