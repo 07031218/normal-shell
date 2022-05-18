@@ -80,7 +80,7 @@ echo -n -e "${yellow}请输入系统Bit版本：32或64 \n>:${plain}"
 read bits
 echo -n -e "${yellow}请输入系统DD之后的登陆密码\n>：${plain}"
 read password
-echo -n -e "${yellow}您设置的密码为:${plain}${red}${password}${plain}  请确认是否正式开始DD系统[Y/N]\n>："
+echo -n -e "${yellow}您设置的密码为:${plain}${red}${password}${plain}  ${red}请确认是否正式开始DD系统[Y/N]${plain}\n>："
 read yn
 if [[ $yn == "y" ]]||[[ $yn == "Y" ]]; then
 	bash <(wget --no-check-certificate -qO- 'https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/InstallNET.sh') --ip-addr ${local_ip} --ip-gate ${gateway} --ip-mask 255.255.255.0 -${sysinfo} ${version} -v ${bits} -a -p ${password}
