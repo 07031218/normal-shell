@@ -62,6 +62,7 @@ check_dependencies(){
 }
 check_dependencies
 ${InstallMethod} install -y xz-utils openssl gawk file wget
+clear
 local_ip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
 gateway=$(route | grep 'default' | awk '{print $2}')
 echo -e "${red}注意：本脚本针对GCP主机原版系统DD到其他自定义系统，如您不是GCP主机请Ctrl+C退出执行脚本${plain}"
