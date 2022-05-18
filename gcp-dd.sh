@@ -74,6 +74,7 @@ elif [[ $chose == "2" ]]; then
 elif [[ $chose == "3" ]]; then
 	sysinfo=c
 fi
+clear
 echo -n -e "${yellow}请输入系统版本号：\n如 Debian 11输入11，Ubuntu 20.04输入20.04，Centos 6.9输入6.9 \n>：${plain}"
 read version
 echo -n -e "${yellow}请输入系统Bit版本：32或64 \n>:${plain}"
