@@ -52,7 +52,7 @@ echo -e "检测到系统未安装wget，开始安装wget"
 fi
 version=$(curl -s 'https://api.github.com/repos/sjlleo/netflix-verify/releases'|grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'|head -1)
 #下载检测程序
-wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${version}_${arch}
+wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${arch}
 chmod +x nf > /dev/null 2>&1 
 clear
 ./nf -method full
