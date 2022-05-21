@@ -55,6 +55,6 @@ version=$(curl -s 'https://api.github.com/repos/sjlleo/netflix-verify/releases'|
 wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/${version}/nf_${arch}
 chmod +x nf > /dev/null 2>&1 
 clear
-./nf -method full
+./nf
 rm nf
 exit
