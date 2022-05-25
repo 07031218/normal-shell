@@ -75,10 +75,11 @@ elif [[ $chose == "2" ]]; then
 elif [[ $chose == "3" ]]; then
 	sysinfo=c
 fi
+bits=$(getconf LONG_BIT)
 echo -n -e "${yellow}请输入系统版本号：\n如 Debian 11输入11，Ubuntu 20.04输入20.04，Centos 6.9输入6.9 \n>：${plain}"
 read version
-echo -n -e "${yellow}请输入系统Bit版本：32或64 \n>:${plain}"
-read bits
+# echo -n -e "${yellow}请输入系统Bit版本：32或64 \n>:${plain}"
+# read bits
 echo -n -e "${yellow}请输入系统DD之后的登陆密码\n>：${plain}"
 read password
 echo -n -e "${yellow}您设置的密码为:${plain}${green}${password}${plain}  ${red}请确认是否正式开始DD系统[Y/N]${plain}\n>："
