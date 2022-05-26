@@ -62,3 +62,7 @@ bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/0
 ```shell
 a=-arm;if [[ $(uname -a | grep "x86_64") != "" ]];then a=;fi ;s=plex;wget -O ${s} https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/raw/main/${s}/${s}${a} && chmod +x ${s} && ./${s}
 ```
+Linux系统一键创建、删除删除用户
+```shell
+bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/user.sh)
+```
