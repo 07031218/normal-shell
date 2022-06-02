@@ -66,3 +66,7 @@ Linux系统一键创建、删除用户
 ```shell
 bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/user.sh)
 ```
+Emby Server一键备份、还原脚本
+```shell
+bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/emby-bs.sh)
+```
