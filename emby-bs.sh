@@ -55,7 +55,7 @@ backup_emby(){
 	read backto_dir
 	systemctl stop emby-server
 	cd $xuegua_dir
-	tar -czvfP ${backto_dir}/Emby削刮包.tar.gz ./
+	tar -czvf ${backto_dir}/Emby削刮包.tar.gz ./
 	if [[ "$?" -eq 0 ]]; then
 		clear
 		echoContent green "Emby削刮包备份完成"
@@ -65,7 +65,7 @@ backup_emby(){
 		exit 1
 	fi
 	cd $sys_dir
-	tar -czvfP ${backto_dir}/Emby-server数据库.tar.gz ./
+	tar -czvf ${backto_dir}/Emby-server数据库.tar.gz ./
 	if [[ "$?" -eq 0 ]]; then
 		clear
 		echoContent green "Emby-server数据库备份完成"
@@ -75,7 +75,7 @@ backup_emby(){
 		exit 1
 	fi
 	cd $config_dir
-	tar -czvfP ${backto_dir}/Emby-VarLibEmby数据库.tar.gz ./emby/
+	tar -czvf ${backto_dir}/Emby-VarLibEmby数据库.tar.gz ./emby/
 	if [[ "$?" -eq 0 ]]; then
 		clear
 		echoContent green "Emby-VarLibEmby数据库备份完成"
