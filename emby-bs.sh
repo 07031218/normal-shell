@@ -57,9 +57,9 @@ untar(){
     if [[ `which pv` == "" ]]; then
         apt install pv -y || yum install pv -y
     fi
-    total_size=`du -sk $2 | awk '{print $2}'`
+    total_size=`du -sk $1 | awk '{print $1}'`
     echo
-    pv -s $((${total_size} * 1020)) $2 | tar -zxf - $1
+    pv -s $((${total_size} * 1020)) $1 | tar zxf - -C $2
 }
 # echoContent skyBlue "请输入Emby系统文件夹路径,留空则默认为/opt/emby-server/"
 sys_dir=/opt/emby-server/
@@ -132,6 +132,7 @@ restore_emby(){
     fi
     systemctl stop emby-server
     if [[ ${xuegua_dir} != "/var/lib/emby/programdata/" ]]; then
+        echoContent yellow "Emby削刮包恢复中，请耐心等待······"
         untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
         if [[ "$?" -eq 0 ]]; then
             # clear
@@ -143,6 +144,7 @@ restore_emby(){
             exit 1
         fi
     fi
+    echoContent yellow "Emby-server数据库恢复中，请耐心等待······"
     untar ${backto_dir}/Emby-server数据库.tar.gz $sys_dir
     if [[ "$?" -eq 0 ]]; then
         # clear
@@ -153,6 +155,7 @@ restore_emby(){
         systemctl start emby-server
         exit 1
     fi
+    echoContent yellow "Emby-VarLibEmby数据库恢复中，请耐心等待······"
     untar ${backto_dir}/Emby-VarLibEmby数据库.tar.gz $config_dir
     if [[ "$?" -eq 0 ]]; then
         echoContent green "Emby-VarLibEmby数据库恢复完成"
