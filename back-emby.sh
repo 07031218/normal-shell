@@ -7,7 +7,7 @@ embylib_dir="/var/lib/"
 # Emby主程序相关目录
 embyserver_dir="/opt/emby-server/"
 # 备份文件存放目录
-bak_dir="/nongjiale/emby-server-bak/bak"
+bak_dir=""
 # 时间格式化，如 20220602
 DATE=`date +%Y%m%d`
 # 备份脚本保存的天数
