@@ -168,6 +168,7 @@ restore_emby(){
     systemctl start emby-server
 }
 copyright(){
+    clear
     echo -e "
 ${green}###########################################################${plain}
 ${green}#                                                         #${plain}
