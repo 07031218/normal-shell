@@ -184,6 +184,7 @@ ${green}###########################################################${plain}"
 main(){
 copyright
 echo -e "
+${red}1.  退出脚本${plain}
 ${green}———————————————————————————————————————————————————————————${plain}
 ${green}1.${plain}  一键备份
 ${green}2.${plain}  一键还原
@@ -191,6 +192,9 @@ ${green}2.${plain}  一键还原
     echo -e "${yellow}请选择你要使用的功能${plain}"
     read -p "请输入数字 :" num   
     case "$num" in
+        0)
+            exit 0
+            ;;
         1)
             backup_emby
             ;;
