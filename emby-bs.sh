@@ -42,6 +42,25 @@ echoContent() {
     ;;
   esac
 }
+targz(){
+    if [[ `which pv` == "" ]]; then
+        apt install pv -y || yum install pv -y
+    fi
+    if [[ $1 = '' ]]; then
+        echo "参数缺失，用法 'targz 压缩名 文件名/目录名'"
+        exit 1
+    fi
+
+    tar -cf - $2 | pv -s $(du -sk ./ | awk '{print $1}') | gzip > $1
+}
+untar(){
+    if [[ `which pv` == "" ]]; then
+        apt install pv -y || yum install pv -y
+    fi
+    total_size=`du -sk $2 | awk '{print $2}'`
+    echo
+    pv -s $((${total_size} * 1020)) $2 | tar -zxf - $1
+}
 # echoContent skyBlue "请输入Emby系统文件夹路径,留空则默认为/opt/emby-server/"
 sys_dir=/opt/emby-server/
 # echoContent skyBlue "请输入Emby配置文件夹路径,留空则默认为/var/lib"
@@ -52,15 +71,18 @@ backup_emby(){
     mkdir -p $backto_dir/$DATE
     echoContent skyBlue "请输入Emby削刮库的目录路径，留空则默认为/var/lib/emby/programdata/"
     read xuegua_dir
+    echoContent white "即将开始对Emby Server进行备份，需要一定的时间，请耐心等待······"
+    sleep 3s
     if [[ ${xuegua_dir} == "" ]]; then
         xuegua_dir=/var/lib/emby/programdata/
         systemctl stop emby-server
     else
         systemctl stop emby-server
         cd $xuegua_dir
-        tar -czvf ${backto_dir}/${DATE}/Emby削刮包.tar.gz ./
+        echoContent yellow "Emby削刮包备份中，请耐心等待······"
+        targz ${backto_dir}/${DATE}/Emby削刮包.tar.gz ./
         if [[ "$?" -eq 0 ]]; then
-            clear
+            # clear
             echoContent green "Emby削刮包备份完成"
             sleep 5s
         else
@@ -70,9 +92,10 @@ backup_emby(){
         fi
     fi
     cd $sys_dir
-    tar -czvf ${backto_dir}/${DATE}/Emby-server数据库.tar.gz ./
+    echoContent yellow "Emby-server数据库备份中，请耐心等待······"
+    targz ${backto_dir}/${DATE}/Emby-server数据库.tar.gz ./
     if [[ "$?" -eq 0 ]]; then
-        clear
+        # clear
         echoContent green "Emby-server数据库备份完成"
         sleep 5s
     else
@@ -81,9 +104,10 @@ backup_emby(){
         exit 1
     fi
     cd $config_dir
-    tar -czvf ${backto_dir}/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby/
+    echoContent yellow "Emby-VarLibEmby数据库备份中，请耐心等待······"
+    targz ${backto_dir}/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby/
     if [[ "$?" -eq 0 ]]; then
-        clear
+        # clear
         echoContent green "Emby-VarLibEmby数据库备份完成"
     else
         echoContent red "Emby-VarLibEmby数据库备份失败"
@@ -108,9 +132,9 @@ restore_emby(){
     fi
     systemctl stop emby-server
     if [[ ${xuegua_dir} != "/var/lib/emby/programdata/" ]]; then
-        tar -xzvf ${backto_dir}/Emby削刮包.tar.gz -C $xuegua_dir
+        untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
         if [[ "$?" -eq 0 ]]; then
-            clear
+            # clear
             echoContent green "Emby削刮包恢复完成"
             sleep 5s
         else
@@ -119,9 +143,9 @@ restore_emby(){
             exit 1
         fi
     fi
-    tar -xzvf ${backto_dir}/Emby-server数据库.tar.gz -C $sys_dir
+    untar ${backto_dir}/Emby-server数据库.tar.gz $sys_dir
     if [[ "$?" -eq 0 ]]; then
-        clear
+        # clear
         echoContent green "Emby-server数据库恢复完成"
         sleep 5s
     else
@@ -129,7 +153,7 @@ restore_emby(){
         systemctl start emby-server
         exit 1
     fi
-    tar -xzvf ${backto_dir}/Emby-VarLibEmby数据库.tar.gz -C $config_dir
+    untar ${backto_dir}/Emby-VarLibEmby数据库.tar.gz $config_dir
     if [[ "$?" -eq 0 ]]; then
         echoContent green "Emby-VarLibEmby数据库恢复完成"
     else
