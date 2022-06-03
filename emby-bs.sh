@@ -51,7 +51,7 @@ targz(){
         exit 1
     fi
 
-    tar -cf - $2 | pv -s $(du -sk ./ | awk '{print $1}') | gzip > $1
+    tar -cf - $2 | pv -s $(du -sk $2 | awk '{print $1}') | gzip > $1
 }
 untar(){
     if [[ `which pv` == "" ]]; then
