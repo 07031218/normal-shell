@@ -170,7 +170,7 @@ setup_rclone(){
 setup_gclone(){
         if [[ ! -f /usr/bin/gclone ]];then
                 echo -e "`curr_date` 正在安装gclone,请稍等..."
-                bash <(curl -sL https://cdn.jsdelivr.net/gh/07031218/normal-shell@main/gclone.sh )
+                bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/main/gclone.sh )
                 if [[ -f /usr/bin/rclone ]];then
                         sleep 1s
                         echo
