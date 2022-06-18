@@ -53,7 +53,7 @@ do
         # 与当天的时间做对比，把早于7天的备份文件删除
         if [ $(( $SECONDS- $indexSecond )) -gt 0 ]
         then
-            rm -rf $index
+            rm -rf $bak_dir/$index
         fi
     fi
 done
