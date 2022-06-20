@@ -80,6 +80,8 @@ install_qBittorrent(){
       exit 1
     fi
   fi
+  echo -ne "${yellow}请输入qBittorrent下载文件存放目录的绝对路径：${plain}"
+  read down_dir
   cat>/root/qBittorrent.yml<<EOF
 version: "2.1"
 services:
@@ -93,7 +95,7 @@ services:
       - WEBUI_PORT=8080
     volumes:
       - /root/qbittorrent/config:/config
-      - /home/downloads:/downloads
+      - ${down_dir}:/downloads
     ports:
       - 8080:8080
       - 6881:6881
@@ -103,7 +105,7 @@ EOF
   cd /root
   docker-compose -f qBittorrent.yml up -d
   if [[ "$#" -eq 0 ]]; then
-    echo -e "${green}qBittorrent安装成功······${plain}"
+    echo -e "${green}qBittorrent安装成功······\n下载文件存放路径:${down_dir}${plain}"
     echo -e "${green}默认用户名：admin\n默认密码：adminadmin\n请登录面板后及时修改默认密码${plain}"
   else
     echo -e "${red}qBittorrent安装失败······${plain}"
