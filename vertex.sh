@@ -59,6 +59,57 @@ EOF
   password=`cat /root/vertex/data/password`
   echo -e "${green}Vertex安装完毕，面板访问地址：http://${baseip}:3000 或 http://${local_ip}:3000\n用户名:admin\n密  码:${plain} ${red}${password}${plain}${green}\n进入vertex面板后通过${plain} ${red}全局设置${plain} ${green}修改密码 ${plain}"
 }
+install_qBittorrent(){
+    if test -z "$(which docker)"; then
+    echo -e "${yellow}检测到系统未安装docker，开始安装docker${plain}"
+    curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+    if [[ "$#" -eq 0 ]]; then
+      echo -e "${green}docker安装成功······${plain}"
+    else
+      echo -e "${red}docker安装失败······${plain}"
+      exit 1
+    fi
+  fi
+  if test -z `which docker-compose`;then
+    echo -e "${yellow}检测到系统未安装docker-compose，开始安装docker-compose${plain}"
+    curl -L https://get.daocloud.io/docker/compose/releases/download/v2.4.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+    if [[ "$#" -eq 0 ]]; then
+       echo -e "${green}docker-compose安装成功······${plain}"
+    else
+      echo -e "${red}docker-compose安装失败······${plain}"
+      exit 1
+    fi
+  fi
+  cat>/root/qBittorrent.yml<<EOF
+version: "2.1"
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Aisa/Shanghai
+      - WEBUI_PORT=8080
+    volumes:
+      - /root/qbittorrent/config:/config
+      - /home/downloads:/downloads
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+EOF
+  cd /root
+  docker-compose -f qBittorrent.yml up -d
+  if [[ "$#" -eq 0 ]]; then
+    echo -e "${green}qBittorrent安装成功······${plain}"
+    echo -e "${green}默认用户名：admin\n默认密码：adminadmin\n请登录面板后及时修改默认密码${plain}"
+  else
+    echo -e "${red}qBittorrent安装失败······${plain}"
+    exit 1
+  fi
+}
 uninstall_vertex(){
   cd /root
   docker-compose down
@@ -88,7 +139,8 @@ main(){
   echo -e "
 ${red}0.${plain} 退出脚本
 ${green}1.${plain} 安装vertex
-${green}2.${plain} 卸载vertex
+${green}2.${plain} 安装qBittorrent
+${green}3.${plain} 卸载vertex
 "
   read -p "请输入数字 :" num
   case "$num" in
@@ -99,6 +151,9 @@ ${green}2.${plain} 卸载vertex
     install_vertex
     ;;
   2)
+    install_qBittorrent
+    ;;
+  3)
     uninstall_vertex
     ;;
   *)
