@@ -55,6 +55,7 @@ install_vertex(){
       image: lswl/vertex-base:latest
 EOF
   docker-compose up -d
+  sleep 5s
   password=`cat /root/vertex/data/password`
   echo -e "${green}Vertex安装完毕，面板访问地址：http://${baseip}:3000 或 http://${local_ip}:3000\n用户名:admin\n密  码:${plain} ${red}${password}${plain}${green}\n进入vertex面板后通过${plain} ${red}全局设置${plain} ${green}修改密码 ${plain}"
 }
