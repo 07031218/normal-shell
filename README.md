@@ -70,7 +70,7 @@ Emby Server一键备份、还原脚本
 ```shell
 bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/emby-bs.sh)
 ```
-Vertex刷流一键安装、卸载脚本
+Vertex、qBittorrent刷流一键安装、卸载脚本
 ```shell
 bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/vertex.sh)
 ```
