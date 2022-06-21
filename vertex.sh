@@ -140,6 +140,7 @@ uninstall_vertex(){
   read yn
   if [[ $yn == "Y" ]]||[[  $yn == "y" ]]; then
     rm -rf /root/vertex
+    rm /root/docker-compose.yml
     docker rmi lswl/vertex:latest
     docker rmi lswl/vertex-base:latest
     echo -e "${yellow}vertex映射目录和相关本地镜像已删除${plain}"
