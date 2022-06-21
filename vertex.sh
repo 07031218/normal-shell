@@ -35,7 +35,8 @@ install_vertex(){
   fi
   mkdir -p /root/vertex && chmod 777 /root/vertex
   cd /root
-  cat >/root/docker-compose.yml <<EOFversion: "2.0"
+  cat >/root/docker-compose.yml <<EOF
+version: "2.0"
 services:
   vertex:
     image: lswl/vertex:latest
