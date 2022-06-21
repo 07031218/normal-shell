@@ -112,6 +112,27 @@ EOF
     exit 1
   fi
 }
+restore_rule(){
+  cd /root/vertex/data
+  if test -z `which unzip`; then
+    echo -e "${yellow}检测到系统未安装unzip，开始安装unzip······${plain}"
+    apt install unzip -y||yum install unzip -y
+    if [[ "$#" -eq 0 ]]; then
+      echo -e "${green}unzip安装成功，开始导入刷流所需相关规则······${plain}"
+    else
+      echo -e "${red}出错了，unzip安装失败，程序退出······${plain}"
+      exit 1
+    fi
+  fi
+  wget https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/raw/main/vertex_ruler/rule.zip -O rule.zip
+  unzip -o rule.zip
+  if [[ "$#" -eq 0 ]]; then
+    echo -e "${green}刷流相关规则导入成功······${plain}"
+  else
+  echo -e "${red}出错了，刷流相关规则导入失败，程序退出······${plain}"
+  exit 1
+  fi
+}
 uninstall_vertex(){
   cd /root
   docker-compose down
@@ -122,11 +143,24 @@ uninstall_vertex(){
     docker rmi lswl/vertex:latest
     docker rmi lswl/vertex-base:latest
     echo -e "${yellow}vertex映射目录和相关本地镜像已删除${plain}"
-    exit 0
   else
     echo -e "${yellow}按照您的选择，vertex映射目录给予保留，程序自动退出${plain}"
-    exit 0
   fi
+}
+menu_go_on(){
+  echo
+  echo -e "${red}是否继续执行脚本?${plain}"
+  read -n1 -p "Y继续执行，N退出脚本[Y/n]" res
+  echo
+  case "$res" in
+    Y |y)
+        ;;
+    N | n)
+        exit 1;;
+    *)
+        echo "输入错误"
+  menu_go_on;;
+  esac
 }
 copyright(){
 echo -e "
@@ -142,7 +176,8 @@ main(){
 ${red}0.${plain} 退出脚本
 ${green}1.${plain} 安装vertex
 ${green}2.${plain} 安装qBittorrent
-${green}3.${plain} 卸载vertex
+${green}3.${plain} 导入vertex刷流相关规则
+${green}4.${plain} 卸载vertex
 "
   read -p "请输入数字 :" num
   case "$num" in
@@ -156,15 +191,22 @@ ${green}3.${plain} 卸载vertex
     install_qBittorrent
     ;;
   3)
+    restore_rule
+    ;;
+  4)
     uninstall_vertex
     ;;
   *)
   clear
-    echo -e "${Error}:请输入正确数字 [0-2]"
-    sleep 5s
-    menu
+    echo -e "${Error}:请输入正确数字 [0-4]"
+    sleep 3s
+    main
     ;;
   esac
+  menu_go_on
+  clear
+  copyright
+  main
 }
 copyright
 main
