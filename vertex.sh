@@ -7,9 +7,6 @@ if [[ $EUID -ne 0 ]]; then
   echo -e "${red}本脚本必须root账号运行，请切换root用户后再执行本脚本!${plain}"
   exit 1
 fi
-apt update||yum update
-apt install curl -y||yum install curl -y
-clear
 install_vertex(){
   local_ip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
   baseip=$(curl -s ipip.ooo)  > /dev/null
