@@ -53,6 +53,18 @@ install_vertex(){
         - 3000:3000
     vertex-base:
       image: lswl/vertex-base:latest
+    watchtower:
+      image: containrrr/watchtower
+      container_name: watchtower
+      restart: always
+      tty: true
+      network_mode: bridge
+      hostname: watchtower
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+        - TZ=Asia/Shanghai
+      command: vertex --cleanup --schedule "0 0 4 * * *"
 EOF
   docker-compose up -d
   sleep 5s
