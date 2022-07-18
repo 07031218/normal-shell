@@ -87,7 +87,7 @@ config_after_install() {
     config_password="admin888"
     config_port=8888
     /usr/local/x-ui/x-ui setting -username ${config_account} -password ${config_password}
-    usr/local/x-ui/x-ui setting -port ${config_port}
+    /usr/local/x-ui/x-ui setting -port ${config_port}
 }
 
 install_x-ui() {
