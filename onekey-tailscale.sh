@@ -55,9 +55,16 @@ tailscale up --advertise-routes=${ipduan}/24 --accept-routes
 echo -e "${green}tailscale客户端部署完毕，如需要打通该设备所处网段其他设备的访问，请进入tailscale官网打开这台设备的转发开关，${end}${red}菜单名称：Edit route settings ${end}，${green}链接：https://login.tailscale.com/admin/machines ${end}"
 }
 install_go(){
-  wget http://dpj.xun-da.com/downloads/go1.17.6.${arch}.tar.gz
-  tar -C /usr/local -xzf go1.17.6.${arch}.tar.gz
+	goweb="https://studygolang.com"
+	if [[ $arch == "linux-amd64" ]]; then
+		gourl=$(curl -s  https://studygolang.com/dl |  sed -n '/dl\/golang\/go.*\.linux-amd64\.tar\.gz/p' | sed -n '1p' | sed -n '/1/p' | awk 'BEGIN{FS="\""}{print $4}')
+	elif [[ $arch == "linux-arm64" ]]; then
+		gourl=$(curl -s  https://studygolang.com/dl |  sed -n '/dl\/golang\/go.*\.linux-amd64\.tar\.gz/p' | sed -n '1p' | sed -n '/1/p' | awk 'BEGIN{FS="\""}{print $6}')
+	fi
+  wget ${goweb}${gourl} -O go.tar.gz
+  tar -C /usr/local -xzf go.tar.gz
   echo -e "export GOROOT=/usr/local/go\nexport GOPATH=/root/goProject\nexport GOBIN=\$GOPATH/bin\nexport PATH=\$PATH:\$GOROOT/bin\nexport PATH=\$PATH:\$GOPATH/bin" >>/etc/profile
+
   echo -e "${yellow}Go环境部署完毕，请退出SSH窗口重进一次使变量生效。${end}"
   exit 0
 }
