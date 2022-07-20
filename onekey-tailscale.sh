@@ -56,10 +56,13 @@ echo -e "${green}tailscale客户端部署完毕，如需要打通该设备所处
 }
 install_go(){
 	goweb="https://studygolang.com"
+	# goweb="https://golang.google.cn"
 	if [[ $arch == "linux-amd64" ]]; then
 		gourl=$(curl -s  https://studygolang.com/dl |  sed -n '/dl\/golang\/go.*\.linux-amd64\.tar\.gz/p' | sed -n '1p' | sed -n '/1/p' | awk 'BEGIN{FS="\""}{print $4}')
+		# gourl=`curl -s https://golang.google.cn/dl/ |  sed -n '/dl\/go.*\.linux-amd64\.tar\.gz/p'| sed -n '1p' | sed -n '/1/p'  | awk 'BEGIN{FS="\""}{print $4}'`
 	elif [[ $arch == "linux-arm64" ]]; then
 		gourl=$(curl -s  https://studygolang.com/dl |  sed -n '/dl\/golang\/go.*\.linux-amd64\.tar\.gz/p' | sed -n '1p' | sed -n '/1/p' | awk 'BEGIN{FS="\""}{print $6}')
+		gourl=`curl -s https://golang.google.cn/dl/ |  sed -n '/dl\/go.*\.linux-arm64\.tar\.gz/p'| sed -n '1p' | sed -n '/1/p'  | awk 'BEGIN{FS="\""}{print $6}'`
 	fi
   wget ${goweb}${gourl} -O go.tar.gz
   tar -C /usr/local -xzf go.tar.gz
