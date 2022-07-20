@@ -30,13 +30,14 @@ install_vertex(){
       exit 1
     fi
   fi
-  mkdir -p /root/vertex && chmod 777 /root/vertex
+  if [[ `docker ps |grep vertex` == "" ]]; then
+      mkdir -p /root/vertex && chmod 777 /root/vertex
   cd /root
   cat >/root/docker-compose.yml <<EOF
 version: "2.0"
 services:
   vertex:
-    image: lswl/vertex:latest
+    image: lswl/vertex:0.0.13.0
     container_name: vertex
     restart: always
     tty: true
@@ -50,23 +51,44 @@ services:
       - 3000:3000
   vertex-base:
     image: lswl/vertex-base:latest
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: always
-    tty: true
-    network_mode: bridge
-    hostname: watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      - TZ=Asia/Shanghai
-    command: vertex --cleanup --schedule "0 0 4 * * *"
 EOF
   docker-compose up -d
   sleep 5s
   password=`cat /root/vertex/data/password`
   echo -e "${green}Vertex安装完毕，面板访问地址：http://${baseip}:3000 或 http://${local_ip}:3000\n用户名:admin\n密  码:${plain} ${red}${password}${plain}${green}\n进入vertex面板后通过${plain} ${red}全局设置${plain} ${green}修改密码 ${plain}"
+  else
+    echo -ne "${red}检测到系统已安装过vertex，是否重装vertex? [Y/n]:${plain}"
+    read yynn
+    if [[ $yynn == "y" ]]||[[ $yynn == "Y" ]]; then
+      docker-compose down
+      docker rmi lswl/vertex:latest
+      docker rmi containrrr/watchtower:latest
+        cat >/root/docker-compose.yml <<EOF
+version: "2.0"
+services:
+  vertex:
+    image: lswl/vertex:0.0.13.0
+    container_name: vertex
+    restart: always
+    tty: true
+    network_mode: bridge
+    hostname: vertex
+    volumes:
+      - /root/vertex:/vertex
+    environment:
+      - TZ=Asia/Shanghai
+    ports: 
+      - 3000:3000
+  vertex-base:
+    image: lswl/vertex-base:latest
+EOF
+      docker-compose up -d
+      echo -e "${green}Vertex重装完毕···${plain}"
+      exit 0
+    else
+     exit 0 
+    fi
+  fi
 }
 install_qBittorrent(){
     if test -z "$(which docker)"; then
@@ -152,8 +174,13 @@ uninstall_vertex(){
     rm /root/docker-compose.yml
     docker rmi lswl/vertex:latest
     docker rmi lswl/vertex-base:latest
+    docker rmi containrrr/watchtower:latest
     echo -e "${yellow}vertex映射目录和相关本地镜像已删除${plain}"
   else
+    rm /root/docker-compose.yml
+    docker rmi lswl/vertex:latest
+    docker rmi lswl/vertex-base:latest
+    docker rmi containrrr/watchtower:latest
     echo -e "${yellow}按照您的选择，vertex映射目录给予保留，程序自动退出${plain}"
   fi
 }
@@ -173,6 +200,7 @@ menu_go_on(){
   esac
 }
 copyright(){
+clear
 echo -e "
 ${green}###########################################################${plain}
 ${green}#                                                         #${plain}
@@ -184,7 +212,7 @@ ${green}###########################################################${plain}"
 main(){
   echo -e "
 ${red}0.${plain} 退出脚本
-${green}1.${plain} 安装vertex
+${green}1.${plain} 安装、重装vertex
 ${green}2.${plain} 安装qBittorrent
 ${green}3.${plain} 导入vertex刷流相关规则
 ${green}4.${plain} 卸载vertex
