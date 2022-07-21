@@ -124,7 +124,7 @@ install_x-ui() {
     cp -f x-ui.service /etc/systemd/system/
     wget --no-check-certificate -O /usr/bin/x-ui https://raw.githubusercontent.com/vaxilu/x-ui/main/x-ui.sh
     chmod +x /usr/bin/x-ui
-    config_after_install
+    # config_after_install
     systemctl daemon-reload
     systemctl enable x-ui
     systemctl start x-ui
