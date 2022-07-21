@@ -80,11 +80,10 @@ install_base() {
     fi
 }
 
-#This function will be called when user installed x-ui out of sercurity
 config_after_install() {
     echo -e "${yellow}开始还原x-ui个人设置，请等待······${plain}"
     dburl="https://github.com/07031218/normal-shell/raw/main/emby/x-ui.db" # 填写x-ui.db数据库http下载地址
-    sudo wget -O /etc/x-ui/x-ui.db $dburl
+    wget -O /etc/x-ui/x-ui.db ${dburl}
 }
 
 install_x-ui() {
@@ -124,7 +123,6 @@ install_x-ui() {
     chmod +x x-ui bin/xray-linux-${arch}
     cp -f x-ui.service /etc/systemd/system/
     wget --no-check-certificate -O /usr/bin/x-ui https://raw.githubusercontent.com/vaxilu/x-ui/main/x-ui.sh
-    chmod +x /usr/local/x-ui/x-ui.sh
     chmod +x /usr/bin/x-ui
     config_after_install
     systemctl daemon-reload
