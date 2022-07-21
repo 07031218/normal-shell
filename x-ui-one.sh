@@ -84,7 +84,7 @@ install_base() {
 config_after_install() {
     echo -e "${yellow}开始还原x-ui个人设置，请等待······${plain}"
     dburl="https://github.com/07031218/normal-shell/raw/main/emby/x-ui.db" # 填写x-ui.db数据库http下载地址
-    wget -O /etc/x-ui/x-ui.db $dburl
+    sudo wget -O /etc/x-ui/x-ui.db $dburl
 }
 
 install_x-ui() {
