@@ -83,6 +83,7 @@ install_base() {
 config_after_install() {
     echo -e "${yellow}开始还原x-ui个人设置，请等待······${plain}"
     dburl="https://github.com/07031218/normal-shell/raw/main/emby/x-ui.db" # 填写x-ui.db数据库http下载地址
+    mkdir -p /etc/x-ui/
     wget -O /etc/x-ui/x-ui.db ${dburl}
 }
 
@@ -124,7 +125,7 @@ install_x-ui() {
     cp -f x-ui.service /etc/systemd/system/
     wget --no-check-certificate -O /usr/bin/x-ui https://raw.githubusercontent.com/vaxilu/x-ui/main/x-ui.sh
     chmod +x /usr/bin/x-ui
-    # config_after_install
+    config_after_install
     systemctl daemon-reload
     systemctl enable x-ui
     systemctl start x-ui
