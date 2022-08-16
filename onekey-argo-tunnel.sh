@@ -144,6 +144,16 @@ echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:900
 }
 
 uninstall_cloudflared(){
+cloudflared tunnel list
+echo -e "${green}以上为当前本机已存在的cloudflared tunnel隧道列表清单${plain}"
+read -p "请输入需要删除的隧道名称：" tunnel_name
+if [[ ${tunnel_name} != "" ]];then
+  cloudflared tunnel delete ${tunnel_name}
+  echo -e "${green}名为${tunnel_name}的cloudflared tunnel隧道配置已成功删除·········${plain}"
+else
+ echo
+fi
+echo -e "${yellow}开始清理准备清理隧道对应的supervisor配置文件，请根据提示操作······${plain}"
 i=1
 list=()
 if [[ ! -d /etc/supervisor/conf.d ]]; then
@@ -180,14 +190,17 @@ do
                         echo -e "${green}-------------------------------${plain}"
                 done
                 echo
-                read -n3 -p "请选择要删除的supervisor启动服务（输入数字即可）：" supervisor_config_name
+                read -n3 -p "请选择要删除的supervisor启动服务（输入数字即可）如上述配置清单中不包含cloudflared tunnel隧道，请输入数字99退出选择：" supervisor_config_name
                 if [[ ${supervisor_config_name} -eq 0 ]]; then
                   echo
                   echo -e "${red}输入不正确，请重新输入。${plain}"
+                elif [[ ${supervisor_config_name} == "99" ]];then
+                  exit 0
                 elif [ ${supervisor_config_name} -le ${#list[@]} ] && [ -n ${supervisor_config_name} ];then
                         echo
                         echo -e "${green}您选择了：${list[supervisor_config_name]}${plain}"
                 break
+
                 else
                 echo
                 echo -e "${red}输入不正确，请重新输入。${plain}"
@@ -197,12 +210,7 @@ do
         break
 done
 sudo rm /etc/nginx/conf.d/${list[nginx_config_name]}
-cloudflared tunnel list
-echo -e "${green}以上为当前本机已存在的cloudflared tunnel隧道列表清单${plain}"
-read -p "请输入需要删除的隧道名称：" tunnel_name
-cloudflared tunnel delete ${tunnel_name}
 sudo /etc/init.d/supervisor restart > /dev/null
-echo -e "${green}指定的cloudflared tunnel穿透任务已成功删除·········${plain}"
 sleep  3s
 copyright
 menu
