@@ -231,7 +231,7 @@ ${plain}
 }
 menu() {
   echo -e "\
-${green}0.${plain} 退出脚本
+${red}0.${plain} 退出脚本
 ${green}1.${plain} 部署cloudflared tunnel
 ${green}2.${plain} 删除指定的cloudflared tunnel穿透任务
 ${green}3.${plain} 开启cloudflared tunnel进程守护
