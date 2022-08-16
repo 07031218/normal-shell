@@ -54,7 +54,7 @@ sudo ${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1
 #开始拉取cloudflared tunnel
 if [ ! -f "$file1" ]; then
 wget  "https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
-sudo chmod +x cloudflared && sudo cp cloudflared /usr/bin
+chmod +x cloudflared && cp cloudflared /usr/bin
 fi
 file="./.cloudflared/cert.pem"
 if [ ! -f "$file" ]; then
@@ -70,14 +70,14 @@ fi
   tunel_uuid=`cloudflared tunnel list|grep ${tunnel_name}|awk -F " " '{print $1}'`
   read -p "请输入传输协议[如不填写默认http]：" tunnel_protocol
   [[ -z ${tunnel_protocol} ]] && tunnel_protocol="http"
+  read -p "请输入需要反代的服务IP地址[不填默认为本机]：" tunnel_ipadr
+  [[ -z ${tunnel_ipadr} ]] && tunnel_ipadr="127.0.0.1"
   read -p "请输入需要反代的服务端口[如不填写默认80]：" tunnel_port
   [[ -z ${tunnel_port} ]] && tunnel_port="80"
   read -p "请输入supervisor值守的任务名称: " taskname
   [[ $EUID -ne 0 ]] && tunnel_config_dir="/home/`whoami`/.cloudflared"
   [[ $EUID -eq 0 ]] && tunnel_config_dir="/root/.cloudflared"
-  [[ $EUID -ne 0 ]] && config_dir="/home/`whoami`"
-  [[ $EUID -eq 0 ]] && config_dir="/root"
-sudo bash -c 'cat > '${config_dir}'/'${tunnel_name}.yml' <<EOF
+sudo bash -c 'cat > ~/'${tunnel_name}.yml' <<EOF
 tunnel: '${tunnel_name}'
 credentials-file: '${tunnel_config_dir}'/'${tunel_uuid}'.json
 originRequest:
@@ -85,9 +85,11 @@ originRequest:
   noTLSVerify: true
 ingress:
   - hostname: '${tunnel_domain}'
-    service: '${tunnel_protocol}'://localhost:'${tunnel_port}'
+    service: '${tunnel_protocol}'://'${tunnel_ipadr}':'${tunnel_port}'
   - service: http_status:404
 EOF'
+[[ $EUID -ne 0 ]] && config_dir="/home/`whoami`"
+[[ $EUID -eq 0 ]] && config_dir="/root"
 sudo bash -c 'cat >> /etc/supervisor/conf.d/'${tunnel_name}.conf' << EOF
 [program:'${taskname}']
 
@@ -141,7 +143,7 @@ password='${passwd}'
 files = /etc/supervisor/conf.d/*.conf
 
 EOF'
-sudo /etc/init.d/supervisor restart > /dev/null
+/etc/init.d/supervisor restart > /dev/null
 baseip=$(curl -s ipip.ooo) > /dev/null
 echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:9001 来进行进程守护${plain}（${red}重启、停止、启动、日志查看${plain}）${green}管理·········${plain}"
 }
