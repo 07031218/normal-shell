@@ -144,6 +144,7 @@ echo -e "${green}supervisor已设置完成，后续可通过http://${baseip}:900
 }
 
 uninstall_cloudflared(){
+sudo /etc/init.d/supervisor stop > /dev/null
 cloudflared tunnel list
 echo -e "${green}以上为当前本机已存在的cloudflared tunnel隧道列表清单${plain}"
 read -p "请输入需要删除的隧道名称：" tunnel_name
@@ -156,8 +157,8 @@ fi
 echo -e "${yellow}开始清理准备清理隧道对应的supervisor配置文件，请根据提示操作······${plain}"
 i=1
 list=()
-if [[ ! -d /etc/supervisor/conf.d ]]; then
-  echo  "错误，未在本机器上找到supervisor的相关conf配置文件"
+if [[ ! -d /etc/supervisor/conf.d ]]||[[ `ls /etc/supervisor/conf.d/` == "" ]]; then
+  echo -e  "${red}错误，未在本机器上找到supervisor的相关conf配置文件${plain}"
   exit 1
 elif [[ -d /etc/supervisor/conf.d ]];then
   items=$(ls /etc/supervisor/conf.d/ -l|awk 'NR>1{print $9}')
@@ -209,7 +210,8 @@ do
         done
         break
 done
-sudo rm /etc/nginx/conf.d/${supervisor_config_name}
+sudo rm /etc/supervisor/conf.d/${list[supervisor_config_name]}
+echo -e "${red}${list[supervisor_config_name]}已被删除，重启supervisor服务······${plain}"
 sudo /etc/init.d/supervisor restart > /dev/null
 sleep  3s
 copyright
