@@ -106,7 +106,7 @@ EOF'
 
 sudo /etc/init.d/supervisor restart > /dev/null
 echo -e "${green}cloudflared tunnel部署完成，脚本退出·········${plain}"
-echo -e "${green}你现在可以通过http://${tunnel_domain}来访问本服务器穿透过的web服务了·········${plain}"
+echo -e "${green}你现在可以通过http://${tunnel_domain} 来访问本服务器穿透过的web服务了·········${plain}"
 exit 0
 }
 update_supervisor(){
