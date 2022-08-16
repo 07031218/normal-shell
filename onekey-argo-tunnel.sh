@@ -73,9 +73,11 @@ fi
   read -p "请输入需要反代的服务端口[如不填写默认80]：" tunnel_port
   [[ -z ${tunnel_port} ]] && tunnel_port="80"
   read -p "请输入supervisor值守的任务名称: " taskname
+  [[ $EUID -ne 0 ]] && tunnel_config_dir="/home/`whoami`/.cloudflared"
+  [[ $EUID -eq 0 ]] && tunnel_config_dir="/root/.cloudflared"
 sudo bash -c 'cat > ~/'${tunnel_name}.yml' <<EOF
 tunnel: '${tunnel_name}'
-credentials-file: ~/.cloudflared/'${tunel_uuid}'.json
+credentials-file: '${tunnel_config_dir}'/'${tunel_uuid}'.json
 originRequest:
   connectTimeout: 30s
   noTLSVerify: true
@@ -84,11 +86,12 @@ ingress:
     service: '${tunnel_protocol}'://localhost:'${tunnel_port}'
   - service: http_status:404
 EOF'
-
+[[ $EUID -ne 0 ]] && config_dir="/home/`whoami`"
+[[ $EUID -eq 0 ]] && config_dir="/root"
 sudo bash -c 'cat >> /etc/supervisor/conf.d/'${tunnel_name}.conf' << EOF
 [program:'${taskname}']
 
-command=cloudflared tunnel --config /home/'`whoami`'/'${tunnel_name}'.yml run
+command=cloudflared tunnel --config '${config_dir}'/'${tunnel_name}'.yml run
 
 autorestart=true
 startsecs=10
