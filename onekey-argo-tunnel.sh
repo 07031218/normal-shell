@@ -209,7 +209,7 @@ do
         done
         break
 done
-sudo rm /etc/nginx/conf.d/${list[nginx_config_name]}
+sudo rm /etc/nginx/conf.d/${supervisor_config_name}
 sudo /etc/init.d/supervisor restart > /dev/null
 sleep  3s
 copyright
