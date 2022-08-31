@@ -45,7 +45,7 @@ function check_docker(){
 	fi
 	if test -z "$(which docker-compose)"; then
 		echoContent yellow "检测到系统未安装docker-compose，开始安装docker-compose"
-		curl -L "https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+		curl -L "https://github.com/docker/compose/releases/download/v2.10.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 		chmod +x /usr/local/bin/docker-compose
 		ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 	fi
@@ -298,6 +298,8 @@ function menu(){
 ###########################################################"
 }
 menu
+echoContent red "请注意：不建议内存低于2GB的设备执行安装"
+echo
 echoContent yellow `echo -ne "输入[Y/y]开始安装，Ctrl+C退出脚本"`
 read yn
 if [[ ${yn} == "Y" ]]||[[ ${yn} == "y" ]]; then
