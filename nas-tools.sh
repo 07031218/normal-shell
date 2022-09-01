@@ -148,13 +148,13 @@ EOF
   fi
   docker-compose -f /root/docker-compose.yml up -d
   if [[ $? -eq 0 ]]; then
-    echoContent green "一键梭哈安装完毕，开始导入jackket的api_key到nas-tools配置文件"
-    jackett_api_key=`cat /home/jackett/Jackett/ServerConfig.json|sed -n '5p'|awk -F ":" '{print $2}'|sed "s/\"//g"|sed "s/,//g"|sed "s/ //g"`
-    sed -i "221c \  api_key: ${jackett_api_key}" /home/nastools/config/config.yaml
-    echoContent yellow "导入jackket的api_key到nas-tools配置文件完毕"
-    echoContent yellow "开始重启nas-tools容器"
-    docker restart nas-tools
-    echoContent green "重启nas-tools容器完毕，已加载新配置"
+    echoContent green "一键梭哈安装完毕······"
+    # jackett_api_key=`cat /home/jackett/Jackett/ServerConfig.json|sed -n '5p'|awk -F ":" '{print $2}'|sed "s/\"//g"|sed "s/,//g"|sed "s/ //g"`
+    # sed -i "221c \  api_key: ${jackett_api_key}" /home/nastools/config/config.yaml
+    # echoContent yellow "导入jackket的api_key到nas-tools配置文件完毕"
+    # echoContent yellow "开始重启nas-tools容器"
+    # docker restart nas-tools
+    # echoContent green "重启nas-tools容器完毕，已加载新配置"
     if [[ ${embyyn} == "Y" ]]||[[ ${embyyn} == "y" ]]; then
       echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），nas-tools端口3000（初始用户名admin，密码password），Emby端口8096"
     else
