@@ -37,7 +37,7 @@ install_vertex(){
 version: "2.0"
 services:
   vertex:
-    image: lswl/vertex:0.0.13.0
+    image: lswl/vertex:stable
     container_name: vertex
     restart: always
     tty: true
@@ -67,7 +67,7 @@ EOF
 version: "2.0"
 services:
   vertex:
-    image: lswl/vertex:0.0.13.0
+    image: lswl/vertex:stable
     container_name: vertex
     restart: always
     tty: true
