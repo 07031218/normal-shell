@@ -547,7 +547,7 @@ echoContent yellow "1. 一键安装Nas-tools
     5)
       insall_proxy;;
     6)
-      update_nastools
+      update_nastools;;
     0)
       exit 0;;
     *)
