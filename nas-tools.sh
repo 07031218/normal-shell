@@ -341,9 +341,9 @@ function mount_drive(){
                 while [[ 0 ]]
                 do
                         echo
-                        echo -e "   本地已配置网盘列表:"
+                        echo -e "本地已配置网盘列表:"
                         echo
-                echo -e "      `red +-------------------------+`"
+                echo -e "${RED}+-------------------------+${END}"
                         for((j=1;j<=${#list[@]};j++))
                         do
                 temp="${j}：${list[j]}"
@@ -355,13 +355,13 @@ function mount_drive(){
                 elif [ "${count}" -gt 14 ];then
                     temp="${temp}\t"
                 fi
-                                echo -e "      ${RED}| ${temp}|${END}"
-                                echo -e "      `red +-------------------------+`"
+                                echo -e "${RED}| ${temp}  |${END}"
+                                echo -e "${RED}+-------------------------+${END}"
                         done
 
 
                         echo
-                        read -n3 -p "   请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
+                        read -n3 -p "请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
                         if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${rclone_config_name} ];then
                                 echo
                                 echo -e "`curr_date` 您选择了：${RED}${list[rclone_config_name]}${END}"
