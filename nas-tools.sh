@@ -58,7 +58,7 @@ function install_rclone(){
     if [[ `which unzip` == "" ]]; then
       apt install unzip -y|| yum install unzip -y
     fi
-    curl https://rclone.org/install.sh | sudo bash
+    curl https://rclone.org/install.sh | bash
     if [[ -f /usr/bin/rclone ]];then
       sleep 1s
       echoContent green "Rclone安装成功."
