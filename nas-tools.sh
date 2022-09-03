@@ -1,5 +1,7 @@
 #!/bin/bash
-# check root
+RED='\E[1;31m'
+RED_W='\E[41;37m'
+END='\E[0m'
 echoType='echo -e'
 echoContent(){
   case $1 in
@@ -34,10 +36,10 @@ echoContent(){
     ;;
   esac
 }
-apt install lsof -y || yum install lsof -y
 clear
+# check root
 [[ $EUID -ne 0 ]] && echo -e "${red}错误: $ 必须使用root用户运行此脚本！\n" && exit 1
-
+apt install lsof -y || yum install lsof -y
 function check_docker(){
   if test -z "$(which docker)"; then
     echoContent yellow "检测到系统未安装docker，开始安装docker"
@@ -50,9 +52,46 @@ function check_docker(){
     ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
   fi
 }
-function install_all(){
-  check_docker
-  cat >/root/docker-compose.yml<<EOF
+function install_rclone(){
+  if [[ ! -f /usr/bin/rclone ]];then
+    echoContent yellow "正在安装rclone,请稍等..."
+    if [[ `which unzip` == "" ]]; then
+      apt install unzip -y|| yum install unzip -y
+    fi
+    curl https://rclone.org/install.sh | sudo bash
+    if [[ -f /usr/bin/rclone ]];then
+      sleep 1s
+      echoContent green "Rclone安装成功."
+    else
+      echoContent red "Rclone安装失败，请重新运行脚本安装."
+      exit 1
+    fi
+  else
+    echoContent skyBlue "本机已安装rclone.无须安装."
+  fi
+}
+
+function install_gclone(){
+  if [[ ! -f /usr/bin/gclone ]];then
+    echo -e "`curr_date` 正在安装gclone,请稍等..."
+    bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/main/gclone.sh )
+    if [[ -f /usr/bin/rclone ]];then
+      sleep 1s
+      echo
+      echoContent green "gclone安装成功."
+    else
+      echoContent red  "安装失败.请重新运行脚本安装."
+      exit 1
+    fi
+  else
+    echo
+    echoContent yellow "本机已安装gclone.无须安装."
+  fi
+  echoContent purple "开始使用gclone来获取Google Api Tkoen，请按照命令行提示操作·····"
+  gclone config
+}
+function checkin_docker-compose(){
+  cat >/root/docker-compose.yml <<EOF
 version: "3"
 services: 
 #自动追剧必备
@@ -70,20 +109,6 @@ services:
       - /downloads:/downloads
       - /home/qbittorrent/watch:/watch  
     restart: unless-stopped
-  nas-tools:
-    image: jxxghp/nas-tools:latest
-    container_name: nas-tools
-    environment:
-      - PUID=0
-      - PGID=0
-      - TZ=Asia/Shanghai
-    ports:
-      - 3000:3000
-    volumes:
-      - /home/nastools/config:/config
-      - /mnt:/mnt
-      - /downloads:/downloads
-    restart: always
   jackett:
     image: lscr.io/linuxserver/jackett
     container_name: jackett
@@ -102,19 +127,19 @@ services:
     image: ghcr.io/flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     environment:
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - LOG_HTML=${LOG_HTML:-false}
-      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
       - TZ=Asia/Shanghaiœ
     ports:
-      - "${PORT:-8191}:8191"
+      - "8191:8191"
     restart: unless-stopped
   chinesesubfinder:
     container_name: chinesesubfinder
     image: allanpk716/chinesesubfinder:latest
     volumes:
       - /home/chinesesubfinder:/config
-      - /mnt:/mnt
+      - /mnt/video:/mnt/video
       - /home/chinesesubfinder/cache:/app/cache
     environment:
       - PUID=0
@@ -148,27 +173,14 @@ EOF
   fi
   docker-compose -f /root/docker-compose.yml up -d
   if [[ $? -eq 0 ]]; then
-    echoContent green "一键梭哈安装完毕······"
-    # jackett_api_key=`cat /home/jackett/Jackett/ServerConfig.json|sed -n '5p'|awk -F ":" '{print $2}'|sed "s/\"//g"|sed "s/,//g"|sed "s/ //g"`
-    # sed -i "221c \  api_key: ${jackett_api_key}" /home/nastools/config/config.yaml
-    # echoContent yellow "导入jackket的api_key到nas-tools配置文件完毕"
-    # echoContent yellow "开始重启nas-tools容器"
-    # docker restart nas-tools
-    # echoContent green "重启nas-tools容器完毕，已加载新配置"
+    echoContent green "qbittorrent、jackett、flaresolverr、chinesesubfinder安装完毕······"
     if [[ ${embyyn} == "Y" ]]||[[ ${embyyn} == "y" ]]; then
-      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），nas-tools端口3000（初始用户名admin，密码password），Emby端口8096"
+      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），Emby端口:8096"
     else
-      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），nas-tools端口3000（初始用户名admin，密码password）"
+      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin）."
     fi
   else
-    echoContent red "一键梭哈安装失败······"
-  fi
-  echoContent yellow `echo -ne "请问是否反代Nas-tools[y/n]"`
-  read proxyyn
-  if [[ ${proxyyn} == "Y" ]]||[[ ${proxyyn} == "y" ]]; then
-    insall_proxy
-  else
-    exit 0
+    echoContent red "qbittorrent、jackett、flaresolverr、chinesesubfinder安装失败······"
   fi
 }
 function insall_proxy(){
@@ -290,10 +302,212 @@ EOF
 ####
     fi
   fi
-  
+}
+function check_dir_file(){
+        if [ "${1:0-1:1}" = "/" ] && [ -d "$1" ];then
+                return 0
+        elif [ -f "$1" ];then
+                return 0
+        fi
+        return 1
 }
 
+function check_rclone(){
+        check_dir_file "/usr/bin/rclone"
+        [ "$?" -ne 0 ] && echoContent red "未检测到rclone程序.请先安装rclone." && exit 1
+        check_dir_file "/root/.config/rclone/rclone.conf"
+        [ "$?" -ne 0 ] && echoContent red "未检测到rclone配置文件.请先安装rclone." && exit 1
+        return 0
+}
+curr_date(){
+        curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
+        echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
+}
+function mount_drive(){
+  check_rclone
+        i=1
+
+        list=()
+
+        for item in $(sed -n "/\[.*\]/p" ~/.config/rclone/rclone.conf | grep -Eo "[0-9A-Za-z-]+")
+        do
+                list[i]=${item}
+                i=$((i+1))
+        done
+        while [[ 0 ]]
+        do
+                while [[ 0 ]]
+                do
+                        echo
+                        echo -e "   本地已配置网盘列表:"
+                        echo
+                echo -e "      `red +-------------------------+`"
+                        for((j=1;j<=${#list[@]};j++))
+                        do
+                temp="${j}：${list[j]}"
+                count=$((`echo "${temp}" | wc -m` -1))
+                if [ "${count}" -le 6 ];then
+                    temp="${temp}\t\t\t"
+                elif [ "${count}" -gt 6 ] && [ "$count" -le 14 ];then
+                    temp="${temp}\t\t"
+                elif [ "${count}" -gt 14 ];then
+                    temp="${temp}\t"
+                fi
+                                echo -e "      ${RED}| ${temp}|${END}"
+                                echo -e "      `red +-------------------------+`"
+                        done
+
+
+                        echo
+                        read -n3 -p "   请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
+                        if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${rclone_config_name} ];then
+                                echo
+                                echo -e "`curr_date` 您选择了：${RED}${list[rclone_config_name]}${END}"
+                                break
+                        fi
+                        echo
+                        echo "输入不正确，请重新输入。"
+                        echo
+                done
+                echo
+                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt/video下）:" path
+                if [[ "${path:0:1}" != "/" ]];then
+                        path="/mnt/video/${path}"
+                fi
+                while [[ 0 ]]
+                do
+                        echo
+                        echo -e "您选择了 ${RED}${list[rclone_config_name]}${END} 网盘，挂载路径为 ${RED}${path}${END}."
+                        read -n1 -p "确认无误[Y/n]:" result
+                        echo
+                        case ${result} in
+                                Y | y)
+                                        echo
+                                        break 2;;
+                                n | N)
+                                        continue 2;;
+                                *)
+                                        echo
+                                        continue;;
+                        esac
+                done
+
+        done
+
+
+        fusermount -qzu "${path}"
+        if [[ ! -d ${path} ]];then
+                echo
+                echo -e "`curr_date`  ${RED}${path}${END} 不存在，正在创建..."
+                mkdir -p ${path}
+                sleep 1s
+                echo
+                echo -e "`curr_date` 创建完成！"
+        fi
+
+
+
+        echo
+        echo -e "`curr_date` 正在检查服务是否存在..."
+        if [[ -f /lib/systemd/system/rclone-${list[rclone_config_name]}.service ]];then
+
+                echo -e "`curr_date` 找到服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"正在删除，请稍等..."
+                systemctl stop rclone-${list[rclone_config_name]}.service &> /dev/null
+                systemctl disable rclone-${list[rclone_config_name]}.service &> /dev/null
+                rm /lib/systemd/system/rclone-${list[rclone_config_name]}.service &> /dev/null
+                sleep 2s
+                echo -e "`curr_date` 删除成功。"
+        fi
+        echo -e "`curr_date` 正在创建服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"请稍等..."
+        echo "[Unit]
+Description = rclone mount for ${list[rclone_config_name]}
+AssertPathIsDirectory=${path}
+Wants=network-online.target
+After=network-online.target
+[Service]
+Type=notify
+KillMode=none
+Restart=on-failure
+RestartSec=5
+User = root
+ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --umask 000 --allow-other --allow-non-empty --use-mmap --daemon-timeout=10m --dir-cache-time 24h --poll-interval 1h --vfs-cache-mode writes --cache-dir=/tmp/vfs_cache --buffer-size 512M --vfs-read-chunk-size 128M --vfs-read-chunk-size-limit 1G --log-level INFO --log-file=/home/rclone.log
+ExecStop=/bin/fusermount -u ${path}
+Restart = on-abort
+[Install]
+WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_name]}.service
+        sleep 2s
+        echo -e "`curr_date` 服务创建成功。"
+        if [ ! -f /etc/fuse.conf ]; then
+                echo -e "`curr_date` 未找到fuse包.正在安装..."
+                sleep 1s
+                if [[ "${release}" = "centos" ]];then
+                        yum install fuse -y
+                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
+                        apt-get install fuse -y
+                fi
+                echo
+                echo -e "`curr_date` fuse安装完成."
+                echo
+        fi
+
+        sleep 2s
+        echo
+        echo -e "`curr_date` 启动服务..."
+        systemctl start rclone-${list[rclone_config_name]}.service &> /dev/null
+        sleep 1s
+        echo -e "`curr_date` 添加开机启动..."
+        systemctl enable rclone-${list[rclone_config_name]}.service &> /dev/null
+        if [[ $? ]];then
+                echo
+                echo -e "已为网盘 ${RED}${list[rclone_config_name]}${END} 创建服务 ${RED}reclone-${list[rclone_config_name]}.service${END}.并已添加开机挂载.\n您可以通过 ${RED}systemctl [start|stop|status]${END} 进行挂载服务管理。"
+                echo
+                echo
+                sleep 2s
+        else
+                echo
+                echo -e "`curr_date` 警告:未知错误."
+        fi
+
+}
+function install_nas-tools(){
+  apt install git supervisor -y||yum install git supervisor -y
+  if [[ `which python3` == "" ]]; then
+    echoContent yellow "开始安装python3环境"
+    apt install python3 -y||yum install python3 -y
+  fi
+  if [[ `which pip3` == "" ]]; then
+    echoContent yellow "开始安装pip3"
+    apt install python3-pip -y||yum install python3-pip -y
+  fi
+  echoContent green "开始拉取nas-tools源码"
+  git clone https://github.com/jxxghp/nas-tools.git /root/nas-tools
+  cd /root/nas-tools
+  echoContent yellow "开始执行安装nas-tools所需依赖包"
+  pip3 install -r requirements.txt
+  echo "qbittorrent-api
+transmission_rpc
+cn2an
+plexapi
+python-opensubtitles
+anitopy
+feapder" >> 1.txt
+  pip3 install -r 1.txt
+  rm 1.txt
+  echo "[program:nastools]   #程序的名称
+command=/usr/bin/python3 run.py #需要执行的命令
+directory=/root/nas-tools/  #命令执行的目录
+environment=NASTOOL_CONFIG="/root/nas-tools/config/config.yaml" #环境变量
+user=root #用户
+stopsignal=INT
+autostart=true #是否自启动
+autorestart=true #是否自动重启
+startsecs=3 #自动重启时间间隔（s）
+" >/etc/supervisor/conf.d/nastool.conf
+  /etc/init.d/supervisor restart
+  echoContent green "Nas-tools安装完毕，默认端口：3000，用户名：admin，密码：password"
+}
 function menu(){
+  clear
     echoContent green "
 ###########################################################
 #                                                         #
@@ -302,12 +516,35 @@ function menu(){
 #                    Blog：https://blog.20120714.xyz      #
 #                                                         #
 ###########################################################"
+echoContent red "请注意：不建议内存低于2GB，磁盘空间低于40G的设备执行安装"
+echoContent white "-----------------------------------------"
+echo -e "${RED}0. 退出脚本${END}"
+echoContent white "-----------------------------------------"
+echoContent yellow "1. 一键安装Nas-tools
+2. 安装Rclone
+3. Gclone获取网盘Token
+4. Rclone挂载网盘
+5. 反代Nas-tools"
+  read -p "请选择输入菜单对应数字开始执行：" select_menu
+  case "${select_menu}" in
+    1)
+      check_docker
+      checkin_docker-compose
+      install_nas-tools;;
+    2)
+      install_rclone;;
+    3)
+      install_gclone;;
+    4)
+      mount_drive;;
+    5)
+      insall_proxy;;
+    0)
+      exit 0;;
+    *)
+      echoContent red "选择错误，请重新选择。"
+      sleep 3s
+      menu;;
+  esac
 }
 menu
-echoContent red "请注意：不建议内存低于2GB的设备执行安装"
-echo
-echoContent yellow `echo -ne "输入[Y/y]开始安装，Ctrl+C退出脚本"`
-read yn
-if [[ ${yn} == "Y" ]]||[[ ${yn} == "y" ]]; then
-  install_all
-fi
