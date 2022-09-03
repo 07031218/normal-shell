@@ -480,7 +480,7 @@ function install_nas-tools(){
     apt install python3-pip -y||yum install python3-pip -y
   fi
   echoContent green "开始拉取nas-tools源码"
-  git clone https://github.com/jxxghp/nas-tools.git /root/nas-tools
+  git clone https://ghproxy.com/https://github.com/jxxghp/nas-tools.git /root/nas-tools
   cd /root/nas-tools
   echoContent yellow "开始执行安装nas-tools所需依赖包"
   pip3 install -r requirements.txt
@@ -506,6 +506,12 @@ startsecs=3 #自动重启时间间隔（s）
   /etc/init.d/supervisor restart
   echoContent green "Nas-tools安装完毕，默认端口：3000，用户名：admin，密码：password"
 }
+function update_nastools(){
+  cd /root/nas-tools
+  git pull
+  /etc/init.d/supervisor restart
+  echoContent green "Nas-tools更新完成，supervisor服务已重启"
+}
 function menu(){
   clear
     echoContent green "
@@ -524,7 +530,8 @@ echoContent yellow "1. 一键安装Nas-tools
 2. 安装Rclone
 3. Gclone获取网盘Token
 4. Rclone挂载网盘
-5. 反代Nas-tools"
+5. 反代Nas-tools
+6. 更新Nas-tools"
   read -p "请选择输入菜单对应数字开始执行：" select_menu
   case "${select_menu}" in
     1)
@@ -539,6 +546,8 @@ echoContent yellow "1. 一键安装Nas-tools
       mount_drive;;
     5)
       insall_proxy;;
+    6)
+      update_nastools
     0)
       exit 0;;
     *)
