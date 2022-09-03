@@ -69,6 +69,8 @@ function install_rclone(){
   else
     echoContent skyBlue "本机已安装rclone.无须安装."
   fi
+  sleep 2s
+  menu
 }
 
 function install_gclone(){
@@ -321,7 +323,7 @@ function check_rclone(){
 }
 curr_date(){
         curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
-        echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
+        echo -e "`echo -e "${RED}${curr_date}${END}"`"
 }
 function mount_drive(){
   check_rclone
