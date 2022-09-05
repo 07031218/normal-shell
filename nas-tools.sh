@@ -177,7 +177,7 @@ EOF
   docker-compose -f /root/docker-compose.yml up -d
   if [[ $? -eq 0 ]]; then
     echoContent green "qbittorrent、jackett、flaresolverr、chinesesubfinder安装完毕······"
-    echoContent yellow "开始将检测网盘盘挂载状态写入开机启动项···"
+    echoContent yellow "开始将检测网盘挂载状态写入开机启动项···"
     cat >/etc/init.d/check <<EOF
 #!/bin/bash
 dir1=/mnt/video
@@ -200,7 +200,7 @@ done
 EOF
     chmod +x /etc/init.d/check
     update-rc.d check defaults
-    echoContent green "检测网盘盘挂载状态写入开机启动项完成···"
+    echoContent green "检测网盘挂载状态写入开机启动项完成···"
     if [[ ${embyyn} == "Y" ]]||[[ ${embyyn} == "y" ]]; then
       echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），Emby端口:8096"
     else
