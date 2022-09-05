@@ -551,20 +551,19 @@ function update_nastools(){
 function menu(){
   clear
     echoContent green "
-###########################################################
-#                                                         #
-#           Nas-tools 一键梭哈脚本                        #
-#                    Powerby 翔翎                         #
-#                    Blog：https://blog.20120714.xyz      #
-#                                                         #
-###########################################################"
+###################################################################
+#                                                                 #
+#           Nas-tools 一键梭哈脚本                                #
+#                    Powerby 翔翎                                 #
+#                    Blog：https://blog.20120714.xyz              #
+#                                                                 #
+###################################################################"
 echoContent red "请注意：不建议内存低于2GB，磁盘空间低于40G的设备执行安装"、
 echo
 echo
 echoContent skyBlue "友情提醒：
-如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby，请先完成网盘挂载(挂载目录选择/mnt/video)
-如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby，请先完成网盘挂载(挂载目录选择/mnt/video)
-如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby，请先完成网盘挂载(挂载目录选择/mnt/video)"
+如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby；
+请先完成网盘挂载(挂载目录选择默认的/mnt/video)"
 echoContent white "-----------------------------------------"
 echo -e "${RED}0. 退出脚本${END}"
 echoContent white "-----------------------------------------"
