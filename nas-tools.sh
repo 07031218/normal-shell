@@ -187,6 +187,10 @@ while true; do
     if [[ -d $dir1 ]]; then
         if [[ `ls $dir1` != "" ]]; then
             docker restart chinesesubfinder
+            docker restart qbittorrent
+            if [[ `docker ps |grep emby` != "" ]];then
+              docker restart emby
+            fi
             break
         else
             echo "No path!"
