@@ -512,7 +512,7 @@ function update_nastools(){
   cp /root/nas-tools/config/config.yaml /tmp/config.yaml
   cp /root/nas-tools/config/meta.dat /tmp/meta.dat
   cp /root/nas-tools/config/user.db /tmp/user.db
-  echoContent yellow "备份nas-tools相关设置和用户操作缓存完成"
+  echoContent green "备份nas-tools相关设置和用户操作缓存完成"
   cd /root/nas-tools
   git pull
   if [[ $? -eq 0 ]]; then
