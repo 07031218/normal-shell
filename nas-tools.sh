@@ -109,6 +109,7 @@ services:
     volumes:
       - /home/qbittorrent/config:/config
       - /downloads:/downloads
+      - /mnt/video:/mnt/video
       - /home/qbittorrent/watch:/watch  
     restart: unless-stopped
   jackett:
@@ -164,7 +165,7 @@ EOF
       - TZ=Asia/Shanghai
     volumes:
       - /home/emby:/config
-      - /mnt:/mnt 
+      - /mnt:/mnt
     ports:
       - 8096:8096
       - 8920:8920
@@ -176,6 +177,26 @@ EOF
   docker-compose -f /root/docker-compose.yml up -d
   if [[ $? -eq 0 ]]; then
     echoContent green "qbittorrent、jackett、flaresolverr、chinesesubfinder安装完毕······"
+    echoContent yellow "开始将检测网盘盘挂载状态写入开机启动项···"
+    cat >/etc/init.d/check <<EOF
+#!/bin/bash
+dir1=/mnt/video
+# dir2=/mnt/onedrive
+while true; do
+    sleep 5s
+    if [[ -d $dir1 ]]; then
+        if [[ `ls $dir1` != "" ]]; then
+            docker restart chinesesubfinder
+            break
+        else
+            echo "No path!"
+        fi
+    fi
+done
+EOF
+    chmod +x /etc/init.d/check
+    update-rc.d check defaults
+    echoContent green "检测网盘盘挂载状态写入开机启动项完成···"
     if [[ ${embyyn} == "Y" ]]||[[ ${embyyn} == "y" ]]; then
       echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），Emby端口:8096"
     else
@@ -537,7 +558,13 @@ function menu(){
 #                    Blog：https://blog.20120714.xyz      #
 #                                                         #
 ###########################################################"
-echoContent red "请注意：不建议内存低于2GB，磁盘空间低于40G的设备执行安装"
+echoContent red "请注意：不建议内存低于2GB，磁盘空间低于40G的设备执行安装"、
+echo
+echo
+echoContent skyBlue "友情提醒：
+如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby，请先完成网盘挂载(挂载目录选择/mnt/video)
+如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby，请先完成网盘挂载(挂载目录选择/mnt/video)
+如果打算映射rclone挂载的网盘给qBittorrent、chinesesubfinder和Emby，请先完成网盘挂载(挂载目录选择/mnt/video)"
 echoContent white "-----------------------------------------"
 echo -e "${RED}0. 退出脚本${END}"
 echoContent white "-----------------------------------------"
