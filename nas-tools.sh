@@ -509,10 +509,23 @@ startsecs=3 #自动重启时间间隔（s）
   echoContent green "Nas-tools安装完毕，默认端口：3000，用户名：admin，密码：password"
 }
 function update_nastools(){
+  cp /root/nas-tools/config/config.yaml /tmp/config.yaml
+  cp /root/nas-tools/config/meta.dat /tmp/meta.dat
+  cp /root/nas-tools/config/user.db /tmp/user.db
+  echoContent yellow "备份nas-tools相关设置和用户操作缓存完成"
   cd /root/nas-tools
   git pull
+  if [[ $? -eq 0 ]]; then
+    echoContent green "nas-tools更新完成，开始还原nas-tools相关设置和用户操作缓存"
+  else
+    echoContent red "nas-tool源码拉取失败，更新失败······"
+  fi
+  mv /tmp/user.db /root/nas-tools/config/user.db
+  mv /tmp/meta.dat /root/nas-tools/config/meta.dat
+  mv /tmp/config.yaml /root/nas-tools/config/config.yaml
+  echoContent green "还原nas-tools相关设置和用户操作缓存完成，开始重启nas-tools服务"
   /etc/init.d/supervisor restart
-  echoContent green "Nas-tools更新完成，supervisor服务已重启"
+  echoContent green "Nas-tools服务已重启"
 }
 function menu(){
   clear
