@@ -92,11 +92,35 @@ function install_gclone(){
   echoContent purple "开始使用gclone来获取Google Api Tkoen，请按照命令行提示操作·····"
   gclone config
 }
-function checkin_docker-compose(){
+function install_nas-tools(){
+  if [[ `docker ps|grep nas-tools` != "" ]]; then
+    echo
+    echoContent red "⚠️ 检测到本机已安装过nas-tools,程序退出······"
+    exit 1
+  fi
   cat >/root/docker-compose.yml <<EOF
 version: "3"
 services: 
 #自动追剧必备
+  nas-tools:
+    image: jxxghp/nas-tools:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - /home/nas-tools/config:/config
+      - /downloads:/downloads
+      - /mnt:/mnt
+      - /root/.config/rclone:/root/.config/rclone
+    environment: 
+      - PUID=0
+      - PGID=0
+      - UMASK=022
+      - TZ=Asia/Shanghai
+      - NASTOOL_AUTO_UPDATE=true
+    restart: always
+    network_mode: bridge
+    hostname: nas-tools
+    container_name: nas-tools
   qbittorrent:
     image: ghcr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -188,6 +212,7 @@ while true; do
         if [[ `ls $dir1` != "" ]]; then
             docker restart chinesesubfinder
             docker restart qbittorrent
+            docker restart nas-tools
             if [[ `docker ps |grep emby` != "" ]];then
               docker restart emby
             fi
@@ -202,9 +227,9 @@ EOF
     update-rc.d check defaults
     echoContent green "检测网盘挂载状态写入开机启动项完成···"
     if [[ ${embyyn} == "Y" ]]||[[ ${embyyn} == "y" ]]; then
-      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin），Emby端口:8096"
+      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin）,nas-tools端口3000(默认用户名admin,密码password)，Emby端口:8096"
     else
-      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin）."
+      echoContent green "qbittorrent端口8088（初始用户名admin，密码adminadmin, nas-tools端口3000(默认用户名admin,密码password)"
     fi
   else
     echoContent red "qbittorrent、jackett、flaresolverr、chinesesubfinder安装失败······"
@@ -496,62 +521,6 @@ WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_
         fi
 
 }
-function install_nas-tools(){
-  apt install git supervisor -y||yum install git supervisor -y
-  if [[ `which python3` == "" ]]; then
-    echoContent yellow "开始安装python3环境"
-    apt install python3 -y||yum install python3 -y
-  fi
-  if [[ `which pip3` == "" ]]; then
-    echoContent yellow "开始安装pip3"
-    apt install python3-pip -y||yum install python3-pip -y
-  fi
-  echoContent green "开始拉取nas-tools源码"
-  git clone https://ghproxy.com/https://github.com/jxxghp/nas-tools.git /root/nas-tools
-  cd /root/nas-tools
-  echoContent yellow "开始执行安装nas-tools所需依赖包"
-  pip3 install -r requirements.txt
-  echo "qbittorrent-api
-transmission_rpc
-cn2an
-plexapi
-python-opensubtitles
-anitopy
-feapder" >> 1.txt
-  pip3 install -r 1.txt
-  rm 1.txt
-  echo "[program:nastools]   #程序的名称
-command=/usr/bin/python3 run.py #需要执行的命令
-directory=/root/nas-tools/  #命令执行的目录
-environment=NASTOOL_CONFIG="/root/nas-tools/config/config.yaml" #环境变量
-user=root #用户
-stopsignal=INT
-autostart=true #是否自启动
-autorestart=true #是否自动重启
-startsecs=3 #自动重启时间间隔（s）
-" >/etc/supervisor/conf.d/nastool.conf
-  /etc/init.d/supervisor restart
-  echoContent green "Nas-tools安装完毕，默认端口：3000，用户名：admin，密码：password"
-}
-function update_nastools(){
-  cp /root/nas-tools/config/config.yaml /tmp/config.yaml
-  cp /root/nas-tools/config/meta.dat /tmp/meta.dat
-  cp /root/nas-tools/config/user.db /tmp/user.db
-  echoContent green "备份nas-tools相关设置和用户操作缓存完成"
-  cd /root/nas-tools
-  git pull
-  if [[ $? -eq 0 ]]; then
-    echoContent green "nas-tools更新完成，开始还原nas-tools相关设置和用户操作缓存"
-  else
-    echoContent red "nas-tool源码拉取失败，更新失败······"
-  fi
-  mv /tmp/user.db /root/nas-tools/config/user.db
-  mv /tmp/meta.dat /root/nas-tools/config/meta.dat
-  mv /tmp/config.yaml /root/nas-tools/config/config.yaml
-  echoContent green "还原nas-tools相关设置和用户操作缓存完成，开始重启nas-tools服务"
-  /etc/init.d/supervisor restart
-  echoContent green "Nas-tools服务已重启"
-}
 function menu(){
   clear
     echoContent green "
@@ -575,13 +544,11 @@ echoContent yellow "1. 一键安装Nas-tools
 2. 安装Rclone
 3. Gclone获取网盘Token
 4. Rclone挂载网盘
-5. 反代Nas-tools
-6. 更新Nas-tools"
+5. 反代Nas-tools"
   read -p "请选择输入菜单对应数字开始执行：" select_menu
   case "${select_menu}" in
     1)
       check_docker
-      checkin_docker-compose
       install_nas-tools;;
     2)
       install_rclone;;
@@ -591,8 +558,6 @@ echoContent yellow "1. 一键安装Nas-tools
       mount_drive;;
     5)
       insall_proxy;;
-    6)
-      update_nastools;;
     0)
       exit 0;;
     *)
