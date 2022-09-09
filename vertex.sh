@@ -119,6 +119,7 @@ services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
+    network_mode: "host"
     environment:
       - PUID=1000
       - PGID=1000
