@@ -118,7 +118,7 @@ services:
     restart: unless-stopped
 EOF
   fi
-  mkdir -p /home/flexget/config && cd /home/flexget/config && wget https://github.com/IvonWei/flexget_qbittorrent_mod/archive/refs/heads/master.zip && unzip master.zip && mv flexget_qbittorrent_mod-master plugins && rm master.zip
+  mkdir -p /home/flexget/config && cd /home/flexget/config && wget https://github.com/IvonWei/flexget_qbittorrent_mod/archive/refs/heads/master.zip && unzip master.zip >/dev/null && mv flexget_qbittorrent_mod-master plugins && rm master.zip
   wget -O plugins/nexusphp.py https://raw.githubusercontent.com/Juszoe/flexget-nexusphp/master/nexusphp.py
   cat >/home/flexget/config/config.yml<<EOF
 web_server:
@@ -220,7 +220,7 @@ EOF
   if [[ ${i} == 1 ]]; then
     text2="${text1}${web},]"
   elif [[ ${i} -eq ${times} ]]; then
-    text2="${text1} ${web}]"
+    text2="\  ${text1} ${web}]"
   else
     text2="${text1} ${web},]"
   fi
@@ -314,9 +314,11 @@ cat >> /home/flexget/config/config.yml<<EOF
       - ol_qbittorrent_base_template
       - qbittorrent_delete_cleaner_template
 EOF
+  echoContent yellow "太好了，所有信息已经准备完毕，开始程序部署"
   docker-compose -f /root/docker-compose.yml up -d
   if [[ $? -eq 0 ]]; then
-    echoContent yellow "开始进入容器，执行安装requests依赖必要操作"
+    sleep 5s
+    echoContent yellow "即将开始进入容器，执行安装requests依赖必要操作"
   else
     echoContent red "flexget安装失败了····"
     exit 1
