@@ -131,18 +131,17 @@ restore_emby(){
         exit 0
     fi
     systemctl stop emby-server
-    if [[ ${xuegua_dir} != "/var/lib/emby/programdata/" ]]; then
-        echoContent yellow "Emby削刮包恢复中，请耐心等待······"
-        untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
-        if [[ "$?" -eq 0 ]]; then
+    # if [[ ${xuegua_dir} != "/var/lib/emby/programdata/" ]]; then
+    echoContent yellow "Emby削刮包恢复中，请耐心等待······"
+    untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
+    if [[ "$?" -eq 0 ]]; then
             # clear
-            echoContent green "Emby削刮包恢复完成"
-            sleep 5s
-        else
-            echoContent red "Emby削刮包恢复失败"
-            systemctl start emby-server
-            exit 1
-        fi
+        echoContent green "Emby削刮包恢复完成"
+        sleep 5s
+    else
+        echoContent red "Emby削刮包恢复失败"
+        systemctl start emby-server
+        exit 1
     fi
     echoContent yellow "Emby-server数据库恢复中，请耐心等待······"
     untar ${backto_dir}/Emby-server数据库.tar.gz $sys_dir
