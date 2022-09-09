@@ -56,20 +56,14 @@ function check_docker(){
 }
 function install_flexget(){
   read -p "请设置flexget面板登录密码[最好英数结合，太简单无法生效]：" password
-  read -p "请添加第一个站点的名称：" web1
-  read -p "请输入第一个站点的Cookie：" Cookie1
-  read -p "请输入第一个站点的Rss订阅链接：" rss1
-  read -p "请添加第二个站点的名称：" web2
-  read -p "请输入第二个站点的Cookie：" Cookie2
-  read -p "请输入第二个站点的Rss订阅链接：" rss2
   read -p "是否在本机部署qBittorrent[Y/N]：" yn
   if [[ ${yn} != "Y" ]]&&[[ ${yn} != "y" ]]; then
     read -p "请输入远程qBittorrent下载器的IP地址：" box_ip
     read -p "请输入远程qBittorrent下载器的服务端口：" boxport
     read -p "请输入远程qBittorrent下载器的用户名：" box_user_name
     read -p "请输入远程qBittorrent下载器的登录密码：" box_password
-  cat >/root/docker-compose.yml <<EOF
-  version: "3"
+    cat >/root/docker-compose.yml <<EOF
+version: "3"
 services: 
   flexget:
     image: madwind/flexget
@@ -92,7 +86,7 @@ EOF
     box_user_name="admin"
     box_password="adminadmin"
     cat >/root/docker-compose.yml <<EOF
-  version: "3"
+version: "3"
 services: 
   flexget:
     image: madwind/flexget
@@ -124,15 +118,15 @@ services:
     restart: unless-stopped
 EOF
   fi
-  mkdir -p /home/flexget/config && cd home/flexget/config && wget https://github.com/IvonWei/flexget_qbittorrent_mod/archive/refs/heads/master.zip && unzip master.zip && mv flexget_qbittorrent_mod-master plugins && rm master.zip
+  mkdir -p /home/flexget/config && cd /home/flexget/config && wget https://github.com/IvonWei/flexget_qbittorrent_mod/archive/refs/heads/master.zip && unzip master.zip && mv flexget_qbittorrent_mod-master plugins && rm master.zip
   wget -O plugins/nexusphp.py https://raw.githubusercontent.com/Juszoe/flexget-nexusphp/master/nexusphp.py
-  cat > /home/flexget/config/config.yml <<haha
+  cat >/home/flexget/config/config.yml<<EOF
 web_server:
   bind: '0.0.0.0'
   port: 3539
 
 schedules:
-  - tasks: [${web1}, ${web2}]
+  - tasks: []
     interval:
       minutes: 5
 
@@ -213,13 +207,32 @@ templates:
       strict: no
 
 tasks:
-  ${web1}:
+EOF
+  i=0
+  read -p "请输入要添加的站点总数量：" times
+  while [ $i -lt $times ]
+  do
+  let i++
+  text1=`sed -n '6p' /home/flexget/config/config.yml|sed 's/]//g'`
+  read -p "请添加第${i}个站点的名称：" web
+  read -p "请输入第${i}个站点的Cookie：" Cookie
+  read -p "请输入第${i}个站点的Rss订阅链接：" rss
+  if [[ ${i} == 1 ]]; then
+    text2="${text1}${web},]"
+  elif [[ ${i} -eq ${times} ]]; then
+    text2="${text1} ${web}]"
+  else
+    text2="${text1} ${web},]"
+  fi
+sed -i "6c ${text2}" /home/flexget/config/config.yml
+cat >> /home/flexget/config/config.yml <<EOF
+  ${web}:
     rss: 
-      url: ${rss1}
+      url: ${rss}
       other_fields:
         - link
     nexusphp:
-      cookie: '${Cookie1}'
+      cookie: '${Cookie}'
       user-agent: '{? headers.user_agent ?}'
       comment: yes
       discount:
@@ -235,30 +248,9 @@ tasks:
     template:
       - ol_qbittorrent_base_template
       - ol_qbittorrent_add_template
-
-  ${web2}:
-    rss: 
-      url: ${rss2}
-      other_fields:
-        - link
-    nexusphp:
-      cookie: '${Cookie2}'
-      user-agent: '{? headers.user_agent ?}'
-      comment: yes
-      discount:
-        - free
-        - 2xfree
-      seeders:
-        min: 1
-    verify_ssl_certificates: no
-    content_size:
-      min: 500
-      max: 120000
-      strict: no
-    template:
-      - ol_qbittorrent_base_template
-      - ol_qbittorrent_add_template
-
+EOF
+done >/dev/null
+cat >> /home/flexget/config/config.yml<<EOF
   resume: &resume
     priority: 2
     disable: [seen, seen_info_hash, retry_failed]
@@ -321,7 +313,7 @@ tasks:
       - ol_from_qbittorrent_template
       - ol_qbittorrent_base_template
       - qbittorrent_delete_cleaner_template
-haha
+EOF
   docker-compose -f /root/docker-compose.yml up -d
   if [[ $? -eq 0 ]]; then
     echoContent yellow "开始进入容器，执行安装requests依赖必要操作"
