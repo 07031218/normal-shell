@@ -143,6 +143,7 @@ restore_emby(){
         systemctl start emby-server
         exit 1
     fi
+    # fi
     echoContent yellow "Emby-server数据库恢复中，请耐心等待······"
     untar ${backto_dir}/Emby-server数据库.tar.gz $sys_dir
     if [[ "$?" -eq 0 ]]; then
