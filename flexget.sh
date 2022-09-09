@@ -71,7 +71,6 @@ function install_flexget(){
   cat >/root/docker-compose.yml <<EOF
   version: "3"
 services: 
-#自动追剧必备
   flexget:
     image: madwind/flexget
     container_name: flexget
