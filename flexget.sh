@@ -216,8 +216,8 @@ EOF
   let i++
   text1=`sed -n '6p' /home/flexget/config/config.yml|sed 's/]//g'`
   read -p "请添加第${i}个站点的名称：" web
-  read -p "请输入第${i}个站点的Cookie：" Cookie
-  read -p "请输入第${i}个站点的Rss订阅链接：" rss
+  read -p "请输入${web}的Cookie：" Cookie
+  read -p "请输入${web}的Rss订阅链接：" rss
   if [[ ${i} == 1 ]]; then
     text2="${text1}${web},]"
   elif [[ ${i} -eq ${times} ]]; then
