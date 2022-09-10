@@ -85,6 +85,7 @@ EOF
     boxport="8088"
     box_user_name="admin"
     box_password="adminadmin"
+    read -p "请输入qBittorrent下载文件保存路径(宿主机目录路径)：" downdir 
     cat >/root/docker-compose.yml <<EOF
 version: "3"
 services: 
@@ -113,7 +114,7 @@ services:
       - WEBUI_PORT=8088
     volumes:
       - /home/qbittorrent/config:/config
-      - /downloads:/downloads
+      - ${downdir}:/downloads
       - /home/qbittorrent/watch:/watch  
     restart: unless-stopped
 EOF
@@ -326,12 +327,28 @@ EOF
   docker exec -it flexget bash -c "pip3 install --upgrade requests"
   if [[ $? -eq 0 ]]; then
     if [[ ${yn} == "y" ]]||[[ ${yn} == "Y" ]]; then
-      echoContent green "Flexget安装完毕，端口3539，面板登录密码:$password ,qBittorrent安装完毕，端口：8088，用户名：admin,密码：adminadmin"
+      echoContent green "--------------------------------------
+      恭喜，Flexget、qBittorrent安装完毕
+      Flexget端口:3539
+      面板登录密码:$password
+      配置文件存放路径:/home/flexget/config
+      --------------------------------------
+      qBittorrent端口:8088
+      qBittorrent用户名:admin
+      qBittorrent密码:adminadmin
+      配置文件存放路径:/home/qbittorrent/config
+      下载文件存放路径:${downdir}
+      --------------------------------------"
     else
-      echoContent green "Flexget安装完毕，端口3539，面板登录密码:$password"
+      echoContent green "--------------------------------------
+      恭喜Flexget安装完毕
+      Flexget端口:3539
+      面板登录密码:$password
+      配置文件存放路径:/home/flexget/config
+      --------------------------------------"
     fi
   else
-    echoContent red "安装requests依赖失败了····"
+    echoContent red "⚠️  安装requests依赖失败了····"
     exit 1
   fi
 }
