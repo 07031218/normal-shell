@@ -329,7 +329,7 @@ EOF
     if [[ ${yn} == "y" ]]||[[ ${yn} == "Y" ]]; then
       echoContent green "
 ------------------------------------------------
-      恭喜，Flexget、qBittorrent安装完毕
+      恭喜:Flexget、qBittorrent安装完毕
       Flexget端口:3539
       面板登录密码:$password
       配置文件存放路径:/home/flexget/config
@@ -343,7 +343,7 @@ EOF
     else
       echoContent green "
 ------------------------------------------------
-      恭喜Flexget安装完毕
+      恭喜:Flexget安装完毕
       Flexget端口:3539
       面板登录密码:$password
       配置文件存放路径:/home/flexget/config
