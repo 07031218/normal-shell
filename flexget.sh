@@ -327,25 +327,27 @@ EOF
   docker exec -it flexget bash -c "pip3 install --upgrade requests"
   if [[ $? -eq 0 ]]; then
     if [[ ${yn} == "y" ]]||[[ ${yn} == "Y" ]]; then
-      echoContent green "--------------------------------------
+      echoContent green "
+------------------------------------------------
       恭喜，Flexget、qBittorrent安装完毕
       Flexget端口:3539
       面板登录密码:$password
       配置文件存放路径:/home/flexget/config
-      --------------------------------------
+------------------------------------------------
       qBittorrent端口:8088
       qBittorrent用户名:admin
       qBittorrent密码:adminadmin
       配置文件存放路径:/home/qbittorrent/config
       下载文件存放路径:${downdir}
-      --------------------------------------"
+------------------------------------------------"
     else
-      echoContent green "--------------------------------------
+      echoContent green "
+------------------------------------------------
       恭喜Flexget安装完毕
       Flexget端口:3539
       面板登录密码:$password
       配置文件存放路径:/home/flexget/config
-      --------------------------------------"
+------------------------------------------------"
     fi
   else
     echoContent red "⚠️  安装requests依赖失败了····"
