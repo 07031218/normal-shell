@@ -531,7 +531,7 @@ function menu(){
 #                    Blog：https://blog.20120714.xyz              #
 #                                                                 #
 ###################################################################"
-echoContent red "请注意：不建议内存低于2GB，磁盘空间低于40G的设备执行安装"、
+echoContent red "请注意：不建议内存低于2GB，磁盘空间低于40G的设备执行安装"
 echo
 echo
 echoContent skyBlue "友情提醒：
