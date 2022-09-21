@@ -51,7 +51,7 @@ targz(){
         exit 1
     fi
 
-    tar -cf - $2 | pv -s $(du -sk $2 | awk '{print $1}') | gzip > $1
+    tar -cf - $3 $2 | pv -s $(du -sk $2 | awk '{print $1}') | gzip > $1
 }
 untar(){
     if [[ `which pv` == "" ]]; then
@@ -106,7 +106,7 @@ backup_emby(){
     cd $config_dir
     echoContent yellow "Emby-VarLibEmby数据库备份中，请耐心等待······"
     # 备份VarLibEmby数据库(排除包含帐户数据相关的文件)
-    targz ${backto_dir}/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby/ --exclude ./emby/data/device.txt --exclude ./emby/data/users.db --exclude ./emby/data/activitylog.db --exclude ./emby/data/authentication.db --exclude ./emby/data/displaypreferences.db
+    targz ${backto_dir}/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby/ '--exclude ./emby/data/device.txt --exclude ./emby/data/users.db --exclude ./emby/data/activitylog.db --exclude ./emby/data/authentication.db --exclude ./emby/data/displaypreferences.db'
     if [[ "$?" -eq 0 ]]; then
         # clear
         echoContent green "Emby-VarLibEmby数据库备份完成"
