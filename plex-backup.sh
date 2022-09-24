@@ -108,9 +108,8 @@ ${green}2.${plain}  一键还原Plex削刮包、数据库
   esac
 }
 if [[ $1 == "b" ]]; then
+	# 可通过命令 bash plexback.sh b 实现一键备份
 	backup_plex
-elif [[ $1 == "r" ]]; then
-	restore_config
 else
 	menu
 fi
