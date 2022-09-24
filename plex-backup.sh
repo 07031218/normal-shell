@@ -10,9 +10,9 @@ bakdir="nongjiale:plex" # 此处填写rclone对应的GD路径，比如rclone con
 DEL_DAY=7 # 备份文件保存的天数
 
 databasefile_dir='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-in Support/Databases/'
-plexdir1='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache'
-plexdir2='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Metadata'
-plexdir3='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Media'
+# plexdir1='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache'
+# plexdir2='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Metadata'
+# plexdir3='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Media'
 plexdir='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/'
 # curr_date=`date +%Y-%m-%d`
 targz(){
