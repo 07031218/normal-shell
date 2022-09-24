@@ -5,30 +5,74 @@ White='\033[37m'
 blue='\033[36m'
 yellow='\033[0;33m'
 plain='\033[0m'
+
+bakdir="nongjiale:plex" # 此处填写rclone对应的GD路径，比如rclone config中GD的配置名是gd，保存到GD的plex目录下，则填写gd:plex
+DEL_DAY=7 # 备份文件保存的天数
+
 databasefile_dir='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Plug-in Support/Databases/'
 plexdir1='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache'
 plexdir2='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Metadata'
 plexdir3='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Media'
 plexdir='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server/'
 # curr_date=`date +%Y-%m-%d`
+targz(){
+    if [[ `which pv` == "" ]]; then
+        apt install pv -y || yum install pv -y
+    fi
+    if [[ $1 = '' ]]; then
+        echo "参数缺失，用法 'targz 压缩名 文件名/目录名'"
+        exit 1
+    fi
+
+    tar -cf - $4 $3 $2  | pv -s $(du -sk $2 | awk '{print $1}') | gzip > $1
+}
 backup_plex(){
 	service plexmediaserver stop
 	cd "$databasefile_dir"
-	tar -czvf /root/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
+	echo "开始打包plex削刮数据库"
+	targz /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
+	echo "plex削刮数据库打包完成"
+	# tar -czf /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
 	cd "$plexdir"
-	tar -czvPf /root/plex-xuegua.tar.gz  ./Metadata ./Cache ./Media
+	echo "开始打包plex削刮缓存目录"
+	targz /root/plex-bak/plex-xuegua.tar.gz  ./Metadata ./Cache ./Media
+	echo "打包plex削刮缓存目录完成，开始同步plex削刮数据库和削刮缓存到谷歌盘"
 	service plexmediaserver start
-	rsync -avzuP /root/plexdatabase.tar.gz /nongjiale
-	rsync -avzuP /root/plex-xuegua.tar.gz /nongjiale 
+	rclone copy -P /root/plex-bak/ $bakdir/$(date +%Y%m%d)
+	echo "同步plex削刮数据库和削刮缓存到谷歌盘完成，备份结束，程序退出"
+	rm /root/plex-bak/plexdatabase.tar.gz /root/plex-bak/plex-xuegua.tar.gz
+	# 遍历备份目录下的日期目录
+	LIST=$(rclone lsd $bakdir/)
+	# 获取7天前的时间，用于作比较，早于该时间的文件将删除
+	SECONDS=$(date -d  "$(date  +%F) -${DEL_DAY} days" +%s)
+	for index in ${LIST}
+	do
+	    # 对目录名进行格式化，取命名末尾的时间，格式如 20200902
+	    timeString=$(echo ${index} | egrep -o "?[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
+	    if [ -n "$timeString" ]
+	    then
+	        indexDate=${timeString//./-}
+	        indexSecond=$( date -d ${indexDate} +%s )
+	        # 与当天的时间做对比，把早于7天的备份文件删除
+	        if [ $(( $SECONDS- $indexSecond )) -gt 0 ]
+	        then
+	            rclone rmdir $bakdir/$index
+	        fi
+	    fi
+	done
 }
 restore_config(){
 	service plexmediaserver stop
+	read -p "请输入要还原的数据的备份日期[yyyymmdd]：" bakdate
 	cd "$databasefile_dir"
-	rsync -avzuP /nongjiale/plexdatabase.tar.gz ./
-	tar -xzvf plexdatabase.tar.gz
+	rclone copy $bakdir/${bakdate}/plexdatabase.tar.gz ./
+	tar -xzvf plexdatabase.tar.gz && rm plexdatabase.tar.gz
 	cd "$plexdir"
-	rsync -avzuP /nongjiale/plex-xuegua.tar.gz ./
-	tar -xzvf plex-xuegua.tar.gz
+	rclone copy $bakdir/${bakdate}/plex-xuegua.tar.gz ./
+	tar -xzvf plex-xuegua.tar.gz && rm plex-xuegua.tar.gz
+	service plexmediaserver start
+	echo "还原备份数据完成	，程序退出······"
+	exit 0
 }
 menu(){
 	echo -e "
@@ -63,4 +107,10 @@ ${green}2.${plain}  一键还原Plex削刮包、数据库
 		;;
   esac
 }
-menu
+if [[ $1 == "b" ]]; then
+	backup_plex
+elif [[ $1 == "r" ]]; then
+	restore_config
+else
+	menu
+fi
