@@ -65,10 +65,10 @@ restore_config(){
 	service plexmediaserver stop
 	read -p "请输入要还原的数据的备份日期[yyyymmdd]：" bakdate
 	cd "$databasefile_dir"
-	rclone copy $bakdir/${bakdate}/plexdatabase.tar.gz ./
+	rclone copy -P $bakdir/${bakdate}/plexdatabase.tar.gz ./
 	tar -xzvf plexdatabase.tar.gz && rm plexdatabase.tar.gz
 	cd "$plexdir"
-	rclone copy $bakdir/${bakdate}/plex-xuegua.tar.gz ./
+	rclone copy -P $bakdir/${bakdate}/plex-xuegua.tar.gz ./
 	tar -xzvf plex-xuegua.tar.gz && rm plex-xuegua.tar.gz
 	service plexmediaserver start
 	echo "还原备份数据完成	，程序退出······"
