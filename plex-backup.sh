@@ -63,11 +63,11 @@ backup_plex(){
 	        # 与当天的时间做对比，把早于7天的备份文件删除
 	        if [ $(( $SECONDS- $indexSecond )) -gt 0 ]
 	        then
-	            rclone rmdir $bakdir/$index
+	            rclone purge $bakdir/$index
 	        fi
 	    fi
 	done
-	echo -e "${White}清理超${DEL_DAY}天的备份文件，程序退出${plain}"
+	echo -e "${White}清理超${DEL_DAY}天的备份文件完成，程序退出${plain}"
 }
 restore_config(){
 	service plexmediaserver stop
