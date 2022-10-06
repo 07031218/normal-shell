@@ -29,17 +29,27 @@ targz(){
 backup_plex(){
 	service plexmediaserver stop
 	cd "$databasefile_dir"
+	echo "===================================================================="
 	echo "开始打包plex削刮数据库"
+	echo "===================================================================="
 	targz /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
+	echo "===================================================================="
 	echo "plex削刮数据库打包完成"
+	echo "===================================================================="
 	# tar -czf /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
 	cd "$plexdir"
+	echo "===================================================================="
 	echo "开始打包plex削刮缓存目录"
+	echo "===================================================================="
 	targz /root/plex-bak/plex-xuegua.tar.gz  ./Metadata ./Cache ./Media
+	echo "========================================================="
 	echo "打包plex削刮缓存目录完成，开始同步plex削刮数据库和削刮缓存到谷歌盘"
+	echo "===================================================================="
 	service plexmediaserver start
 	rclone copy -P /root/plex-bak/ $bakdir/$(date +%Y%m%d)
+	echo "===================================================================="
 	echo "同步plex削刮数据库和削刮缓存到谷歌盘完成，备份结束，程序退出"
+	echo "===================================================================="
 	rm /root/plex-bak/plexdatabase.tar.gz /root/plex-bak/plex-xuegua.tar.gz
 	# 遍历备份目录下的日期目录
 	LIST=$(rclone lsd $bakdir/)
