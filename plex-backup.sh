@@ -29,24 +29,24 @@ targz(){
 backup_plex(){
 	service plexmediaserver stop
 	cd "$databasefile_dir"
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	echo -e "${White}开始打包plex削刮数据库${plain}"
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	targz /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	echo -e "${White}plex削刮数据库打包完成,开始打包plex削刮缓存目录${plain}"
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	# tar -czf /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
 	cd "$plexdir"
 	targz /root/plex-bak/plex-xuegua.tar.gz  ./Metadata ./Cache ./Media
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	echo -e "${White}打包plex削刮缓存目录完成，开始同步plex削刮数据库和削刮缓存到谷歌盘${plain}"
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	service plexmediaserver start
 	rclone copy -P /root/plex-bak/ $bakdir/$(date +%Y%m%d)
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	echo -e "${White}同步plex削刮数据库和削刮缓存到谷歌盘完成，开始检查清理超${DEL_DAY}天的备份文件${plain}"
-	echo -e "${yellow}====================================================================${plain}"
+	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	rm /root/plex-bak/plexdatabase.tar.gz /root/plex-bak/plex-xuegua.tar.gz
 	# 遍历备份目录下的日期目录
 	LIST=$(rclone lsd $bakdir/)
