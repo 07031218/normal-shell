@@ -29,27 +29,24 @@ targz(){
 backup_plex(){
 	service plexmediaserver stop
 	cd "$databasefile_dir"
-	echo "===================================================================="
-	echo "开始打包plex削刮数据库"
-	echo "===================================================================="
+	echo "${yellow}====================================================================${plain}"
+	echo "${White}开始打包plex削刮数据库${plain}"
+	echo "${yellow}====================================================================${plain}"
 	targz /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
-	echo "===================================================================="
-	echo "plex削刮数据库打包完成"
-	echo "===================================================================="
+	echo "${yellow}====================================================================${plain}"
+	echo "${White}plex削刮数据库打包完成,开始打包plex削刮缓存目录${plain}"
+	echo "${yellow}====================================================================${plain}"
 	# tar -czf /root/plex-bak/plexdatabase.tar.gz ./com.plexapp.plugins.library.db
 	cd "$plexdir"
-	echo "===================================================================="
-	echo "开始打包plex削刮缓存目录"
-	echo "===================================================================="
 	targz /root/plex-bak/plex-xuegua.tar.gz  ./Metadata ./Cache ./Media
-	echo "========================================================="
-	echo "打包plex削刮缓存目录完成，开始同步plex削刮数据库和削刮缓存到谷歌盘"
-	echo "===================================================================="
+	echo "${yellow}====================================================================${plain}"
+	echo "${White}打包plex削刮缓存目录完成，开始同步plex削刮数据库和削刮缓存到谷歌盘${plain}"
+	echo "${yellow}====================================================================${plain}"
 	service plexmediaserver start
 	rclone copy -P /root/plex-bak/ $bakdir/$(date +%Y%m%d)
-	echo "===================================================================="
-	echo "同步plex削刮数据库和削刮缓存到谷歌盘完成，备份结束，程序退出"
-	echo "===================================================================="
+	echo "${yellow}====================================================================${plain}"
+	echo "${White}同步plex削刮数据库和削刮缓存到谷歌盘完成，开始检查清理超${DEL_DAY}天的备份文件${plain}"
+	echo "${yellow}====================================================================${plain}"
 	rm /root/plex-bak/plexdatabase.tar.gz /root/plex-bak/plex-xuegua.tar.gz
 	# 遍历备份目录下的日期目录
 	LIST=$(rclone lsd $bakdir/)
@@ -70,6 +67,7 @@ backup_plex(){
 	        fi
 	    fi
 	done
+	echo "${White}清理超${DEL_DAY}天的备份文件，程序退出${plain}"
 }
 restore_config(){
 	service plexmediaserver stop
