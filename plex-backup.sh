@@ -29,6 +29,12 @@ targz(){
 backup_plex(){
 	service plexmediaserver stop
 	cd "$databasefile_dir"
+	if [[ ! -d /root/plex-bak ]]; then
+		echo -e "${red}本地备份缓存目录不存在，开始创建备份缓存目录${plain}"
+		mkdir -p /root/plex-bak
+	else
+		echo -e "${green}本地备份缓存目录存在，程序继续${plain}"
+	fi
 	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
 	echo -e "${White}开始打包plex削刮数据库${plain}"
 	echo -e "${yellow}❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️❄️${plain}"
