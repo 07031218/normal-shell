@@ -6,6 +6,10 @@ bak_dir="" # 备份文件存放目录，需要自行填写
 DATE=`date +%Y%m%d` # 时间格式化，勿动
 
 DEL_DAY=7 # 备份脚本保存的天数，默认7天，支持自定义修改
+if [[ $bak_dir == "" ]]; then
+    echo "⚠️ 监测到未配置备份目录，程序退出" >> /root/emby_bak_error.log
+    exit 1
+fi
 targz(){
     if [[ `which pv` == "" ]]; then
         apt install pv -y || yum install pv -y
