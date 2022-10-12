@@ -93,7 +93,7 @@ backup_emby(){
         if [[ $baksys == "Y" ]]||[[ $baksys == "y" ]]; then
             cd $sys_dir
             echoContent yellow "Emby-server主程序备份中，请耐心等待······"
-            targz ${backto_dir}/${DATE}/Emby-server数据库.tar.gz ./
+            targz ${backto_dir}/${DATE}/Emby-server主程序.tar.gz ./
             if [[ "$?" -eq 0 ]]; then
                 # clear
                 echoContent green "Emby-server主程序备份完成"
@@ -135,7 +135,7 @@ backup_emby(){
         if [[ $baksys == "Y" ]]||[[ $baksys == "y" ]]; then
             cd $sys_dir
             echoContent yellow "Emby-server主程序备份中，请耐心等待······"
-            targz ${backto_dir}/${DATE}/Emby-server数据库.tar.gz ./
+            targz ${backto_dir}/${DATE}/Emby-server主程序.tar.gz ./
             if [[ "$?" -eq 0 ]]; then
                 # clear
                 echoContent green "Emby-server主程序备份完成"
@@ -151,54 +151,67 @@ backup_emby(){
     fi
 }
 restore_emby(){
-    echoContent skyBlue "请输入Emby削刮库的目录路径，留空则默认为/var/lib/emby/programdata/"
+    echoContent skyBlue "请输入Emby削刮库的目录路径，如未自定义过削刮缓存目录或者你看不懂这条在说什么，那么直接回车即可⬇"
     read xuegua_dir
-    if [[ ${xuegua_dir} == "" ]]; then
-        xuegua_dir=/var/lib/emby/programdata/
-    fi
     echoContent yellow "请输入备份文件所在的路径⬇"
     read backto_dir
-    echoContent red "请确认如下目录无误再继续操作\n1、系统文件夹路径：/opt/emby-server/system\n2、配置文件夹路径：/var/lib/emby\n是否继续？[Y/N]"
+    echoContent yellow "是否还原Emby-sever主程序？[Y/N]:"
+    read restore_sys
+    echoContent red "即将开始还原操作，是否继续执行:[Y/N]"
     read yn
     if [[ $yn != "Y" ]] && [[ $yn != "y" ]]; then
         exit 0
     fi
     systemctl stop emby-server
-    # if [[ ${xuegua_dir} != "/var/lib/emby/programdata/" ]]; then
-    echoContent yellow "Emby削刮包恢复中，请耐心等待······"
-    untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
-    if [[ "$?" -eq 0 ]]; then
+    if [[ ${xuegua_dir} == "" ]]; then
+        xuegua_dir=/var/lib/emby/
+        echoContent yellow "Emby削刮包和LibEmby数据库恢复中，请耐心等待······"
+        untar ${backto_dir}/Emby削刮包和LibEmby数据库.tar.gz $xuegua_dir
+        if [[ "$?" -eq 0 ]]; then
+                # clear
+            echoContent green "Emby削刮包和LibEmby数据库恢复完成"
+            sleep 5s
+        else
+            echoContent red "Emby削刮包和LibEmby数据库失败"
+            systemctl start emby-server
+            exit 1
+        fi
+    else
+        echoContent yellow "Emby削刮包恢复中，请耐心等待······"
+        untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
+        if [[ "$?" -eq 0 ]]; then
+            echoContent green "Emby削刮包恢复完成"
+            sleep 3s
+        else
+            echoContent red "Emby削刮包恢复失败"
+            systemctl start emby-server
+            exit 1
+        fi
+        echoContent yellow "LibEmby数据库恢复中，请耐心等待······"
+        untar ${backto_dir}/LibEmby数据库.tar.gz $config_dir
+        if [[ "$?" -eq 0 ]]; then
+            echoContent green "LibEmby数据库恢复完成"
+        else
+            echoContent red "LibEmby数据库恢复失败"
+            systemctl start emby-server
+            exit 1
+        fi
+    fi
+    if [[ $restore_sys == "y" ]]||[[ $restore_sys == "Y" ]]; then
+        echoContent yellow "Emby-server主程序恢复中，请耐心等待······"
+        untar ${backto_dir}/Emby-server主程序.tar.gz $sys_dir
+        if [[ "$?" -eq 0 ]]; then
             # clear
-        echoContent green "Emby削刮包恢复完成"
-        sleep 5s
-    else
-        echoContent red "Emby削刮包恢复失败"
-        systemctl start emby-server
-        exit 1
+            echoContent green "Emby-server主程序恢复完成"
+            sleep 5s
+        else
+            echoContent red "Emby-server主程序恢复失败"
+            systemctl start emby-server
+            exit 1
+        fi
     fi
-    # fi
-    echoContent yellow "Emby-server数据库恢复中，请耐心等待······"
-    untar ${backto_dir}/Emby-server数据库.tar.gz $sys_dir
-    if [[ "$?" -eq 0 ]]; then
-        # clear
-        echoContent green "Emby-server数据库恢复完成"
-        sleep 5s
-    else
-        echoContent red "Emby-server数据库恢复失败"
-        systemctl start emby-server
-        exit 1
-    fi
-    echoContent yellow "Emby-VarLibEmby数据库恢复中，请耐心等待······"
-    untar ${backto_dir}/Emby-VarLibEmby数据库.tar.gz $config_dir
-    if [[ "$?" -eq 0 ]]; then
-        echoContent green "Emby-VarLibEmby数据库恢复完成"
-    else
-        echoContent red "Emby-VarLibEmby数据库恢复失败"
-        systemctl start emby-server
-        exit 1
-    fi
-    echoContent yellow "恭喜，所有恢复均已完成。"
     systemctl start emby-server
+    echoContent yellow "恭喜，所有恢复均已完成。"
 }
 copyright(){
     clear
