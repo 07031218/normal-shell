@@ -7,8 +7,8 @@ DATE=`date +%Y%m%d` # 时间格式化，勿动
 
 DEL_DAY=7 # 备份脚本保存的天数，默认7天，支持自定义修改
 if [[ $bak_dir == "" ]]; then
-    echo "`DATE` ⚠️ 检测到未配置备份目录，程序退出" >> /root/emby_bak_error.log
-    echo "`DATE` ⚠️ 检测到未配置备份目录，程序退出"
+    echo "`date '+%Y-%m-%d %H:%M:%S'` ⚠️ 检测到未配置备份目录，程序退出" >> /root/emby_bak_error.log
+    echo "`date '+%Y-%m-%d %H:%M:%S'` ⚠️ 检测到未配置备份目录，程序退出"
     exit 1
 fi
 targz(){
@@ -22,16 +22,16 @@ targz(){
     tar -cf - $3 $2  | pv -s $(du -sk $2 | awk '{print $1}') | gzip > $1
 }
 # 创建日期目录
-mkdir -p $bak_dir/$DATE
+mkdir -p $bak_dir/`date '+%Y-%m-%d %H:%M:%S'`
 # 停止Emby Server服务
 systemctl stop emby-server
 if [[ $xuegua_dir != "" ]]; then
     cd $xuegua_dir
-    targz $bak_dir/$DATE/Emby削刮包.tar.gz ./
+    targz $bak_dir/`date '+%Y-%m-%d %H:%M:%S'`/Emby削刮包.tar.gz ./
     if [[ $? -eq 0 ]]; then
         echo "Emby削刮包备份完成······"
     else
-        echo "`DATE` Emby削刮包备份失败" >> /root/emby_bak_error.log
+        echo "`date '+%Y-%m-%d %H:%M:%S'` Emby削刮包备份失败" >> /root/emby_bak_error.log
         systemctl start emby-server
         exit 1
     fi
@@ -41,17 +41,17 @@ if [[ $xuegua_dir != "" ]]; then
     if [[ $? -eq 0 ]]; then
         echo "LibEmby数据库备份完成······"
     else
-        echo "`DATE` LibEmby数据库备份失败" >> /root/emby_bak_error.log
+        echo "`date '+%Y-%m-%d %H:%M:%S'` LibEmby数据库备份失败" >> /root/emby_bak_error.log
         systemctl start emby-server
         exit 1
     fi
 else
     cd $xuegua_dir
-    targz $bak_dir/$DATE/Emby削刮包和LibEmby数据库.tar.gz ./
+    targz $bak_dir/`date '+%Y-%m-%d %H:%M:%S'`/Emby削刮包和LibEmby数据库.tar.gz ./
     if [[ $? -eq 0 ]]; then
         echo "Emby削刮包和LibEmby数据库备份完成······"
     else
-        echo "`DATE` Emby削刮包和LibEmby数据库备份失败" >> /root/emby_bak_error.log
+        echo "`date '+%Y-%m-%d %H:%M:%S'` Emby削刮包和LibEmby数据库备份失败" >> /root/emby_bak_error.log
         systemctl start emby-server
         exit 1
     fi
@@ -62,7 +62,7 @@ if [[ $embyserver_dir != "" ]]; then
     if [[ $? -eq 0 ]]; then
         echo "Emby-server主程序备份完成······"
     else
-        echo "`DATE` Emby-server主程序备份失败" >> /root/emby_bak_error.log
+        echo "`date '+%Y-%m-%d %H:%M:%S'` Emby-server主程序备份失败" >> /root/emby_bak_error.log
         systemctl start emby-server
         exit 1
     fi
