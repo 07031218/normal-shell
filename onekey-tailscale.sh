@@ -273,6 +273,7 @@ $python_command ./acme_tiny.py --account-key ./account.key --csr ./domain.csr --
 wget --no-check-certificate -O - https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem > intermediate.pem
 cat /tmp/signed.crt intermediate.pem > $web_dir/certificate/chained.pem
 cat /tmp/signed.crt intermediate.pem > $web_dir/certificate/chained.pem
+cp $web_dir/certificate/domain.key $web_dir/certificate/$web_domains.key
 cp $web_dir/certificate/chained.pem $web_dir/certificate/$web_domains.crt
 service nginx reload
 EOF
