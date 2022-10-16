@@ -9,7 +9,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 install_vertex(){
   local_ip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
-  baseip=$(curl -s ipip.ooo)  > /dev/null
+  baseip=$(curl -s http3.ooo)  > /dev/null
   if test -z "$(which docker)"; then
     echo -e "${yellow}检测到系统未安装docker，开始安装docker${plain}"
     curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
