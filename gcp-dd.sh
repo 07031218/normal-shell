@@ -70,10 +70,13 @@ echo -n -e "${yellow}请选择你要DD到的系统：\n1、Debian\n2、Ubuntu\n3
 read chose
 if [[ $chose == "1" ]]; then
 	sysinfo=d
+  sys1=Debian
 elif [[ $chose == "2" ]]; then
 	sysinfo=u
+  sys1=Ubuntu
 elif [[ $chose == "3" ]]; then
 	sysinfo=c
+  sys1=Centos
 fi
 bits=$(getconf LONG_BIT)
 echo -n -e "${yellow}请输入系统版本号：\n如 Debian 11输入11，Ubuntu 20.04输入20.04，Centos 6.9输入6.9 \n>：${plain}"
@@ -82,7 +85,9 @@ read version
 # read bits
 echo -n -e "${yellow}请输入系统DD之后的登陆密码\n>：${plain}"
 read password
-echo -n -e "${yellow}您设置的密码为:${plain}${green}${password}${plain}  ${red}请确认是否正式开始DD系统[Y/N]${plain}\n>："
+echo -n -e "${yellow}您计划要DD重装到${sys1} ${version} ${bits}版本；
+设置的登录密码为:${plain}${green}${password}${plain}
+${red}请确认是否正式开始DD系统[Y/N]${plain}\n>："
 read yn
 if [[ $yn == "y" ]]||[[ $yn == "Y" ]]; then
 	bash <(wget --no-check-certificate -qO- 'https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/InstallNET.sh') --ip-addr ${local_ip} --ip-gate ${gateway} --ip-mask 255.255.255.0 -${sysinfo} ${version} -v ${bits} -a -p ${password}
