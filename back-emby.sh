@@ -1,8 +1,8 @@
 #!/bin/bash
 xuegua_dir="" # 削刮库目录,如未自定义，留空即可
-embylib_dir="/var/lib/emby" # Emby默认Libray数据库和削刮包缓存目录,不要修改
+embylib_dir="/var/lib/" # Emby默认Libray数据库和削刮包缓存目录,不要修改
 embyserver_dir="/opt/emby-server/" # Emby主程序相关目录，如果不需要备份主程序，删除内容留空即可
-bak_dir="" # 备份文件存放目录，需要自行填写
+bak_dir="" # 备份文件存放目录，需要自行填写，最末尾不要/
 DATE=`date +%Y%m%d` # 时间格式化，勿动
 
 DEL_DAY=7 # 备份脚本保存的天数，默认7天，支持自定义修改
@@ -37,7 +37,7 @@ if [[ $xuegua_dir != "" ]]; then
     fi
     cd $embylib_dir
     # 备份VarLibEmby数据库(排除包含帐户数据相关的文件)
-    targz $bak_dir/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt --exclude ./emby/data/users.db --exclude ./emby/data/activitylog.db --exclude ./emby/data/authentication.db --exclude ./emby/data/displaypreferences.db'
+    targz $bak_dir/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt'
     if [[ $? -eq 0 ]]; then
         echo "LibEmby数据库备份完成······"
     else
