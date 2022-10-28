@@ -22,12 +22,12 @@ targz(){
     tar -cf - $3 $2  | pv -s $(du -sk $2 | awk '{print $1}') | gzip > $1
 }
 # 创建日期目录
-mkdir -p $bak_dir/`date '+%Y-%m-%d %H:%M:%S'`
+mkdir -p $bak_dir/${DATE}
 # 停止Emby Server服务
 systemctl stop emby-server
 if [[ $xuegua_dir != "" ]]; then
     cd $xuegua_dir
-    targz $bak_dir/`date '+%Y-%m-%d %H:%M:%S'`/Emby削刮包.tar.gz ./
+    targz $bak_dir/${DATE}/Emby削刮包.tar.gz ./
     if [[ $? -eq 0 ]]; then
         echo "Emby削刮包备份完成······"
     else
@@ -47,7 +47,7 @@ if [[ $xuegua_dir != "" ]]; then
     fi
 else
     cd $xuegua_dir
-    targz $bak_dir/`date '+%Y-%m-%d %H:%M:%S'`/Emby削刮包和LibEmby数据库.tar.gz ./
+    targz $bak_dir/${DATE}/Emby削刮包和LibEmby数据库.tar.gz ./
     if [[ $? -eq 0 ]]; then
         echo "Emby削刮包和LibEmby数据库备份完成······"
     else
