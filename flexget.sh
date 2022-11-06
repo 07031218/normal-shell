@@ -218,6 +218,7 @@ EOF
   read -p "请添加第${i}个站点的名称：" web
   read -p "请输入${web}的Cookie：" Cookie
   read -p "请输入${web}的Rss订阅链接：" rss
+  read -p "请输入${web}的上行限制(单位Kb/s,如45000则为限速45Mb/s)：" maxupspeed
   if [[ ${i} == 1 ]]; then
     text2="${text1}${web},]"
   elif [[ ${i} -eq ${times} ]]; then
@@ -232,6 +233,10 @@ cat >> /home/flexget/config/config.yml <<EOF
       url: ${rss}
       other_fields:
         - link
+    qbittorrent:
+      maxupspeed: ${maxupspeed}
+      maxdownspeed: 100000
+      label: ${web}
     nexusphp:
       cookie: '${Cookie}'
       user-agent: '{? headers.user_agent ?}'
