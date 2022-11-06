@@ -121,6 +121,7 @@ EOF
   fi
   mkdir -p /home/flexget/config && cd /home/flexget/config && wget https://github.com/IvonWei/flexget_qbittorrent_mod/archive/refs/heads/master.zip && unzip master.zip >/dev/null && mv flexget_qbittorrent_mod-master plugins && rm master.zip
   wget -O plugins/nexusphp.py https://raw.githubusercontent.com/Juszoe/flexget-nexusphp/master/nexusphp.py
+  read -p "请设置磁盘低于多少G不再添加种子并触发删种操作：" keep_disk_space
   cat >/home/flexget/config/config.yml<<EOF
 web_server:
   bind: '0.0.0.0'
@@ -173,7 +174,7 @@ templates:
         remove:
           keeper:
             delete_files: yes
-            keep_disk_space: 36
+            keep_disk_space: ${keep_disk_space}
             dl_limit_interval: 900
 
 
