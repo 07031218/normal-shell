@@ -215,19 +215,23 @@ EOF
   while [ $i -lt $times ]
   do
   let i++
-  text1=`sed -n '6p' /home/flexget/config/config.yml|sed 's/]//g'`
+  text1=`sed -n '6p' /home/flexget/config/config.yml|sed 's/]//g'|sed 's/^[ ]*//g'`
   read -p "请添加第${i}个站点的名称：" web
   read -p "请输入${web}的Cookie：" Cookie
   read -p "请输入${web}的Rss订阅链接：" rss
   read -p "请输入${web}的上行限制(单位Kb/s,如45000则为限速45Mb/s)：" maxupspeed
-  if [[ ${i} == 1 ]]; then
-    text2="${text1}${web},]"
-  elif [[ ${i} -eq ${times} ]]; then
-    text2="\  ${text1} ${web}]"
+  if [[ ${times} -eq 1 ]]; then
+    text2="\  ${text1}${web}]"
   else
-    text2="${text1} ${web},]"
+    if [[ ${i} == 1 ]]; then
+      text2="${text1}${web},]"
+    elif [[ ${i} -eq ${times} ]]; then
+      text2="\  ${text1} ${web}]"
+    else
+      text2="${text1} ${web},]"
+    fi
   fi
-sed -i "6c ${text2}" /home/flexget/config/config.yml
+  sed -i "6c ${text2}" /home/flexget/config/config.yml
 cat >> /home/flexget/config/config.yml <<EOF
   ${web}:
     rss: 
