@@ -366,7 +366,7 @@ ExecStop=/bin/fusermount -u ${path}
 Restart = on-abort
 
 [Install]
-WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_name]}.service
+WantedBy = multi-user.target" > /usr/lib/systemd/system/rclone-${list[rclone_config_name]}.service
         sleep 2s
         echo -e "`curr_date` 服务创建成功。"
         if [ ! -f /etc/fuse.conf ]; then
