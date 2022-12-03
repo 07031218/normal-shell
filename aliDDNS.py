@@ -33,7 +33,8 @@ import requests
 
 aliddnsipv6_ak = "AccessKeyId" # 
 aliddnsipv6_sk = "Access Key Secret"
-
+bottoken = "" # 填写tg机器人bot-token
+chat_id = "" # 填写频道或者管理员的TG ID编号
 # aliddnsipv6_ttl = "600"
 
 params = {
@@ -348,7 +349,7 @@ if __name__ == '__main__':
                     print("当前IP与历史A记录一致，无需更新")
                 else:
                     print("更新域名")
-                    response = requests.get(f'https://api.telegram.org/bot1822948434:AAEz9BJWMxaah6Zk79sc3XOT8L5HFu-YlLM/sendMessage?chat_id=459180203&text=发现jp.xun-da.com被墙，已为jp.xun-da.com更换新的IP地址，新的IP地址为:{ip}')
+                    response = requests.get(f'https://api.telegram.org/bot{bottoken}/sendMessage?chat_id={chat_id}&text=更换新的IP地址，新的IP地址为:{ip}')
                     update_domain_record(record['RecordId'], RR, ip, Type)
 
         if not hasFind:
