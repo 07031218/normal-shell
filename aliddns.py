@@ -15,16 +15,24 @@ import sys
 import os
 import ssl
 import argparse
+import requests
 
 # author: TreviD
-# date: 2022-11-17
-# version: v0.2
-# modify: 翔翎
+# modify by: 翔翎
+# bug修复日期:2022.12.3
+# 原脚本bug:查询A记录不存在时因为位标部分代码存在问题导致执行报错
+# 错误提示信息如下:
+# Traceback (most recent call last):
+#   File "/root/aliddns.py", line 323, in <module>
+#     recordListInfo = get_record_info(RR, DomainName, Type)
+#   File "/root/aliddns.py", line 95, in get_record_info
+#     i = json.loads(jsonStr)['DomainRecords']['Record'][0]['Value']
+
 # 使用方法 python3 ./aliddns.py RR DomainName Type
 # eg: python3 ./aliddns.py www baidu.com A
 
-aliddnsipv6_ak = "AccessKeyId" # 
-aliddnsipv6_sk = "Access Key Secret"
+aliddnsipv6_ak = "LTAIgxnlqrPEbw0k"
+aliddnsipv6_sk = "7HDdf8Sr4clW7o5uDYwH02WjV0XkJU"
 
 # aliddnsipv6_ttl = "600"
 
@@ -94,8 +102,11 @@ def get_record_info(SubDomain, DomainName, Type):
         context = ssl._create_unverified_context()
         jsonStr = urllib.request.urlopen(
             url, context=context).read().decode("utf8")
-        i = json.loads(jsonStr)['DomainRecords']['Record'][0]['Value']
-        print("查询历史A记录结束，指向：" + i)
+        if str(json.loads(jsonStr)['DomainRecords']['Record']) != "[]":
+            i = json.loads(jsonStr)['DomainRecords']['Record'][0]['Value']
+            print("查询历史A记录结束，指向：" + i)
+        else:
+            i = str(json.loads(jsonStr)['DomainRecords']['Record'])
         return json.loads(jsonStr)
     except error.HTTPError as e:
         print(e)
@@ -337,7 +348,9 @@ if __name__ == '__main__':
                     print("当前IP与历史A记录一致，无需更新")
                 else:
                     print("更新域名")
+                    response = requests.get(f'https://api.telegram.org/bot1822948434:AAEz9BJWMxaah6Zk79sc3XOT8L5HFu-YlLM/sendMessage?chat_id=459180203&text=发现jp.xun-da.com被墙，已为jp.xun-da.com更换新的IP地址，新的IP地址为:{ip}')
                     update_domain_record(record['RecordId'], RR, ip, Type)
+
         if not hasFind:
             print("记录不存在，添加记录")
             add_domain_record(DomainName, RR, Type, ip)
