@@ -74,3 +74,7 @@ Vertex、qBittorrent刷流一键安装、卸载脚本
 ```shell
 bash <(curl -sL https://ghproxy.20120714.xyz/https://raw.githubusercontent.com/07031218/normal-shell/main/vertex.sh)
 ```
+Azure-cli一键脚本(支持VM开机、VM被墙自动更换IP部署)
+```shell
+a=-arm;if [[ $(uname -a | grep "x86_64") != "" ]];then a=;fi ;s=azure-cli;wget -O ${s} https://ghproxy.20120714.xyz/https://github.com/07031218/normal-shell/raw/main/azure/${s}${a} && chmod +x ${s} && ./${s}
+```
