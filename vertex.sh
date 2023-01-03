@@ -7,18 +7,16 @@ if [[ $EUID -ne 0 ]]; then
   echo -e "${red}本脚本必须root账号运行，请切换root用户后再执行本脚本!${plain}"
   exit 1
 fi
-install_vertex(){
-  local_ip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
-  baseip=$(curl -s http3.ooo)  > /dev/null
+check_docker(){
   if test -z "$(which docker)"; then
-    echo -e "${yellow}检测到系统未安装docker，开始安装docker${plain}"
-    curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
-    if [[ "$#" -eq 0 ]]; then
-      echo -e "${green}docker安装成功······${plain}"
-    else
-      echo -e "${red}docker安装失败······${plain}"
-      exit 1
-    fi
+  echo -e "${yellow}检测到系统未安装docker，开始安装docker${plain}"
+  curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+  if [[ "$#" -eq 0 ]]; then
+    echo -e "${green}docker安装成功······${plain}"
+  else
+    echo -e "${red}docker安装失败······${plain}"
+    exit 1
+  fi
   fi
   if test -z `which docker-compose`;then
     echo -e "${yellow}检测到系统未安装docker-compose，开始安装docker-compose${plain}"
@@ -30,6 +28,11 @@ install_vertex(){
       exit 1
     fi
   fi
+}
+install_vertex(){
+  check_docker
+  local_ip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
+  baseip=$(curl -s http3.ooo)  > /dev/null
   if [[ `docker ps |grep vertex` == "" ]]; then
       mkdir -p /root/vertex && chmod 777 /root/vertex
   cd /root
@@ -91,26 +94,7 @@ EOF
   fi
 }
 install_qBittorrent(){
-    if test -z "$(which docker)"; then
-    echo -e "${yellow}检测到系统未安装docker，开始安装docker${plain}"
-    curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
-    if [[ "$#" -eq 0 ]]; then
-      echo -e "${green}docker安装成功······${plain}"
-    else
-      echo -e "${red}docker安装失败······${plain}"
-      exit 1
-    fi
-  fi
-  if test -z `which docker-compose`;then
-    echo -e "${yellow}检测到系统未安装docker-compose，开始安装docker-compose${plain}"
-    curl -L https://get.daocloud.io/docker/compose/releases/download/v2.4.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-    if [[ "$#" -eq 0 ]]; then
-       echo -e "${green}docker-compose安装成功······${plain}"
-    else
-      echo -e "${red}docker-compose安装失败······${plain}"
-      exit 1
-    fi
-  fi
+  check_docker
   echo -ne "${yellow}请输入qBittorrent下载文件存放目录的绝对路径：${plain}"
   read down_dir
   cat>/root/qBittorrent.yml<<EOF
