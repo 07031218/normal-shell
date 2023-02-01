@@ -6,8 +6,7 @@ fi
 if [[ `which python3` == "" ]]; then
 	apt update && apt install python3 -y
 fi
-echo -ne "请输入CPU线程数："
-read cpunumber
+cpunumber=$(cat /proc/cpuinfo| grep "processor"| wc -l)
 cpup=$(expr ${cpunumber} \* 15)
 cat > /etc/systemd/system/KeepCPU.service <<EOF
 [Unit]
