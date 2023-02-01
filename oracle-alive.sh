@@ -10,6 +10,7 @@ fi
 if [[ -f /tmp/cpu.py ]]; then
 	systemctl stop KeepCPU
 	systemctl disable KeepCPU
+	rm /tmp/cpu.py
 elif [[ -f /etc/systemd/system/KeepCPU.service ]] && [[ `ps aux|grep cpu.py|wc -l` != 2 ]]; then
 	systemctl stop KeepCPU
 	systemctl disable KeepCPU
