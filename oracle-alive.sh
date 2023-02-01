@@ -7,12 +7,15 @@ fi
 if [[ `which python3` == "" ]]; then
 	apt update && apt install python3 -y
 fi
-if [[ `ps aux|grep cpu.py|wc -l` == 2 ]]; then
-	echo "检测到机器上已经部署过保号脚本了，程序退出。"
-	exit 0
+if [[ -f /tmp/cpu.py ]]; then
+	systemctl stop KeepCPU
+	systemctl disable KeepCPU
 elif [[ -f /etc/systemd/system/KeepCPU.service ]] && [[ `ps aux|grep cpu.py|wc -l` != 2 ]]; then
 	systemctl stop KeepCPU
 	systemctl disable KeepCPU
+elif [[ `ps aux|grep cpu.py|wc -l` == 2 ]]; then
+	echo "检测到机器上已经部署过保号脚本了，程序退出。"
+	exit 0
 fi
 cpunumber=$(cat /proc/cpuinfo| grep "processor"| wc -l)
 cpup=$(expr ${cpunumber} \* 15)
