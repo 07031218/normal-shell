@@ -5,7 +5,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 if [[ `which python3` == "" ]]; then
-	apt update && apt install python3 -y
+	apt update || yum update
+	apt install python3 -y || yum install python3 -y 
 fi
 if [[ -f /tmp/cpu.py ]]; then
 	systemctl stop KeepCPU
