@@ -25,7 +25,7 @@ elif [[ -f /etc/systemd/system/KeepCPU.service ]] && [[ -f /root/cpu.py ]]; then
 	systemctl stop KeepCPU
 	systemctl disable KeepCPU
 	rm /root/cpu.py && rm /etc/systemd/system/KeepCPU.service
-elif [[ `ps aux|grep cpumemory.py|wc -l` == 2 ]] && [[ -f /roo/cpumemory.py ]]; then
+elif [[ `ps aux|grep cpumemory.py|wc -l` == 2 ]] && [[ -f /root/cpumemory.py ]]; then
 	echo "检测到机器上已经部署过保号脚本了，程序退出。"
 	exit 0
 fi
@@ -51,4 +51,4 @@ systemctl daemon-reload
 systemctl start KeepCpuMemory
 systemctl enable KeepCpuMemory
 echo "设置CPU、内存占用保号完成。"
-# 配置CPU、内存占用结束
+	# 配置CPU、内存占用结束
