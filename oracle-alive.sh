@@ -77,6 +77,18 @@ EOF
 	echo "设置CPU、内存占用保号完成。"
 	# 配置CPU、内存占用结束
 }
+remove(){
+	if [[ -f /root/cpu.py ]]; then
+		systemctl stop KeepCPU
+		systemctl disable KeepCPU
+		rm /root/cpu.py && rm /etc/systemd/system/KeepCPU.service
+	elif [[ -f /root/cpumemory.py ]]; then
+		systemctl stop KeepCpuMemory
+		systemctl disable KeepCpuMemory
+		rm /root/cpumemory.py && rm /etc/systemd/system/KeepCpuMemory.service
+	fi
+	echo "保号脚本卸载完成！"
+}
 if [[ $# > 0 ]];then
     key="$1"
     case $key in
@@ -85,6 +97,9 @@ if [[ $# > 0 ]];then
     ;;
     -cm|--cpumemory)
     config_cpu_memory
+    ;;
+    -u|--uninstall)
+    remove
     ;;
     esac
 elif [[ $# -eq 0 ]]; then
