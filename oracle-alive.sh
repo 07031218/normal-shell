@@ -29,8 +29,9 @@ elif [[ `ps aux|grep cpumemory.py|wc -l` == 2 ]] && [[ -f /root/cpumemory.py ]];
 	echo "检测到机器上已经部署过保号脚本了，程序退出。"
 	exit 0
 fi
-# 配置CPU、内存占用开始
-cat > /etc/systemd/system/KeepCpuMemory.service <<EOF
+config_cpu(){
+	# 配置CPU占用开始
+	cat > /etc/systemd/system/KeepCpuMemory.service <<EOF
 [Unit]
 
 [Service]
@@ -42,13 +43,50 @@ WantedBy=multi-user.target
 EOF
 
 cat > /root/cpumemory.py <<EOF
+while True:
+	x=1
+EOF
+	systemctl daemon-reload
+	systemctl start KeepCpuMemory
+	systemctl enable KeepCpuMemory
+	echo "设置CPU、内存占用保号完成。"
+	# 配置CPU占用结束
+}
+config_cpu_memory(){
+	# 配置CPU、内存占用开始
+	cat > /etc/systemd/system/KeepCpuMemory.service <<EOF
+[Unit]
+
+[Service]
+CPUQuota=${cpup}%
+ExecStart=/usr/bin/python3 /root/cpumemory.py
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+	cat > /root/cpumemory.py <<EOF
 import platform
 memory = bytearray(int(${memorylimit}))
 while True:
 	pass
 EOF
-systemctl daemon-reload
-systemctl start KeepCpuMemory
-systemctl enable KeepCpuMemory
-echo "设置CPU、内存占用保号完成。"
+	systemctl daemon-reload
+	systemctl start KeepCpuMemory
+	systemctl enable KeepCpuMemory
+	echo "设置CPU、内存占用保号完成。"
 	# 配置CPU、内存占用结束
+}
+if [[ $# > 0 ]];then
+    key="$1"
+    case $key in
+    -c|--cpu)
+    config_cpu
+    ;;
+    -cu|--cpumemory)
+    config_cpu_memory
+    ;;
+    esac
+elif [[ $# -eq 0 ]]; then
+	config_cpu
+fi
