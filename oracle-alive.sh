@@ -49,7 +49,7 @@ EOF
 	systemctl daemon-reload
 	systemctl start KeepCpuMemory
 	systemctl enable KeepCpuMemory
-	echo "设置CPU、内存占用保号完成。"
+	echo "设置CPU占用保号完成。"
 	# 配置CPU占用结束
 }
 config_cpu_memory(){
