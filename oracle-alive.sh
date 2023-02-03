@@ -29,7 +29,7 @@ elif [[ `ps aux|grep cpumemory.py|wc -l` == 2 ]] && [[ -f /roo/cpumemory.py ]]; 
 	echo "检测到机器上已经部署过保号脚本了，程序退出。"
 	exit 0
 fi
-# 配置CPU占用开始
+# 配置CPU、内存占用开始
 cat > /etc/systemd/system/KeepCpuMemory.service <<EOF
 [Unit]
 
