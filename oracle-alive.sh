@@ -83,7 +83,7 @@ if [[ $# > 0 ]];then
     -c|--cpu)
     config_cpu
     ;;
-    -cu|--cpumemory)
+    -cm|--cpumemory)
     config_cpu_memory
     ;;
     esac
