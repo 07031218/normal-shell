@@ -33,7 +33,7 @@ while [[ $i -lt $times ]]; do
 done
 read -p "本机是否跳板机(跳板机需要开启NAT转发)[Y/n]:" yn
 if [[ $yn == "Y" ]]||[[ $yn == "y" ]]; then
-	iptables -t nat -A POSTROUTING -s remotevip -j MASQUERADE
+	iptables -t nat -A POSTROUTING -s $remotevip -j MASQUERADE
 fi
 echo "IPIP隧道和相关路由表已经配置完毕，开始添加自动修改对端IP定时任务脚本。"
 
