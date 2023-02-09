@@ -23,7 +23,8 @@ if [[ ! -d .ssh ]]; then
   mkdir .ssh
 fi
 cd .ssh
-echo "$1" >authorized_keys
+read -p "请输入公钥内容(注意，公钥内容千万别漏字也别多字，也千万不要错把私钥内容复制上来了！)：" keywords
+echo "$keywords" >authorized_keys
 chmod 700 authorized_keys
 cd ../
 chmod 600 .ssh
@@ -37,3 +38,4 @@ sed -i "/RSAAuthentication yes/c RSAAuthentication yes" sshd_config
 sed -i "/PubkeyAuthentication yes/c PubkeyAuthentication yes" sshd_config
 service sshd restart
 service ssh restart
+echo "启用密钥登录完成，密码登录已失效，后续请用对应私钥登录小鸡。"
