@@ -29,11 +29,7 @@ install_ipip(){
 	else
 		remoteip=$(dig ${ddnsname} @8.8.8.8 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}')
 	fi
-	if [[ `ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1` == "" ]]; then
-		localip=$(ip a |grep -w 'inet' |grep 'global'| awk '{print $2}' |awk -F '[ /]' '{print $1}')
-	else
-		localip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
-	fi
+	localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
 	echo "${remoteip}" >/root/.tunnel-ip.txt
 	ip tunnel add $tunname mode ipip remote ${remoteip} local $localip ttl 64 # 创建IP隧道
 	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
@@ -54,12 +50,7 @@ else
 	remoteip=\$(dig ${ddnsname} @8.8.8.8 | awk -F "[ ]+" '/IN/{print \$1}' | awk 'NR==2 {print \$5}')
 fi
 oldip="\$(cat /root/.tunnel-ip.txt)"
-if [[ \`ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1\` == "" ]]; then
-	localip=$(ip a |grep -w 'inet' |grep 'global'| awk '{print $2}' |awk -F '[ /]' '{print $1}')
-else
-	\=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
-fi
-routelist=\$(ip route list|sed "\$d")
+localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
 if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel del $tunname >/dev/null &
 	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
