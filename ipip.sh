@@ -88,7 +88,7 @@ echo -e "
 ${red}0.${plain}  退出脚本
 ${green}———————————————————————————————————————————————————————————${plain}
 ${green}1.${plain}  一键部署IPIP隧道
-${green}2.${plain}  一键部署wierguard
+${green}2.${plain}  一键部署wireguard
 "
     echo -e "${yellow}请选择你要使用的功能${plain}"
     read -p "请输入数字 :" num   
