@@ -75,14 +75,22 @@ EOF
 install_wg(){
 	apt-get update 
 	apt-get install wireguard -y
-	wg genkey | tee /etc/wireguard/privatekey | wg pubkey | tee /etc/wireguard/publickey
+	if [[ ! -f /etc/wireguard/privatekey ]]; then
+		wg genkey | tee /etc/wireguard/privatekey | wg pubkey | tee /etc/wireguard/publickey
+	fi
+	localprivatekey=$(cat /etc/wireguard/privatekey)
 	read -p "请输入对端wg使用的V-ip地址:" revip
 	read -p "请输入本机wg使用的v-ip地址:" localip1
 	read -p "请输入ros端wg的公钥内容:" rospublickey
 	read -p "请输入ros端wg调用的端口号:" wgport
-	localprivatekey=$(cat /etc/wireguard/privatekey)
-	allowedip=$(ip a|grep /30|awk '{print $2}'|awk -F "[ ./]" '{print $1"."$2"."$3}')
 	allowedip1=$(echo $revip|awk -F "." '{print  $1"."$2"."$3}')
+	if [[ -f /etc/wireguard/wg0.conf ]]; then
+		read -p "请给本机wg配置文件取个名(英文):" filename
+		if [[ -f /etc/wireguard/${filename}.conf ]]; then
+			echo "⚠️  已存在同样名称的配置文件，程序退出，请重新执行程序。"
+			exit 1
+		fi
+	read -p "请输入对端ipip隧道IP段(例如 192.168.2.1 只填写 192.168.2 即可)：" ipduan
 	echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
@@ -90,7 +98,26 @@ PrivateKey = $localprivatekey
 
 [Peer]
 PublicKey = $rospublickey
-AllowedIPs = $allowedip.0/24,$allowedip1.0/24
+AllowedIPs = $ipduan.0/24,$allowedip1.0/24
+Endpoint = ${revip}:$wgport
+PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
+	wg-quick up $filename
+	vpspublickey=$(cat /etc/wireguard/publickey)
+	# vip=$(ip a|grep "scope global"|grep "/30"|awk '{print $2}'|awk -F "/" '{print $1}')
+	linstenport=$(cat /etc/wireguard/$filename.conf|grep "ListenPort"|awk '{print $3}')
+	echo "    "
+	echo -e "${green}------------------------------------------------------------${plain}"
+	echo -e  "${green}请在ros的wireguard选项卡里边的Peers里添加配置，具体填写如下信息：${plain}\nPublic key 填写：${yellow}${vpspublickey}${plain}\nEndpoint port 填写：${yellow}${linstenport}${plain}\nAllowed Address填写：${green}0.0.0.0/0\n祝使用愉快。${plain}"
+	else
+		read -p "请输入对端ipip隧道IP段(例如 192.168.2.1 只填写 192.168.2 即可)：" ipduan
+		echo "[Interface]
+ListenPort = $wgport
+Address = $localip1/24
+PrivateKey = $localprivatekey
+
+[Peer]
+PublicKey = $rospublickey
+AllowedIPs = $ipduan.0/24,$allowedip1.0/24
 Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 	wg-quick up wg0
@@ -100,6 +127,8 @@ PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 	echo "    "
 	echo -e "${green}------------------------------------------------------------${plain}"
 	echo -e  "${green}请在ros的wireguard选项卡里边的Peers里添加配置，具体填写如下信息：${plain}\nPublic key 填写：${yellow}${vpspublickey}${plain}\nEndpoint 填写：${yellow}${vip}${plain}\nEndpoint port 填写：${yellow}${linstenport}${plain}\nAllowed Address填写：${green}0.0.0.0/0\n祝使用愉快。${plain}"
+	fi
+
 }
 copyright(){
     clear
