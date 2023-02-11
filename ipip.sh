@@ -29,8 +29,13 @@ install_ipip(){
 	else
 		remoteip=$(dig ${ddnsname} @8.8.8.8 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}')
 	fi
+	if [[ `ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1` == "" ]]; then
+		localip=$(ip a |grep -w 'inet' |grep 'global'| awk '{print $2}' |awk -F '[ /]' '{print $1}')
+	else
+		localip=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
+	fi
 	echo "${remoteip}" >/root/.tunnel-ip.txt
-	ip tunnel add $tunname mode ipip remote ${remoteip} local $(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1) ttl 64 # 创建IP隧道
+	ip tunnel add $tunname mode ipip remote ${remoteip} local $localip ttl 64 # 创建IP隧道
 	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
 	ip link set $tunname up # 启用隧道虚拟网卡
 	ip route add ${remotevip}/32 dev $tunname scope link src ${vip}
@@ -49,10 +54,15 @@ else
 	remoteip=\$(dig ${ddnsname} @8.8.8.8 | awk -F "[ ]+" '/IN/{print \$1}' | awk 'NR==2 {print \$5}')
 fi
 oldip="\$(cat /root/.tunnel-ip.txt)"
+if [[ \`ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1\` == "" ]]; then
+	localip=$(ip a |grep -w 'inet' |grep 'global'| awk '{print $2}' |awk -F '[ /]' '{print $1}')
+else
+	\=$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1)
+fi
 routelist=\$(ip route list|sed "\$d")
 if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel del $tunname >/dev/null &
-	ip tunnel add $tunname mode ipip remote \${remoteip} local \$(ip a 2>&1 | grep -w 'inet' | grep 'global' | grep -E '\ 1(92|0|72|00|1)\.' | sed 's/.*inet.//g' | sed 's/\/[0-9][0-9].*$//g' | head -n 1) ttl 64
+	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
 	ip addr add ${vip}/30 dev $tunname
 	ip link set $tunname up
 fi
@@ -71,6 +81,35 @@ EOF
 	echo "程序全部执行完毕，脚本退出。。"
 	exit 0
 }
+install_wg(){
+	apt-get update 
+	apt-get install wireguard -y
+	# wg genkey | tee /etc/wireguard/privatekey | wg pubkey | tee /etc/wireguard/publickey
+	read -p "请输入对端wg使用的V-ip地址:" revip
+	read -p "请输入本机wg使用的v-ip地址:" localip1
+	read -p "请输入ros端wg的公钥内容:" rospublickey
+	read -p "请输入ros端wg调用的端口号:" wgport
+	localprivatekey=$(cat /etc/wireguard/privatekey)
+	allowedip=$(ip a|grep /30|awk '{print $2}'|awk -F "[ ./]" '{print $1"."$2"."$3}')
+	allowedip1=$(echo $revip|awk -F "." '{print  $1"."$2"."$3}')
+	echo "[Interface]
+ListenPort = $wgport
+Address = $localip1/24
+PrivateKey = $localprivatekey
+
+[Peer]
+PublicKey = $rospublickey
+AllowedIPs = $allowedip.0/24,$allowedip1.0/24
+Endpoint = ${revip}:$wgport
+PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
+	wg-quick up wg0
+	vpspublickey=$(cat /etc/wireguard/publickey)
+	vip=$(ip a|grep "scope global"|grep "/30"|awk '{print $2}'|awk -F "/" '{print $1}')
+	linstenport=$(cat /etc/wireguard/wg0.conf|grep "ListenPort"|awk '{print $3}')
+	echo "    "
+	echo -e "${green}------------------------------------------------------------${plain}"
+	echo -e  "${green}请在ros的wireguard选项卡里边的Peers里添加配置，具体填写如下信息：${plain}\nPublic key 填写：${yellow}${vpspublickey}${plain}\nEndpoint 填写：${yellow}${vip}${plain}\nEndpoint port 填写：${yellow}${linstenport}${plain}\nAllowed Address填写：${green}0.0.0.0/0\n祝使用愉快。${plain}"
+}
 copyright(){
     clear
     echo -e "
@@ -88,7 +127,7 @@ echo -e "
 ${red}0.${plain}  退出脚本
 ${green}———————————————————————————————————————————————————————————${plain}
 ${green}1.${plain}  一键部署IPIP隧道
-${green}2.${plain}  一键部署wireguard
+${green}2.${plain}  一键部署wireguard(仅适用对接ROS)
 "
     echo -e "${yellow}请选择你要使用的功能${plain}"
     read -p "请输入数字 :" num   
@@ -100,7 +139,7 @@ ${green}2.${plain}  一键部署wireguard
             install_ipip
             ;;
         2)
-            bash <(curl -sL https://raw.githubusercontent.com/07031218/normal-shell/main/wireguard.sh)
+            install_wg
             ;;
         *)
     clear
