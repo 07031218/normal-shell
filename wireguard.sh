@@ -50,6 +50,9 @@ if [[ x"${release}" == x"debian" ]]; then
         echo -e "${red}请使用 Debian 11 或更高版本的系统!\n${end}" && exit 1
     fi
 fi
+if [[ `which qrencode` == "" ]]; then
+    apt update && apt install qrencode -y
+fi
 rand(){
     min=$1
     max=$(($2-$min+1))
@@ -70,8 +73,10 @@ wireguard_install(){
     	echo 'deb http://ftp.debian.org/debian buster-backports main' | tee /etc/apt/sources.list.d/buster-backports.list
     	apt update && apt install wireguard -y
     fi
-    echo net.ipv4.ip_forward = 1 >> /etc/sysctl.conf
-    sysctl -p
+    if [[ `sysctl -p|grep "net.ipv4.ip_forward = 1"` == "" ]]; then
+        echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+        sysctl -p /etc/sysctl.conf
+    fi
     echo "1"> /proc/sys/net/ipv4/ip_forward
     mkdir -p /etc/wireguard
     cd /etc/wireguard
@@ -84,10 +89,12 @@ wireguard_install(){
     serverip=$(curl ipv4.icanhazip.com)
     port=$(rand 10000 60000)
     eth=$(ls /sys/class/net | awk '/^e/{print}')
+    read -p "请输入该设备预备设置的wireguard内网IP地址:" vvip
+    ipmask1=$(echo $vvip|awk -F '.' '{print $1"."$2"."$3}')
     cat > /etc/wireguard/wg0.conf <<-EOF
 [Interface]
 PrivateKey = $s1
-Address = 10.10.10.1/24 
+Address = ${vvip}/24 
 PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $eth -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $eth -j MASQUERADE
 ListenPort = $port
@@ -95,12 +102,12 @@ DNS = 8.8.8.8,8.8.4.4
 MTU = 1420
 [Peer]
 PublicKey = $c2
-AllowedIPs = 10.10.10.2/32
+AllowedIPs = $ipmask1.2/32
 EOF
 cat > /etc/wireguard/client.conf <<-EOF
 [Interface]
 PrivateKey = $c1
-Address = 10.10.10.2/24 
+Address = $ipmask1.2/24 
 DNS = 8.8.8.8,8.8.4.4
 MTU = 1420
 [Peer]
@@ -109,7 +116,6 @@ Endpoint = $serverip:$port
 AllowedIPs = 0.0.0.0/0, ::0/0
 PersistentKeepalive = 25
 EOF
-apt-get install -y qrencode
 cat > /etc/init.d/wgstart <<-EOF
 #! /bin/bash
 ### BEGIN INIT INFO
@@ -151,16 +157,17 @@ add_user(){
     cp client.conf $newname.conf
     wg genkey | tee temprikey | wg pubkey > tempubkey
     ipnum=$(grep Allowed /etc/wireguard/wg0.conf | tail -1 | awk -F '[ ./]' '{print $6}')
+    ipmask=$(grep Allowed /etc/wireguard/wg0.conf | tail -1 | awk -F '[ ./]' '{print $3"."$4"."$5}')
     newnum=$((10#${ipnum}+1))
     sed -i 's%^PrivateKey.*$%'"PrivateKey = $(cat temprikey)"'%' $newname.conf
-    sed -i 's%^Address.*$%'"Address = 10.10.10.$newnum\/24"'%' $newname.conf
+    sed -i 's%^Address.*$%'"Address = $ipmask.$newnum\/24"'%' $newname.conf
 
 cat >> /etc/wireguard/wg0.conf <<-EOF
 [Peer]
 PublicKey = $(cat tempubkey)
-AllowedIPs = 10.10.10.$newnum/32
+AllowedIPs = $ipmask.$newnum/32
 EOF
-    wg set wg0 peer $(cat tempubkey) allowed-ips 10.10.10.$newnum/32
+    wg set wg0 peer $(cat tempubkey) allowed-ips $ipmask.$newnum/32
     echo -e "${yellowb}添加完成，文件：/etc/wireguard/$newname.conf${end}"
     rm -f temprikey tempubkey
     content=$(cat /etc/wireguard/$newname.conf)
