@@ -84,7 +84,7 @@ EOF
 install_wg(){
 	apt-get update 
 	apt-get install wireguard -y
-	# wg genkey | tee /etc/wireguard/privatekey | wg pubkey | tee /etc/wireguard/publickey
+	wg genkey | tee /etc/wireguard/privatekey | wg pubkey | tee /etc/wireguard/publickey
 	read -p "请输入对端wg使用的V-ip地址:" revip
 	read -p "请输入本机wg使用的v-ip地址:" localip1
 	read -p "请输入ros端wg的公钥内容:" rospublickey
@@ -127,7 +127,7 @@ echo -e "
 ${red}0.${plain}  退出脚本
 ${green}———————————————————————————————————————————————————————————${plain}
 ${green}1.${plain}  一键部署IPIP隧道
-${green}2.${plain}  一键部署wireguard(仅适用对接ROS)
+${green}2.${plain}  一键部署wireguard
 "
     echo -e "${yellow}请选择你要使用的功能${plain}"
     read -p "请输入数字 :" num   
