@@ -149,8 +149,8 @@ install_wg(){
 	echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
-PostUp   = iptables -A FORWARD -i $filename -j ACCEPT; iptables -A FORWARD -o $filename -j ACCEPT; iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
-PostDown = iptables -D FORWARD -i $filename -j ACCEPT; iptables -D FORWARD -o $filename -j ACCEPT; iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
+PostUp   = iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
 PrivateKey = $localprivatekey
 	
 [Peer]
@@ -171,8 +171,8 @@ PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
 		echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
-PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
-PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
+PostUp   = iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
 PrivateKey = $localprivatekey
 
 [Peer]
