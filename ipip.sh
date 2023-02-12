@@ -32,7 +32,7 @@ install_ipip(){
 #!/bin/bash
 remoteip=\$(ping $ddnsname -c 1|awk "NR==2 {print \$5}" |awk -F ':' "{print \$1}" |sed -nr "s#\(##gp"|sed -nr "s#\)##gp")
 oldip="\$(cat /root/.tunnel-ip.txt)"
-localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
+localip=$(ip a |grep brd|grep global|awk '{print $2}'|grep /24|awk -F "/" '{print $1}')
 if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel del $tunname >/dev/null &
 	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
@@ -42,7 +42,7 @@ if [[ \$oldip != \$remoteip ]]; then
 fi
 EOF
 	fi
-	localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
+	localip=$(ip a |grep brd|grep global|awk '{print $2}'|grep /24|awk -F "/" '{print $1}')
 	echo "${remoteip}" >/root/.tunnel-ip.txt
 	ip tunnel add $tunname mode ipip remote ${remoteip} local $localip ttl 64 # 创建IP隧道
 	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
