@@ -24,10 +24,23 @@ install_ipip(){
 	read vip
 	echo -ne "请输入对端的V-IP："
 	read remotevip
-	if [[ `dig ${ddnsname} @8.8.8.8| grep 'ANSWER SECTION'` == "" ]]; then
+	if [[ `ping $ddnsname -c 1|awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp"` ==  $ddnsname ]]; then
 		remoteip=${ddnsname}
 	else
-		remoteip=$(dig ${ddnsname} @8.8.8.8 | awk -F "[ ]+" '/IN/{print $1}' | awk 'NR==2 {print $5}')
+		remoteip=$(ping $ddnsname -c 1|awk 'NR==2 {print $5}' |awk -F ':' '{print $1}' |sed -nr "s#\(##gp"|sed -nr "s#\)##gp")
+			cat >/root/change-tunnel-ip_${ddnsname}.sh <<EOF
+#!/bin/bash
+remoteip=\$(ping $ddnsname -c 1|awk "NR==2 {print \$5}" |awk -F ':' "{print \$1}" |sed -nr "s#\(##gp"|sed -nr "s#\)##gp")
+oldip="\$(cat /root/.tunnel-ip.txt)"
+localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
+if [[ \$oldip != \$remoteip ]]; then
+	ip tunnel del $tunname >/dev/null &
+	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
+	ip addr add ${vip}/30 dev $tunname
+	ip link set $tunname up
+	sed -i "s/ip tunnel add $tunname mode ipip remote \${oldip} local ${localip} ttl 64/ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64/g" /etc/rc.local
+fi
+EOF
 	fi
 	localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
 	echo "${remoteip}" >/root/.tunnel-ip.txt
@@ -42,20 +55,6 @@ install_ipip(){
 		echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
 		sysctl -p /etc/sysctl.conf
 	fi
-# 	cat > /etc/init.d/$tunname <<-EOF
-# #! /bin/bash
-# ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
-# ip addr add ${vip}/30 dev $tunname
-# ip link set $tunname up
-# EOF
-# 	chmod +x /etc/init.d/$tunname
-#     cd /etc/init.d
-#     if [ `awk -F'[= ."]' '/VERSION_ID/{print $3}' /etc/os-release` == "18" ]
-#     then
-#         update-rc.d $tunname defaults 90
-#     else
-#         update-rc.d $tunname defaults
-#     fi
 cat > /etc/rc.local <<EOF
 #!/bin/sh -e
 #
@@ -95,23 +94,6 @@ SysVStartPriority=99
 WantedBy=multi-user.target
 EOF
 systemctl enable rc-local
-	cat >/root/change-tunnel-ip_${ddnsname}.sh <<EOF
-#!/bin/bash
-if [[ \`dig ${ddnsname} @8.8.8.8| grep 'ANSWER SECTION'\` == "" ]]; then
-	remoteip="${ddnsname}"
-else
-	remoteip=\$(dig ${ddnsname} @8.8.8.8 | awk -F "[ ]+" '/IN/{print \$1}' | awk 'NR==2 {print \$5}')
-fi
-oldip="\$(cat /root/.tunnel-ip.txt)"
-localip=$(ip a |grep brd|grep global|awk '{print $2}'|awk -F "/" '{print $1}')
-if [[ \$oldip != \$remoteip ]]; then
-	ip tunnel del $tunname >/dev/null &
-	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
-	ip addr add ${vip}/30 dev $tunname
-	ip link set $tunname up
-	sed -i "s/ip tunnel add $tunname mode ipip remote \${oldip} local ${localip} ttl 64/ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64/g" /etc/rc.local
-fi
-EOF
 	echo "开始添加定时任务"
 	bashsrc=$(which bash)
 	crontab -l 2>/dev/null > /root/crontab_test 
