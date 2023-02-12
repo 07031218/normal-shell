@@ -42,6 +42,59 @@ install_ipip(){
 		echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
 		sysctl -p /etc/sysctl.conf
 	fi
+# 	cat > /etc/init.d/$tunname <<-EOF
+# #! /bin/bash
+# ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
+# ip addr add ${vip}/30 dev $tunname
+# ip link set $tunname up
+# EOF
+# 	chmod +x /etc/init.d/$tunname
+#     cd /etc/init.d
+#     if [ `awk -F'[= ."]' '/VERSION_ID/{print $3}' /etc/os-release` == "18" ]
+#     then
+#         update-rc.d $tunname defaults 90
+#     else
+#         update-rc.d $tunname defaults
+#     fi
+cat > /etc/rc.local <<EOF
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+ 
+# bash /root/bindip.sh
+ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
+ip addr add ${vip}/30 dev $tunname
+ip link set $tunname up
+exit 0
+EOF
+
+chmod +x /etc/rc.local
+cat > /etc/systemd/system/rc-local.service <<EOF
+[Unit]
+Description=/etc/rc.local
+ConditionPathExists=/etc/rc.local
+ 
+[Service]
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+ 
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl enable rc-local
 	cat >/root/change-tunnel-ip_${ddnsname}.sh <<EOF
 #!/bin/bash
 if [[ \`dig ${ddnsname} @8.8.8.8| grep 'ANSWER SECTION'\` == "" ]]; then
@@ -56,6 +109,7 @@ if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
 	ip addr add ${vip}/30 dev $tunname
 	ip link set $tunname up
+	sed -i "s/ip tunnel add $tunname mode ipip remote \${oldip} local ${localip} ttl 64/ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64/g" /etc/rc.local
 fi
 EOF
 	echo "开始添加定时任务"
@@ -79,6 +133,7 @@ install_wg(){
 		wg genkey | tee /etc/wireguard/privatekey | wg pubkey | tee /etc/wireguard/publickey
 	fi
 	localprivatekey=$(cat /etc/wireguard/privatekey)
+	netcardname=$(ls /sys/class/net | awk '/^e/{print}')
 	read -p "请输入对端wg使用的V-ip地址:" revip
 	read -p "请输入本机wg使用的v-ip地址:" localip1
 	read -p "请输入ros端wg的公钥内容:" rospublickey
@@ -91,19 +146,21 @@ install_wg(){
 			exit 1
 		fi
 	read -p "请输入对端ipip隧道IP段(例如 192.168.2.1 只填写 192.168.2 即可)：" ipduan
-	read -p "请输入当前设备的物理网卡名：" netcardname
 	echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
-PostUp   = iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
-PostDown = iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
+PostUp   = iptables -A FORWARD -i $filename -j ACCEPT; iptables -A FORWARD -o $filename -j ACCEPT; iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
+PostDown = iptables -D FORWARD -i $filename -j ACCEPT; iptables -D FORWARD -o $filename -j ACCEPT; iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
 PrivateKey = $localprivatekey
-
+	
 [Peer]
 PublicKey = $rospublickey
 AllowedIPs = $ipduan.0/24,$allowedip1.0/24
 Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
+	echo "wg-quick up $filename" >>/etc/init.d/wgstart
+	chmod +x /etc/init.d/wgstart
+	chmod 600 /etc/wireguard/wg0.conf
 	wg-quick up $filename
 	vpspublickey=$(cat /etc/wireguard/publickey)
 	# vip=$(ip a|grep "scope global"|grep "/30"|awk '{print $2}'|awk -F "/" '{print $1}')
@@ -113,12 +170,11 @@ PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
 	echo -e  "${green}请在ros的wireguard选项卡里边的Peers里添加配置，具体填写如下信息：${plain}\nPublic key 填写：${yellow}${vpspublickey}${plain}\nEndpoint port 填写：${yellow}${linstenport}${plain}\nAllowed Address填写：${green}0.0.0.0/0\n祝使用愉快。${plain}"
 	else
 		read -p "请输入对端ipip隧道IP段(例如 192.168.2.1 只填写 192.168.2 即可)：" ipduan
-		read -p "请输入当前设备的物理网卡名：" netcardname
 		echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
-PostUp   = iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
-PostDown = iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
+PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $netcardname -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $netcardname -j MASQUERADE
 PrivateKey = $localprivatekey
 
 [Peer]
@@ -126,6 +182,23 @@ PublicKey = $rospublickey
 AllowedIPs = $ipduan.0/24,$allowedip1.0/24
 Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
+	cat > /etc/init.d/wgstart <<-EOF
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:		wgstart
+# Short-Description:	wgstart
+### END INIT INFO
+wg-quick up wg0
+EOF
+	chmod +x /etc/init.d/wgstart
+    cd /etc/init.d
+    if [ `awk -F'[= ."]' '/VERSION_ID/{print $3}' /etc/os-release` == "18" ]
+    then
+        update-rc.d wgstart defaults 90
+    else
+        update-rc.d wgstart defaults
+    fi
+    chmod 600 /etc/wireguard/wg0.conf
 	wg-quick up wg0
 	vpspublickey=$(cat /etc/wireguard/publickey)
 	vip=$(ip a|grep "scope global"|grep "/30"|awk '{print $2}'|awk -F "/" '{print $1}')
