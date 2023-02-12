@@ -158,9 +158,7 @@ PublicKey = $rospublickey
 AllowedIPs = $ipduan.0/24,$allowedip1.0/24
 Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
-	echo "wg-quick up $filename" >>/etc/init.d/wgstart
-	chmod +x /etc/init.d/wgstart
-	chmod 600 /etc/wireguard/wg0.conf
+	sed -i "/exit 0/i\wg-quick up $filename" /etc/rc.local
 	wg-quick up $filename
 	vpspublickey=$(cat /etc/wireguard/publickey)
 	# vip=$(ip a|grep "scope global"|grep "/30"|awk '{print $2}'|awk -F "/" '{print $1}')
@@ -182,22 +180,7 @@ PublicKey = $rospublickey
 AllowedIPs = $ipduan.0/24,$allowedip1.0/24
 Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
-	cat > /etc/init.d/wgstart <<-EOF
-#! /bin/bash
-### BEGIN INIT INFO
-# Provides:		wgstart
-# Short-Description:	wgstart
-### END INIT INFO
-wg-quick up wg0
-EOF
-	chmod +x /etc/init.d/wgstart
-    cd /etc/init.d
-    if [ `awk -F'[= ."]' '/VERSION_ID/{print $3}' /etc/os-release` == "18" ]
-    then
-        update-rc.d wgstart defaults 90
-    else
-        update-rc.d wgstart defaults
-    fi
+	sed -i '/exit 0/i\wg-quick up wg0' /etc/rc.local
     chmod 600 /etc/wireguard/wg0.conf
 	wg-quick up wg0
 	vpspublickey=$(cat /etc/wireguard/publickey)
