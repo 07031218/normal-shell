@@ -74,7 +74,8 @@ EOF
 #!/bin/bash
 remoteip=\$(ping $ddnsname -c 1|awk "NR==2 {print \$5}" |awk -F ':' "{print \$1}" |awk '{print \$4}')
 oldip="\$(cat /root/.tunnel-ip.txt)"
-localip=\$(ip a |grep brd|grep global|awk '{print \$2}'|grep /24|awk -F "/" '{print \$1}')
+netcardname=\$(ls /sys/class/net | awk '/^e/{print}')
+localip=\$(ip a |grep brd|grep global|grep \$netcardname|awk '{print \$2}'|awk -F "/" '{print \$1}')
 if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel del $tunname >/dev/null &
 	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
