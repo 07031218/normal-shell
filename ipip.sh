@@ -25,8 +25,28 @@ install_ipip(){
 	echo -ne "请输入对端的V-IP："
 	read remotevip
 	localip=$(ip a |grep brd|grep global|awk '{print $2}'|grep /24|awk -F "/" '{print $1}')
-	if [[ `ping $ddnsname -c 1|awk "NR==2 {print $5}" |awk -F ':' "{print $1}" |awk '{print $4}'` ==  $ddnsname ]]; then
+	if [[ `ping $ddnsname -c 1|awk "NR==2 {print $5}" |awk -F ':' "{print $1}" |awk '{print $4}'|awk -F ":" '{print $1}'` ==  "${ddnsname}" ]]; then
 		remoteip=${ddnsname}
+				cat > /etc/rc.local <<EOF
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+ 
+# bash /root/bindip.sh
+ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
+ip addr add ${vip}/30 dev $tunname
+ip link set $tunname up
+exit 0
+EOF
 	else
 		remoteip=$(ping $ddnsname -c 1|awk "NR==2 {print $5}" |awk -F ':' "{print $1}" |awk '{print $4}')
 		cat > /etc/rc.local <<EOF
@@ -62,6 +82,18 @@ if [[ \$oldip != \$remoteip ]]; then
 	sed -i "s/ip tunnel add $tunname mode ipip remote \${oldip} local ${localip} ttl 64/ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64/g" /etc/rc.local
 fi
 EOF
+		echo "开始添加定时任务"
+		bashsrc=$(which bash)
+		crontab -l 2>/dev/null > /root/crontab_test 
+		echo -e "*/2 * * * * ${bashsrc} /root/change-tunnel-ip_${ddnsname}.sh" >> /root/crontab_test 
+		crontab /root/crontab_test 
+		rm /root/crontab_test
+		crontask=$(crontab -l)
+
+		echo -------------------------------------------------------
+		echo -e "设置定时任务成功，当前系统所有定时任务清单如下:\n${crontask}"
+		echo -------------------------------------------------------
+		echo "程序全部执行完毕，脚本退出。。"
 	fi
 	echo "${remoteip}" >/root/.tunnel-ip.txt
 	ip tunnel add $tunname mode ipip remote ${remoteip} local $localip ttl 64 # 创建IP隧道
@@ -95,18 +127,6 @@ SysVStartPriority=99
 WantedBy=multi-user.target
 EOF
 systemctl enable rc-local
-	echo "开始添加定时任务"
-	bashsrc=$(which bash)
-	crontab -l 2>/dev/null > /root/crontab_test 
-	echo -e "*/2 * * * * ${bashsrc} /root/change-tunnel-ip_${ddnsname}.sh" >> /root/crontab_test 
-	crontab /root/crontab_test 
-	rm /root/crontab_test
-	crontask=$(crontab -l)
-
-	echo -------------------------------------------------------
-	echo -e "设置定时任务成功，当前系统所有定时任务清单如下:\n${crontask}"
-	echo -------------------------------------------------------
-	echo "程序全部执行完毕，脚本退出。。"
 	exit 0
 }
 install_wg(){
