@@ -26,7 +26,7 @@ install_ipip(){
 	read remotevip
 	netcardname=$(ls /sys/class/net | awk '/^e/{print}')
 	localip=$(ip a |grep brd|grep global|grep $netcardname|awk '{print $2}'|awk -F "/" '{print $1}')
-	if [[ `ping $ddnsname -c 1|awk "NR==2 {print $5}" |awk -F ':' "{print $1}" |awk '{print $4}'|awk -F ":" '{print $1}'` ==  "${ddnsname}" ]]; then
+	if [[ `ping $ddnsname -c 1| sed '1{s/[^(]*(//;s/).*//;q}'` ==  "${ddnsname}" ]]; then
 		remoteip=${ddnsname}
 				cat > /etc/rc.local <<EOF
 #!/bin/sh -e
@@ -49,7 +49,7 @@ ip link set $tunname up
 exit 0
 EOF
 	else
-		remoteip=$(ping $ddnsname -c 1|awk "NR==2 {print $5}" |awk -F ':' "{print $1}" |awk '{print $4}')
+		remoteip=$(ping $ddnsname -c 1| sed '1{s/[^(]*(//;s/).*//;q}')
 		cat > /etc/rc.local <<EOF
 #!/bin/sh -e
 #
@@ -72,7 +72,7 @@ exit 0
 EOF
 		cat >/root/change-tunnel-ip_${ddnsname}.sh <<EOF
 #!/bin/bash
-remoteip=\$(ping $ddnsname -c 1|awk "NR==2 {print \$5}" |awk -F ':' "{print \$1}" |awk '{print \$4}')
+remoteip=\$(ping $ddnsname -c 1| sed '1{s/[^(]*(//;s/).*//;q}')
 oldip="\$(cat /root/.tunnel-ip.txt)"
 netcardname=\$(ls /sys/class/net | awk '/^e/{print}')
 localip=\$(ip a |grep brd|grep global|grep \$netcardname|awk '{print \$2}'|awk -F "/" '{print \$1}')
