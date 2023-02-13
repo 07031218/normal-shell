@@ -24,7 +24,8 @@ install_ipip(){
 	read vip
 	echo -ne "请输入对端的V-IP："
 	read remotevip
-	localip=$(ip a |grep brd|grep global|awk '{print $2}'|grep /24|awk -F "/" '{print $1}')
+	netcardname=$(ls /sys/class/net | awk '/^e/{print}')
+	localip=$(ip a |grep brd|grep global|grep $netcardname|awk '{print $2}'|awk -F "/" '{print $1}')
 	if [[ `ping $ddnsname -c 1|awk "NR==2 {print $5}" |awk -F ':' "{print $1}" |awk '{print $4}'|awk -F ":" '{print $1}'` ==  "${ddnsname}" ]]; then
 		remoteip=${ddnsname}
 				cat > /etc/rc.local <<EOF
