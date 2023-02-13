@@ -149,6 +149,7 @@ install_wg(){
 			exit 1
 		fi
 	read -p "请输入对端ipip隧道IP段(例如 192.168.2.1 只填写 192.168.2 即可)：" ipduan
+	read -p "请输入对端ipip隧道的IP地址：" ipaddrremote
 	echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
@@ -159,7 +160,7 @@ PrivateKey = $localprivatekey
 [Peer]
 PublicKey = $rospublickey
 AllowedIPs = $ipduan.0/24,$allowedip1.0/24
-Endpoint = ${revip}:$wgport
+Endpoint = ${ipaddrremote}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
 	chmod 600 /etc/wireguard/$filename.conf
 	sed -i '$d' /etc/rc.local
@@ -172,6 +173,7 @@ PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
 	echo -e  "${green}请在ros的wireguard选项卡里边的Peers里添加配置，具体填写如下信息：${plain}\nPublic key 填写：${yellow}${vpspublickey}${plain}\nEndpoint port 填写：${yellow}${linstenport}${plain}\nAllowed Address填写：${green}0.0.0.0/0\n祝使用愉快。${plain}"
 	else
 		read -p "请输入对端ipip隧道IP段(例如 192.168.2.1 只填写 192.168.2 即可)：" ipduan
+		read -p "请输入对端ipip隧道的IP地址：" ipaddrremote
 		echo "[Interface]
 ListenPort = $wgport
 Address = $localip1/24
@@ -182,7 +184,7 @@ PrivateKey = $localprivatekey
 [Peer]
 PublicKey = $rospublickey
 AllowedIPs = $ipduan.0/24,$allowedip1.0/24
-Endpoint = ${revip}:$wgport
+Endpoint = ${ipaddrremote}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 	sed -i '$d' /etc/rc.local
 	echo -e "wg-quick up wg0\nexit 0" >> /etc/rc.local
