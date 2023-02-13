@@ -163,7 +163,7 @@ Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/$filename.conf
 	chmod 600 /etc/wireguard/$filename.conf
 	sed -i '$d' /etc/rc.local
-	echo -e "wg-quick up $filename\n exit 0" >> /etc/rc.local
+	echo -e "wg-quick up $filename\nexit 0" >> /etc/rc.local
 	wg-quick up $filename
 	vpspublickey=$(cat /etc/wireguard/publickey)
 	linstenport=$(cat /etc/wireguard/$filename.conf|grep "ListenPort"|awk '{print $3}')
@@ -185,7 +185,7 @@ AllowedIPs = $ipduan.0/24,$allowedip1.0/24
 Endpoint = ${revip}:$wgport
 PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 	sed -i '$d' /etc/rc.local
-	echo -e "wg-quick up wg0\n exit 0" >> /etc/rc.local
+	echo -e "wg-quick up wg0\nexit 0" >> /etc/rc.local
     chmod 600 /etc/wireguard/wg0.conf
 	wg-quick up wg0
 	vpspublickey=$(cat /etc/wireguard/publickey)
