@@ -72,7 +72,13 @@ exit 0
 EOF
 		cat >/root/change-tunnel-ip_${ddnsname}.sh <<EOF
 #!/bin/bash
-remoteip=\$(ping4 $ddnsname -c 1| sed '1{s/[^(]*(//;s/).*//;q}')
+while true; do
+	remoteip=\$(ping4 $ddnsname -c 1| sed '1{s/[^(]*(//;s/).*//;q}')
+	if [[ \$remoteip != "" ]]; then
+		echo "获取对端设备的IP为: \$remoteip"
+		break
+	fi
+done
 oldip="\$(cat /root/.tunnel-ip.txt)"
 netcardname=\$(ls /sys/class/net | awk '/^e/{print}')
 localip=\$(ip a |grep brd|grep global|grep \$netcardname|awk '{print \$2}'|awk -F "/" '{print \$1}')
@@ -81,7 +87,7 @@ if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64
 	ip addr add ${vip}/30 dev $tunname
 	ip link set $tunname up
-	sed -i "s/ip tunnel add $tunname mode ipip remote \${oldip} local ${localip} ttl 64/ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64/g" /etc/rc.local
+	sed -i '/ip tunnel add $tunname mode ipip/c\ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64' /etc/rc.local
 fi
 EOF
 		echo "开始添加定时任务"
