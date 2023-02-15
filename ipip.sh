@@ -83,7 +83,8 @@ oldip="\$(cat /root/.tunnel-ip.txt)"
 netcardname=\$(ls /sys/class/net | awk '/^e/{print}')
 localip=\$(ip a |grep brd|grep global|grep \$netcardname|awk '{print \$2}'|awk -F "/" '{print \$1}')
 if [[ \$oldip != \$remoteip ]]; then
-	ip tunnel del $tunname >/dev/null &
+	ip tunnel del $tunname
+	wg-quick down wg0
 	sed -i '/ip tunnel add $tunname mode ipip/c\ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64' /etc/rc.local
 	systemctl restart rc-local
 fi
