@@ -195,7 +195,7 @@ exit 0
 EOF
 		else
 			sed -i '$d' /etc/rc.local
-			echo "ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip} ttl 64
+			echo "ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} ttl 64
 ip addr add ${vip}/30 dev $tunname
 ip link set $tunname up
 exit 0" >> /etc/rc.local
@@ -218,14 +218,14 @@ exit 0" >> /etc/rc.local
 # By default this script does nothing.
  
 # bash /root/bindip.sh
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip} ttl 64
+ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} ttl 64
 ip addr add ${vip}/30 dev $tunname
 ip link set $tunname up
 exit 0
 EOF
 		else
 			sed -i '$d' /etc/rc.local
-			echo "ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip} ttl 64
+			echo "ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} ttl 64
 ip addr add ${vip}/30 dev $tunname
 ip link set $tunname up
 exit 0" >> /etc/rc.local
