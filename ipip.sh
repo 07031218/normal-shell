@@ -44,7 +44,6 @@ install_ipip(){
 # By default this script does nothing.
  
 # bash /root/bindip.sh
-sleep 20s
 ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
 ip addr add ${vip}/30 dev $tunname
 ip link set $tunname up
@@ -75,7 +74,6 @@ exit 0" >> /etc/rc.local
 # By default this script does nothing.
  
 # bash /root/bindip.sh
-sleep 20s
 ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
 ip addr add ${vip}/30 dev $tunname
 ip link set $tunname up
@@ -156,8 +154,8 @@ systemctl enable rc-local
 }
 install_ipipv6(){
 	if [[ `lsmod |grep tunnel6` == "" ]]; then
-	modprobe ip6_tunnel
-	fi
+		modprobe ip6_tunnel
+		fi
 	if [[ `which iptables` == "" ]]; then
 		apt install iptables -y>/dev/null ||yum install iptables -y>/dev/null 
 	fi
@@ -172,160 +170,13 @@ install_ipipv6(){
 	routerule=$(ip -6 route list|grep default|awk '{print $1" "$2" "$3" "$4" "$5}')
 	localip6=$(ip a |grep inet6|grep 'scope global' |awk '{print $2}'|awk -F "/" '{print $1}')
 	if [[ `ping6 $ddnsname -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'` ==  "$ddnsname" ]]; then
-		remoteip=${ddnsname}
-		read -p "请问是甲骨文的小鸡吗?[Y/n]:" yn
-		if [[ $yn == "Y" ]]||[[ $yn == "y" ]]; then
-			if [[ ! -f /etc/rc.local ]]; then
-							cat > /etc/rc.local <<EOF
-#!/bin/sh -e
-#
-# rc.local
-#
-# This script is executed at the end of each multiuser runlevel.
-# Make sure that the script will "exit 0" on success or any other
-# value on error.
-#
-# In order to enable or disable this script just change the execution
-# bits.
-#
-# By default this script does nothing.
- 
-# bash /root/bindip.sh
-sleep 20s
-dhclient -6 $netcardname
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-ip -6 route add $routerule
-exit 0
-EOF
-			else
-				sed -i '$d' /etc/rc.local
-				echo "dhclient -6 $netcardname
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-ip -6 route add $routerule
-exit 0" >> /etc/rc.local
-			fi
-	ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local $localip6 dev $netcardname encaplimit none # 创建IP隧道
-	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
-	ip link set $tunname up # 启用隧道虚拟网卡
-	ip -6 route add $routerule
-		else
-						if [[ ! -f /etc/rc.local ]]; then
-							cat > /etc/rc.local <<EOF
-#!/bin/sh -e
-#
-# rc.local
-#
-# This script is executed at the end of each multiuser runlevel.
-# Make sure that the script will "exit 0" on success or any other
-# value on error.
-#
-# In order to enable or disable this script just change the execution
-# bits.
-#
-# By default this script does nothing.
- 
-# bash /root/bindip.sh
-sleep 20s
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-exit 0
-EOF
-			else
-				sed -i '$d' /etc/rc.local
-				echo "ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-exit 0" >> /etc/rc.local
-			fi
-		fi
-	ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local $localip6 dev $netcardname encaplimit none # 创建IP隧道
-	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
-	ip link set $tunname up # 启用隧道虚拟网卡
+		remoteip=$ddnsname
 	else
 		remoteip=$(ping6 $ddnsname -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
-		read -p "请问是甲骨文的小鸡吗?[Y/n]:" yn
-		if [[ $yn == "Y" ]]||[[ $yn == "y" ]]; then
-					if [[ ! -f /etc/rc.local ]]; then
-			cat > /etc/rc.local <<EOF
-#!/bin/sh -e
-#
-# rc.local
-#
-# This script is executed at the end of each multiuser runlevel.
-# Make sure that the script will "exit 0" on success or any other
-# value on error.
-#
-# In order to enable or disable this script just change the execution
-# bits.
-#
-# By default this script does nothing.
- 
-# bash /root/bindip.sh
-sleep 20s
-dhclient -6 $netcardname
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-ip -6 route add $routerule
-exit 0
-EOF
-		else
-			sed -i '$d' /etc/rc.local
-			echo "dhclient -6 $netcardname
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-ip -6 route add $routerule
-exit 0" >> /etc/rc.local
-		fi
-	ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local $localip6 dev $netcardname encaplimit none # 创建IP隧道
-	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
-	ip link set $tunname up # 启用隧道虚拟网卡
-	ip -6 route add $routerule
-			else
-						if [[ ! -f /etc/rc.local ]]; then
-			cat > /etc/rc.local <<EOF
-#!/bin/sh -e
-#
-# rc.local
-#
-# This script is executed at the end of each multiuser runlevel.
-# Make sure that the script will "exit 0" on success or any other
-# value on error.
-#
-# In order to enable or disable this script just change the execution
-# bits.
-#
-# By default this script does nothing.
- 
-# bash /root/bindip.sh
-sleep 20s
-ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-exit 0
-EOF
-		else
-			sed -i '$d' /etc/rc.local
-			echo "ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
-exit 0" >> /etc/rc.local
-		fi
-
-		fi
-	ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local $localip6 dev $netcardname encaplimit none # 创建IP隧道
-	ip addr add ${vip}/30 dev $tunname # 添加本机VIP
-	ip link set $tunname up # 启用隧道虚拟网卡
 		cat >/root/change-tunnel-ip_${ddnsname}.sh <<EOF
 #!/bin/bash
 while true; do
-	remoteip=\$(ping6 $ddnsname -c 1 | sed '1{s/[^(]*(//;s/).*//;q}'|awk '{print \$2}'|sed 's/(//')
+	remoteip=\$(ping6 $ddnsname -c 1 | sed '1{s/[^(]*(//;s/).*//;q}')
 	if [[ \$remoteip != "" ]]; then
 		echo "获取对端设备的IP为: \$remoteip"
 		break
@@ -336,7 +187,7 @@ localip6=\$(ip a |grep inet6|grep 'scope global' |awk '{print \$2}'|awk -F "/" '
 if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel del $tunname
 	wg-quick down wg0
-	sed -i "/ip -6 tunnel add $tunname mode ipip6/c\ip -6 tunnel add $tunname mode ipip6 remote \${remoteip} local ${localip6} dev $netcardname encaplimit none" /etc/rc.local
+	sed -i "/ip link add name/c\ip link add name $tunname type ip6tnl local ${localip6} remote \${remoteip} mode any" /etc/rc.local
 	systemctl restart rc-local
 fi
 EOF
@@ -347,32 +198,65 @@ EOF
 		crontab /root/crontab_test 
 		rm /root/crontab_test
 		crontask=$(crontab -l)
-
 		echo -------------------------------------------------------
 		echo -e "设置定时任务成功，当前系统所有定时任务清单如下:\n${crontask}"
 		echo -------------------------------------------------------
 		echo "程序全部执行完毕，脚本退出。。"
 	fi
-	echo "${remoteip}" >/root/.tunnel-ip.txt
-
-	# ip -6 route add ${remotevip}/32 dev $tunname scope link src ${vip}
-	if [[ `iptables -t nat -L|grep "${remotevip}"` == "" ]]; then
-		iptables -t nat -A POSTROUTING -s ${remotevip} -j MASQUERADE
+		echo "${remoteip}" >/root/.tunnel-ip.txt
+		read -p "当前机器是甲骨文吗？[Y/n]:" yn
+		if [[ $yn == "Y" ]]||[[ $yn == "y" ]]; then
+			addtxt="dhclient -6 $netcardname"
+			addtxt1="sleep 20s"
+		fi
+	# 将隧道相关配置写入自启动调用的rc.local文件夹
+	if [[ ! -f /etc/rc.local ]]; then
+		cat > /etc/rc.local <<EOF
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+ 
+# bash /root/bindip.sh
+$addtxt1
+$addtxt
+ip link add name $tunname type ip6tnl local ${localip6} remote ${remoteip} mode any
+# ip -6 tunnel add $tunname mode ipip6 remote ${remoteip} local ${localip6} dev $netcardname encaplimit none
+ip addr add ${vip}/30 dev $tunname
+ip link set $tunname up
+ip -6 route add $routerule
+exit 0
+EOF
+	else
+		sed -i '$d' /etc/rc.local
+		echo "$addtxt1
+$addtxt
+ip link add name $tunname type ip6tnl local ${localip6} remote ${remoteip} mode any
+ip addr add ${vip}/30 dev $tunname
+ip link set $tunname up
+ip -6 route add $routerule
+exit 0" >> /etc/rc.local
 	fi
-	if [[ `sysctl -p|grep "net.ipv6.conf.all.forwarding=1"` == "" ]]; then
-		echo "net.ipv6.conf.all.forwarding=1" >> /etc/sysctl.conf
-		sysctl -p /etc/sysctl.conf
-	fi
-	if [[ `sysctl -p|grep "net.ipv4.ip_forward = 1"` == "" ]]; then
-		echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-		sysctl -p /etc/sysctl.conf
-	fi
+	# 执行创建隧道规则操作
+	ip link add name $tunname type ip6tnl local ${localip6} remote ${remoteip} mode any
+	ip addr add ${vip}/30 dev $tunname
+	ip link set $tunname up
+	ip -6 route add $routerule
 
-
-chmod +x /etc/rc.local
-cat > /etc/systemd/system/rc-local.service <<EOF
+	# 通过systemd实现开机rc.local自启动
+	chmod +x /etc/rc.local
+	cat > /etc/systemd/system/rc-local.service <<EOF
 [Unit]
 Description=/etc/rc.local
+After=network.target
 ConditionPathExists=/etc/rc.local
  
 [Service]
@@ -382,11 +266,24 @@ TimeoutSec=0
 StandardOutput=tty
 RemainAfterExit=yes
 SysVStartPriority=99
+
  
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl enable rc-local
+	systemctl enable rc-local
+	# 开始添加MASQUERADE伪装
+	if [[ `iptables -t nat -L|grep "${remotevip}"` == "" ]]; then
+		iptables -t nat -A POSTROUTING -s ${remotevip} -j MASQUERADE
+	fi
+	# 启用IPv6转发
+	if [[ `sysctl -p|grep "net.ipv6.conf.all.forwarding=1"` == "" ]]; then
+		echo "net.ipv6.conf.all.forwarding=1" >> /etc/sysctl.conf
+		sysctl -p /etc/sysctl.conf
+	fi
+	if [[ $yn == "Y" ]]||[[ $yn == "y" ]]; then
+		echo -e "${red}提示:${plain}${yellow}你的机器是甲骨文，IPIPv6隧道生效,需要重启一次！${plain}"
+	fi
 	exit 0
 }
 install_wg(){
