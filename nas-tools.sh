@@ -122,7 +122,7 @@ services:
     hostname: nas-tools
     container_name: nas-tools
   qbittorrent:
-    image: ghcr.io/linuxserver/qbittorrent:latest
+    image: ghcr.io/linuxserver/qbittorrent:14.3.9
     container_name: qbittorrent
     network_mode: "host"
     environment:
