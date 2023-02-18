@@ -16,20 +16,23 @@ elif [[ `uname -m` == "x86_64" ]]; then
 	memorylimit="${cpunumber}*0.1*1024*1024*1024"
 fi
 # 取内存占用数值结束处
+checkstatus(){
+	if [[ -f /tmp/cpu.py ]]; then
+		systemctl stop KeepCPU
+		systemctl disable KeepCPU
+		rm /tmp/cpu.py && rm /etc/systemd/system/KeepCPU.service
+	elif [[ -f /etc/systemd/system/KeepCPU.service ]] && [[ -f /root/cpu.py ]]; then
+		systemctl stop KeepCPU
+		systemctl disable KeepCPU
+		rm /root/cpu.py && rm /etc/systemd/system/KeepCPU.service
+	elif [[ `ps aux|grep cpumemory.py|wc -l` == 2 ]] && [[ -f /root/cpumemory.py ]]; then
+		echo "检测到机器上已经部署过保号脚本了，程序退出。"
+		exit 0
+	fi
+}
 
-if [[ -f /tmp/cpu.py ]]; then
-	systemctl stop KeepCPU
-	systemctl disable KeepCPU
-	rm /tmp/cpu.py && rm /etc/systemd/system/KeepCPU.service
-elif [[ -f /etc/systemd/system/KeepCPU.service ]] && [[ -f /root/cpu.py ]]; then
-	systemctl stop KeepCPU
-	systemctl disable KeepCPU
-	rm /root/cpu.py && rm /etc/systemd/system/KeepCPU.service
-elif [[ `ps aux|grep cpumemory.py|wc -l` == 2 ]] && [[ -f /root/cpumemory.py ]]; then
-	echo "检测到机器上已经部署过保号脚本了，程序退出。"
-	exit 0
-fi
 config_cpu(){
+	checkstatus
 	# 配置CPU占用开始
 	cat > /etc/systemd/system/KeepCpuMemory.service <<EOF
 [Unit]
@@ -53,6 +56,7 @@ EOF
 	# 配置CPU占用结束
 }
 config_cpu_memory(){
+	checkstatus
 	# 配置CPU、内存占用开始
 	cat > /etc/systemd/system/KeepCpuMemory.service <<EOF
 [Unit]
@@ -77,7 +81,7 @@ EOF
 	echo "设置CPU、内存占用保号完成。"
 	# 配置CPU、内存占用结束
 }
-remove(){
+removesh(){
 	if [[ -f /root/cpu.py ]]; then
 		systemctl stop KeepCPU
 		systemctl disable KeepCPU
@@ -99,7 +103,7 @@ if [[ $# > 0 ]];then
     config_cpu_memory
     ;;
     -u|--uninstall)
-    remove
+    removesh
     ;;
     esac
 elif [[ $# -eq 0 ]]; then
