@@ -261,7 +261,7 @@ setup_emby(){
 create_rclone_service(){
 
         check_rclone
-
+        fusermountsrc=$(which fusermount)
         i=1
 
         list=()
@@ -369,7 +369,7 @@ Restart=on-failure
 RestartSec=5
 User = root
 ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --umask 0000  --allow-other  --allow-non-empty --attr-timeout 1h --buffer-size 128M --dir-cache-time 5000h
-ExecStop=/bin/fusermount -u ${path}
+ExecStop=${fusermountsrc} -u ${path}
 Restart = on-abort
 
 [Install]
