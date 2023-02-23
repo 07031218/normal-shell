@@ -3,6 +3,15 @@ RED='\E[1;31m'
 RED_W='\E[41;37m'
 END='\E[0m'
 echoType='echo -e'
+checkCPU(){
+  CPUArch=$(uname -m)
+  if [[ "$CPUArch" == "aarch64" ]];then
+    arch=arm64
+  elif [[ "$CPUArch" == "x86_64" ]];then
+    arch=amd64
+  fi
+}
+checkCPU
 echoContent(){
   case $1 in
   # 红色
@@ -103,7 +112,7 @@ version: "3"
 services: 
 #自动追剧必备
   nas-tools:
-    image: jxxghp/nas-tools:latest
+    image: 07031218/nas-tools:v2.9.0-${arch}
     ports:
       - 3000:3000
     volumes:
