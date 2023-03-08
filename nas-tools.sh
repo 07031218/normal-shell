@@ -112,7 +112,7 @@ version: "3"
 services: 
 #自动追剧必备
   nas-tools:
-    image: 07031218/nas-tools:v2.9.0-${arch}
+    image: jxxghp/nas-tools:latest
     ports:
       - 3000:3000
     volumes:
