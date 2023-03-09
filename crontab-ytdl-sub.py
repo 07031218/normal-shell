@@ -10,7 +10,6 @@ db = mysql.connector.connect(
     password="",
     database=""
 )
-
 # 创建游标对象
 cursor = db.cursor()
 
@@ -32,6 +31,7 @@ for chinesename, name, url, timerange in results:
         os.system(f"rm {config_file_name}")
         query1 = "UPDATE `ytdl-sub`.`list` SET `timerange` = '1weeks' WHERE `name` = '%s'"%(name,)
         try:
+            db.ping(reconnect=True)
             cursor.execute(query1)
             db.commit()
         except Exception as e:
