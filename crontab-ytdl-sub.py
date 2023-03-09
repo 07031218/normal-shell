@@ -1,5 +1,5 @@
 # 请预先安装如下依赖
-# pip3 install pymysql mysql-connector-python
+# pip3 install mysql-connector-python
 import mysql.connector
 import os
 
