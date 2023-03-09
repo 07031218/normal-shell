@@ -20,9 +20,9 @@ cursor = db.cursor()
 query = "SELECT chinesename, name, url, timerange FROM list"
 cursor.execute(query)
 results = cursor.fetchall()
-# 定义新的配置文件名格式
 # 循环遍历结果，执行任务
 for chinesename, name, url, timerange in results:
+    # 定义新的配置文件名格式
     config_file_name = f"subscriptions-{name}.yaml"
     if timerange == "1years":
         os.system(f"cp subscriptions-clasic.yaml {config_file_name}")
