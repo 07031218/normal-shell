@@ -1,5 +1,8 @@
 # 请预先安装如下依赖
 # pip3 install mysql-connector-python
+# subscriptions-clasic.yaml为订阅模板文件
+# config-1years.yaml 为配置模板文件
+# 注意：如果订阅下载最近多长时间的视频，那么配置模板中和订阅模板中的download_range值要一致[1weeks为最近一周,1months为最近一个月,1years为最近一年]，否则会报错。
 import mysql.connector
 import os
 
@@ -26,7 +29,7 @@ for chinesename, name, url, timerange in results:
         os.system(f'sed -i "s/laogao/{name}/" {config_file_name}')
         os.system(f'sed -i "s/老高與小茉/{chinesename}/" {config_file_name}')
         os.system(f'sed -i "s/1weeks/1years/" {config_file_name}')
-        os.system(f'sed -i "s%https://www.youtube.com/@laogao/videos%{url}%" {config_file_name}')
+        os.system(f'sed -i "s%https://www.youtube.com/@xxx/videos%{url}%" {config_file_name}')
         os.system(f"ytdl-sub --config=/config/config-1years.yaml sub /config/{config_file_name}")
         os.system(f"rm {config_file_name}")
         query1 = "UPDATE `ytdl-sub`.`list` SET `timerange` = '1weeks' WHERE `name` = '%s'"%(name,)
@@ -40,7 +43,7 @@ for chinesename, name, url, timerange in results:
         os.system(f"cp subscriptions-clasic.yaml {config_file_name}")
         os.system(f'sed -i "s/laogao/{name}/" {config_file_name}')
         os.system(f'sed -i "s/老高與小茉/{chinesename}/" {config_file_name}')
-        os.system(f'sed -i "s%https://www.youtube.com/@laogao/videos%{url}%" {config_file_name}')
+        os.system(f'sed -i "s%https://www.youtube.com/@xxx/videos%{url}%" {config_file_name}')
         os.system(f"ytdl-sub --config=/config/config-dianxixiaoge.yaml sub /config/{config_file_name}")
         os.system(f"rm {config_file_name}")
 
