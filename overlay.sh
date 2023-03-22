@@ -15,18 +15,30 @@ check_root(){
 check_root
 echo -ne "${yellow}请输入GD网盘的初始挂载点路径:${plain}"
 read lowerdir
+if [[ $lowerdir == "" ]]; then
+	echo "${red}输入错误，程序退出。${plain}"
+fi
 echo -ne "${yellow}请输入upperdir(削刮文件)的存放路径:${plain}"
 read upperdir
+if [[ $upperdir == "" ]]; then
+	echo "${red}输入错误，程序退出。${plain}"
+fi
 if [[ ! -d ${upperdir} ]]; then
 	mkdir -p ${upperdir}
 fi
 echo -ne "${yellow}请输入workdir(overlay分层文件临时活动目录)的路径:${plain}"
 read workdir
+if [[ $workdir == "" ]]; then
+	echo "${red}输入错误，程序退出。${plain}"
+fi
 if [[ ! -d ${workdir} ]]; then
 	mkdir -p ${workdir}
 fi
 echo -ne "${yellow}请输入merga目录(overlay分层文件顶端合并目录)的路径:${plain}"
 read mountdir
+if [[ $mountdir == "" ]]; then
+	echo "${red}输入错误，程序退出。${plain}"
+fi
 if [[ ! -d ${mountdir} ]]; then
 	mkdir -p ${mountdir}
 fi
