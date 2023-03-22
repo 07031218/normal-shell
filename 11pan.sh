@@ -355,6 +355,11 @@ create_rclone_service(){
                 sleep 2s
                 echo -e "`curr_date` 删除成功。"
         fi
+        if [[ `cat /proc/meminfo|head -1 |awk '{sum=$2/1024/1024} {print sum}'` -lt 1 ]]; then
+                buffersize="128M"
+        elif [[ `cat /proc/meminfo|head -1 |awk '{sum=$2/1024/1024} {print sum}'` -ge 10 ]]; then
+                buffersize="512M"
+        fi
         echo -e "`curr_date` 正在创建服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"请稍等..."
         echo "[Unit]
 Description = rclone mount for ${list[rclone_config_name]}
@@ -364,11 +369,11 @@ After=network-online.target
 
 [Service]
 Type=notify
-KillMode=none
+KillMode=control-group
 Restart=on-failure
 RestartSec=5
 User = root
-ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --umask 0000  --allow-other  --allow-non-empty --attr-timeout 1h --buffer-size 128M --dir-cache-time 5000h
+ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --use-mmap --umask 0000 --default-permissions --no-check-certificate --allow-other --allow-non-empty --dir-cache-time 24h --cache-dir=/home/rclone --vfs-cache-mode full --buffer-size ${buffersize} --vfs-read-ahead 512M --vfs-read-chunk-size 32M --vfs-read-chunk-size-limit 128M --vfs-cache-max-size 30G --low-level-retries 200
 ExecStop=${fusermountsrc} -u ${path}
 Restart = on-abort
 
