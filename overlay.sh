@@ -25,41 +25,41 @@ fi
 echo -ne "${yellow}请输入GD网盘的初始挂载点路径:${plain}"
 read lowerdir
 if [[ $lowerdir == "" ]]; then
-	echo "${red}输入错误，程序退出。${plain}"
-	exit 1
+    echo "${red}输入错误，程序退出。${plain}"
+    exit 1
 fi
 echo -ne "${yellow}请输入upperdir(削刮文件)的存放路径:${plain}"
 read upperdir
 if [[ $upperdir == "" ]]; then
-	echo "${red}输入错误，程序退出。${plain}"
-	exit 1
+    echo -e "${red}输入错误，程序退出。${plain}"
+    exit 1
 fi
 if [[ ! -d ${upperdir} ]]; then
-	mkdir -p ${upperdir}
+    mkdir -p ${upperdir}
 fi
 echo -ne "${yellow}请输入workdir(overlay分层文件临时活动目录)的路径:${plain}"
 read workdir
 if [[ $workdir == "" ]]; then
-	echo "${red}输入错误，程序退出。${plain}"
-	exit 1
+    echo -e "${red}输入错误，程序退出。${plain}"
+    exit 1
 fi
 if [[ ! -d ${workdir} ]]; then
-	mkdir -p ${workdir}
+    mkdir -p ${workdir}
 fi
 echo -ne "${yellow}请输入merga目录(overlay分层文件顶端合并目录)的路径:${plain}"
 read mountdir
 if [[ $mountdir == "" ]]; then
-	echo "${red}输入错误，程序退出。${plain}"
-	exit 1
+    echo -e "${red}输入错误，程序退出。${plain}"
+    exit 1
 fi
 if [[ ! -d ${mountdir} ]]; then
-	mkdir -p ${mountdir}
+    mkdir -p ${mountdir}
 fi
 $(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}
 if [[ "$?" -eq 0 ]]; then
-	echo "${green}已经完成overlayFS文件系统挂载,开始将挂载写入开机自启动。${plain}"
-	if [[ ! -f /etc/rc.local ]]; then
-		cat > /etc/rc.local <<EOF
+    echo -e "${green}已经完成overlayFS文件系统挂载,开始将挂载写入开机自启动。${plain}"
+    if [[ ! -f /etc/rc.local ]]; then
+        cat > /etc/rc.local <<EOF
 #!/bin/sh -e
 #
 # rc.local
@@ -78,8 +78,8 @@ sleep 30s
 $(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}
 exit 0
 EOF
-		chmod +x /etc/rc.local
-		cat > /etc/systemd/system/rc-local.service <<EOF
+        chmod +x /etc/rc.local
+        cat > /etc/systemd/system/rc-local.service <<EOF
 [Unit]
 Description=/etc/rc.local
 After=network.target
@@ -97,19 +97,19 @@ SysVStartPriority=99
 [Install]
 WantedBy=multi-user.target
 EOF
-		systemctl start rc-local
-		systemctl enable rc-local
-		if [[ "$?" -eq 0 ]]; then
-		echo "${green}将挂载写入开机自启动成功。${plain}"
-	fi
-	else
-		sed -i '$d' /etc/rc.local
-		echo -e "sleep 30s\n$(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}\nexit 0" >> /etc/rc.local
-		if [[ "$?" -eq 0 ]]; then
-			echo "${green}将挂载写入开机自启动成功。${plain}"
-		fi
-	fi
+        systemctl start rc-local
+        systemctl enable rc-local
+        if [[ "$?" -eq 0 ]]; then
+        echo -e "${green}将挂载写入开机自启动成功。${plain}"
+    fi
+    else
+        sed -i '$d' /etc/rc.local
+        echo -e "sleep 30s\n$(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}\nexit 0" >> /etc/rc.local
+        if [[ "$?" -eq 0 ]]; then
+            echo -e "${green}将挂载写入开机自启动成功。${plain}"
+        fi
+    fi
 else
-	echo "${red}overlayFS文件系统挂载失败，程序退出。${plain}"
-	exit 1
+    echo -e "${red}overlayFS文件系统挂载失败，程序退出。${plain}"
+    exit 1
 fi
