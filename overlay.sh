@@ -12,6 +12,7 @@ check_root(){
            exit 1
     fi
 }
+check_root
 echo -ne "${yellow}请输入GD网盘的初始挂载点路径:${plain}"
 read lowerdir
 echo -ne "${yellow}请输入upperdir(削刮文件)的存放路径:${plain}"
