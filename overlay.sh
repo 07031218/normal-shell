@@ -74,12 +74,10 @@ if [[ "$?" -eq 0 ]]; then
 # By default this script does nothing.
  
 # bash /root/bindip.sh
-ip tunnel add $tunname mode ipip remote ${remoteip} local ${localip} ttl 64
-ip addr add ${vip}/30 dev $tunname
-ip link set $tunname up
+sleep 30s
+$(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}
 exit 0
 EOF
-		echo -e "sleep 30s\n$(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}" >> /etc/rc.local
 		chmod +x /etc/rc.local
 		cat > /etc/systemd/system/rc-local.service <<EOF
 [Unit]
@@ -105,7 +103,8 @@ EOF
 		echo "${green}将挂载写入开机自启动成功。${plain}"
 	fi
 	else
-		echo -e "sleep 30s\n$(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}" >> /etc/rc.local
+		sed -i '$d' /etc/rc.local
+		echo -e "sleep 30s\n$(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}\nexit 0" >> /etc/rc.local
 		if [[ "$?" -eq 0 ]]; then
 			echo "${green}将挂载写入开机自启动成功。${plain}"
 		fi
