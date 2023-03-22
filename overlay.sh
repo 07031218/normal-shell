@@ -34,7 +34,7 @@ $(which mount) -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=$
 if [[ "$?" -eq 0 ]]; then
 	echo "${green}已经完成overlayFS文件系统挂载,开始将挂载写入开机自启动。${plain}"
 	echo "overlay ${mountdir} overlay lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} 0 0" >>/etc/fstab
-	[[ "$?" -eq 0 ]]; then
+	if [[ "$?" -eq 0 ]]; then
 		echo "${green}将挂载写入开机自启动成功。${plain}"
 	fi
 else
