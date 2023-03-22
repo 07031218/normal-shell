@@ -13,7 +13,7 @@ check_root(){
     fi
 }
 check_root
-if cat /etc/issue | grep -Eqi "debian" && ; then
+if cat /etc/issue | grep -Eqi "debian"; then
     release="debian"
 elif cat /etc/issue | grep -Eqi "Armbian"; then
     release="Armbian"
