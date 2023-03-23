@@ -373,7 +373,7 @@ KillMode=control-group
 Restart=on-failure
 RestartSec=5
 User = root
-ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --use-mmap --umask 0000 --default-permissions --no-check-certificate --allow-other --allow-non-empty --dir-cache-time 24h --cache-dir=/home/rclone --vfs-cache-mode full --buffer-size ${buffersize} --vfs-read-ahead 512M --vfs-read-chunk-size 32M --vfs-read-chunk-size-limit 128M --vfs-cache-max-size 30G --low-level-retries 200
+ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --use-mmap --umask 0000 --default-permissions --no-check-certificate --allow-other --allow-non-empty --dir-cache-time 24h --cache-dir=/home/rclone --vfs-cache-mode full --buffer-size ${buffersize} --vfs-read-ahead 512M --vfs-read-chunk-size 32M --vfs-read-chunk-size-limit 128M --vfs-cache-max-size 10G --low-level-retries 200
 ExecStop=${fusermountsrc} -u ${path}
 Restart = on-abort
 
