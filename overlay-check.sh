@@ -8,6 +8,7 @@ if [[ ! -f ${upperdir}/油管专辑/xuegua.tar ]]; then
         mkdir -p ${upperdir}/油管专辑
     fi
     cp ${lowerdir}/油管削刮包/xuegua.tar ${upperdir}/油管专辑/ && cd ${upperdir}/油管专辑/ && tar xvf xuegua.tar
+    /usr/bin/mount -t overlay -o lowerdir=${lowerdir},upperdir=${upperdir},workdir=${workdir} overlay ${mountdir}
 fi
 if [[ `du ${lowerdir}/油管削刮包/xuegua.tar -h|awk '{print $1}'` != `du ${upperdir}/油管专辑/xuegua.tar -h|awk '{print $1}'` ]]; then
     cp ${lowerdir}/油管削刮包/xuegua.tar ${upperdir}/油管专辑/ && cd ${upperdir}/油管专辑/ && tar xvf xuegua.tar
