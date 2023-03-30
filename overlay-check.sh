@@ -3,7 +3,7 @@ lowerdir="/youtube-lower" # 填写GD原始挂载点路径，末尾不带/
 upperdir="/youtube-upper" # 填写削刮文件存放路径，末尾不带/
 workdir="/youtube-work" # 填写overlay分层文件的临时工作路径，末尾不带/
 mountdir="/youtube" # 填写overlay的顶端merga路径，末尾不带/
-rcloneconfig="sa-anboy0714"
+rcloneconfig="sa-anboy0714" # 填写GD网盘的rclone config配置名称
 if [[ ! -f ${upperdir}/油管专辑/xuegua.tar ]]; then
     if [[ ! -d ${upperdir}/油管专辑 ]]; then
         mkdir -p ${upperdir}/油管专辑
