@@ -355,11 +355,11 @@ create_rclone_service(){
                 sleep 2s
                 echo -e "`curr_date` 删除成功。"
         fi
-        if [[ `cat /proc/meminfo|head -1 |awk '{sum=$2/1024/1024} {print sum}'` -lt 1 ]]; then
-                buffersize="128M"
-        elif [[ `cat /proc/meminfo|head -1 |awk '{sum=$2/1024/1024} {print sum}'` -ge 10 ]]; then
-                buffersize="512M"
-        fi
+#         if [[ `cat /proc/meminfo|head -1 |awk '{sum=$2/1024/1024} {print sum}'` -lt 1 ]]; then
+#                 buffersize="128M"
+#         elif [[ `cat /proc/meminfo|head -1 |awk '{sum=$2/1024/1024} {print sum}'` -ge 10 ]]; then
+#                 buffersize="512M"
+#         fi
         echo -e "`curr_date` 正在创建服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"请稍等..."
         echo "[Unit]
 Description = rclone mount for ${list[rclone_config_name]}
