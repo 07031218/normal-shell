@@ -9,6 +9,16 @@ yellow='\033[0;33m'
 plain='\033[0m'
 echoType='echo -e'
 DATE=`date +%Y%m%d`
+
+sys_dir=/opt/emby-server/
+config_dir=/var/lib/
+
+
+backto_dir="" # 填写gd网盘挂载路径下面其中一个文件夹作为数据备份存放目录
+xuegua_dir="" # 填写自定义削刮文件的存放路径，如未曾自定义过削刮文件存放目录，则留空即可
+baksys="" # 是否备份Emby主程序的开关，如果要备份Emby的主程序，则填写Y或者y，否则留空即可
+
+
 echoContent() {
   case $1 in
   # 红色
@@ -61,18 +71,9 @@ untar(){
     echo
     pv -s $((${total_size} * 1020)) $1 | tar zxf - -C $2
 }
-# echoContent skyBlue "请输入Emby系统文件夹路径,留空则默认为/opt/emby-server/"
-sys_dir=/opt/emby-server/
-# echoContent skyBlue "请输入Emby配置文件夹路径,留空则默认为/var/lib"
-config_dir=/var/lib/
+
 backup_emby(){
-    echoContent skyBlue "请输入备份文件的存放路径⬇"
-    read backto_dir
     mkdir -p $backto_dir/$DATE
-    echoContent skyBlue "请输入Emby削刮库的目录路径(路径末尾不要带/)，如未自定义过削刮缓存目录或者你看不懂这条在说什么，那么直接回车即可⬇"
-    read xuegua_dir
-    echoContent skyBlue "是否需要备份Emby-server主程序[Y/N]:"
-    read baksys
     echoContent white "即将开始对Emby Server进行备份，需要一定的时间，请耐心等待······"
     sleep 3s
     if [[ ${xuegua_dir} == "" ]]; then
@@ -151,12 +152,61 @@ backup_emby(){
     fi
 }
 restore_emby(){
-    echoContent skyBlue "请输入Emby削刮库的目录路径(路径末尾不要带/)，如未自定义过削刮缓存目录或者你看不懂这条在说什么，那么直接回车即可⬇"
-    read xuegua_dir
-    echoContent yellow "请输入备份文件所在的路径⬇"
-    read backto_dir
     echoContent yellow "是否还原Emby-sever主程序？[Y/N]:"
     read restore_sys
+        i=1
+        list=()
+        if [[ ! -d ${backto_dir} ]]; then
+                echoContent red "错误，未检索到备份数据目录。"
+                exit 1
+        elif [[ -d ${backto_dir} ]];then
+                items=$(ls ${backto_dir}/ -l|awk 'NR>1{print $9}')
+        fi
+        for item in $items
+        do
+                list[i]=${item}
+                i=$((i+1))
+        done
+        while [[ 0 ]]
+        do
+                while [[ 0 ]]
+                do
+                        echo
+                        echoContent skyBlue "当前[yyyy-mm-dd]格式数据备份列表如下:"
+                        # echo
+                echoContent skyBlue "-------------------------------"
+                        for((j=1;j<=${#list[@]};j++))
+                        do
+                temp="${j}：${list[j]}"
+                count=$((`echo "${temp}" | wc -m` -1))
+                if [ "${count}" -le 6 ];then
+                    temp="${temp}\t\t\t"
+                elif [ "${count}" -gt 6 ] && [ "$count" -le 14 ];then
+                    temp="${temp}\t\t"
+                elif [ "${count}" -gt 14 ];then
+                    temp="${temp}"
+                fi
+                                echoContent skyBlue "${temp}"
+                                echoContent skyBlue "-------------------------------"
+                        done
+                        echo
+                        read -n3 -p "请选择要使用的备份档（输入数字即可）：" bak_date_name
+                        if [[ ${bak_date_name} -eq 0 ]]; then
+                          echo
+                          echoContent red "输入不正确，请重新输入。"
+                        elif [ ${bak_date_name} -le ${#list[@]} ] && [ -n ${bak_date_name} ];then
+                                echo
+                                echoContent purple "您选择了：${list[bak_date_name]}"
+                                break
+                        else
+                          echo
+                          echoContent red "输入不正确，请重新输入。"
+                          echo
+                        fi
+                 
+                done
+            break
+        done
     echoContent red "即将开始还原操作，是否继续执行:[Y/N]"
     read yn
     if [[ $yn != "Y" ]] && [[ $yn != "y" ]]; then
@@ -166,7 +216,7 @@ restore_emby(){
     if [[ ${xuegua_dir} == "" ]]; then
         xuegua_dir=$config_dir
         echoContent yellow "Emby削刮包和LibEmby数据库恢复中，请耐心等待······"
-        untar ${backto_dir}/Emby削刮包和LibEmby数据库.tar.gz $xuegua_dir
+        untar ${backto_dir}/${list[bak_date_name]}/Emby削刮包和LibEmby数据库.tar.gz $xuegua_dir
         if [[ "$?" -eq 0 ]]; then
                 # clear
             echoContent green "Emby削刮包和LibEmby数据库恢复完成"
@@ -178,7 +228,7 @@ restore_emby(){
         fi
     else
         echoContent yellow "Emby削刮包恢复中，请耐心等待······"
-        untar ${backto_dir}/Emby削刮包.tar.gz $xuegua_dir
+        untar ${backto_dir}/${list[bak_date_name]}/Emby削刮包.tar.gz $xuegua_dir
         if [[ "$?" -eq 0 ]]; then
             echoContent green "Emby削刮包恢复完成"
             sleep 3s
@@ -188,7 +238,7 @@ restore_emby(){
             exit 1
         fi
         echoContent yellow "LibEmby数据库恢复中，请耐心等待······"
-        untar ${backto_dir}/LibEmby数据库.tar.gz $config_dir
+        untar ${backto_dir}/${list[bak_date_name]}/LibEmby数据库.tar.gz $config_dir
         if [[ "$?" -eq 0 ]]; then
             echoContent green "LibEmby数据库恢复完成"
         else
@@ -199,7 +249,7 @@ restore_emby(){
     fi
     if [[ $restore_sys == "y" ]]||[[ $restore_sys == "Y" ]]; then
         echoContent yellow "Emby-server主程序恢复中，请耐心等待······"
-        untar ${backto_dir}/Emby-server主程序.tar.gz $sys_dir
+        untar ${backto_dir}/${list[bak_date_name]}/Emby-server主程序.tar.gz $sys_dir
         if [[ "$?" -eq 0 ]]; then
             # clear
             echoContent green "Emby-server主程序恢复完成"
@@ -256,5 +306,9 @@ ${green}2.${plain}  一键还原
     ;;
   esac
 }
-echoContent
-main
+if [[ $1 == "b" ]]; then
+    # 可通过命令 bash emby-bs.sh b 实现一键备份
+    backup_emby
+else
+    main
+fi
