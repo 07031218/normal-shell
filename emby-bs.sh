@@ -124,7 +124,7 @@ backup_emby(){
         cd $config_dir
         echoContent yellow "LibEmby数据库备份中，请耐心等待······"
         # 备份VarLibEmby数据库(排除包含帐户数据相关的文件)
-        targz ${backto_dir}/${DATE}/LibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt --exclude ./emby/data/users.db --exclude ./emby/data/activitylog.db --exclude ./emby/data/authentication.db --exclude ./emby/data/displaypreferences.db'
+        targz ${backto_dir}/${DATE}/LibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt'
         if [[ "$?" -eq 0 ]]; then
             # clear
             echoContent green "LibEmby数据库备份完成"
