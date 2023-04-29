@@ -81,7 +81,7 @@ backup_emby(){
         systemctl stop emby-server
         cd $xuegua_dir
         echoContent yellow "Emby削刮包和数据库备份中，请耐心等待······"
-        targz ${backto_dir}/${DATE}/Emby削刮包和LibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt --exclude ./emby/data/users.db --exclude ./emby/data/activitylog.db --exclude ./emby/data/authentication.db --exclude ./emby/data/displaypreferences.db'
+        targz ${backto_dir}/${DATE}/Emby削刮包和LibEmby数据库.tar.gz ./emby
         if [[ "$?" -eq 0 ]]; then
                 # clear
             echoContent green "Emby削刮包和LibEmby数据库备份完成"
@@ -124,7 +124,7 @@ backup_emby(){
         cd $config_dir
         echoContent yellow "LibEmby数据库备份中，请耐心等待······"
         # 备份VarLibEmby数据库(排除包含帐户数据相关的文件)
-        targz ${backto_dir}/${DATE}/LibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt'
+        targz ${backto_dir}/${DATE}/LibEmby数据库.tar.gz ./emby
         if [[ "$?" -eq 0 ]]; then
             # clear
             echoContent green "LibEmby数据库备份完成"
