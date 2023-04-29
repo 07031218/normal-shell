@@ -36,8 +36,7 @@ if [[ $xuegua_dir != "" ]]; then
         exit 1
     fi
     cd $embylib_dir
-    # 备份VarLibEmby数据库(排除包含帐户数据相关的文件)
-    targz $bak_dir/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby '--exclude ./emby/data/device.txt --exclude ./emby/data/users.db --exclude ./emby/data/activitylog.db --exclude ./emby/data/authentication.db --exclude ./emby/data/displaypreferences.db'
+    targz $bak_dir/${DATE}/Emby-VarLibEmby数据库.tar.gz ./emby 
     if [[ $? -eq 0 ]]; then
         echo "LibEmby数据库备份完成······"
     else
