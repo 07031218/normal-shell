@@ -17,6 +17,7 @@ config_dir=/var/lib/
 backto_dir="" # 填写gd网盘挂载路径下面其中一个文件夹作为数据备份存放目录
 xuegua_dir="" # 填写自定义削刮文件的存放路径，如未曾自定义过削刮文件存放目录，则留空即可
 baksys="" # 是否备份Emby主程序的开关，如果要备份Emby的主程序，则填写Y或者y，否则留空即可
+DEL_DAY=7 # 备份文件保存的天数，默认7天，支持自定义修改
 
 
 echoContent() {
@@ -150,6 +151,24 @@ backup_emby(){
         echoContent yellow "恭喜，所有备份均已完成。"
         systemctl start emby-server
     fi
+    LIST=$(ls $backto_dir)
+    # 获取7天前的时间，用于作比较，早于该时间的文件将删除
+    SECONDS=$(date -d  "$(date  +%F) -${DEL_DAY} days" +%s)
+    for index in ${LIST}
+    do
+        # 对目录名进行格式化，取命名末尾的时间，格式如 20200902
+        timeString=$(echo ${index} | egrep -o "?[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]")
+        if [ -n "$timeString" ]
+        then
+            indexDate=${timeString//./-}
+            indexSecond=$( date -d ${indexDate} +%s )
+            # 与当天的时间做对比，把早于7天的备份文件删除
+            if [ $(( $SECONDS- $indexSecond )) -gt 0 ]
+            then
+                rm -rf $backto_dir/$index
+            fi
+        fi
+    done
 }
 restore_emby(){
     echoContent yellow "是否还原Emby-sever主程序？[Y/N]:"
