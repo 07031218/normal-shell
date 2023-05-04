@@ -101,7 +101,7 @@ localip=\$(ip a |grep brd|grep global|grep \$netcardname|awk '{print \$2}'|awk -
 if [[ \$oldip != \$remoteip ]]; then
 	ip tunnel del $tunname
 	wg-quick down wg0
-	sed -i "/ip tunnel add $tunname mode ipip/c\ip tunnel add $tunname mode ipip remote \${remoteip} local ${localip} ttl 64" /etc/rc.local
+	sed -i "/ip tunnel add $tunname mode ipip/c\ip tunnel add $tunname mode ipip remote \${remoteip} local \${localip} ttl 64" /etc/rc.local
 	systemctl restart rc-local
 fi
 EOF
