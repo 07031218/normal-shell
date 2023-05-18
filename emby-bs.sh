@@ -82,29 +82,29 @@ backup_emby(){
         systemctl stop emby-server
         cd $xuegua_dir
         echoContent yellow "Emby削刮包和数据库备份中，请耐心等待······"
-        targz ${backto_dir}/${DATE}/Emby削刮包和LibEmby数据库.tar.gz ./emby
-        if [[ "$?" -eq 0 ]]; then
-                # clear
-            echoContent green "Emby削刮包和LibEmby数据库备份完成"
-            sleep 5s
-        else
-            echoContent red "Emby削刮包和LibEmby数据库备份失败"
-            systemctl start emby-server
-            exit 1
-        fi
+        while true; do
+            targz ${backto_dir}/${DATE}/Emby削刮包和LibEmby数据库.tar.gz ./emby
+            if [[ "$?" -eq 0 ]]; then
+                    # clear
+                echoContent green "Emby削刮包和LibEmby数据库备份完成"
+                break
+            else
+                echoContent red "Emby削刮包和LibEmby数据库备份失败,开始重试······"
+            fi
+        done
         if [[ $baksys == "Y" ]]||[[ $baksys == "y" ]]; then
             cd $sys_dir
             echoContent yellow "Emby-server主程序备份中，请耐心等待······"
-            targz ${backto_dir}/${DATE}/Emby-server主程序.tar.gz ./
-            if [[ "$?" -eq 0 ]]; then
-                # clear
-                echoContent green "Emby-server主程序备份完成"
-                sleep 5s
-            else
-                echoContent red "Emby-server主程序备份失败"
-                systemctl start emby-server
-                exit 1
-            fi
+            while true; do
+                targz ${backto_dir}/${DATE}/Emby-server主程序.tar.gz ./
+                if [[ "$?" -eq 0 ]]; then
+                    # clear
+                    echoContent green "Emby-server主程序备份完成"
+                    break
+                else
+                    echoContent red "Emby-server主程序备份失败,开始重试······"
+                fi
+            done
         fi
         echoContent yellow "恭喜，所有备份均已完成。"
         systemctl start emby-server
@@ -112,41 +112,42 @@ backup_emby(){
         systemctl stop emby-server
         cd $xuegua_dir
         echoContent yellow "Emby削刮包备份中，请耐心等待······"
-        targz ${backto_dir}/${DATE}/Emby削刮包.tar.gz ./
-        if [[ "$?" -eq 0 ]]; then
-            # clear
-            echoContent green "Emby削刮包备份完成"
-            sleep 5s
-        else
-            echoContent red "Emby削刮包备份失败"
-            systemctl start emby-server
-            exit 1
-        fi
+        while true; do
+            targz ${backto_dir}/${DATE}/Emby削刮包.tar.gz ./
+            if [[ "$?" -eq 0 ]]; then
+                # clear
+                echoContent green "Emby削刮包备份完成"
+                break
+            else
+                echoContent red "Emby削刮包备份失败,开始重试······"
+            fi
+        done
         cd $config_dir
         echoContent yellow "LibEmby数据库备份中，请耐心等待······"
         # 备份VarLibEmby数据库(排除包含帐户数据相关的文件)
-        targz ${backto_dir}/${DATE}/LibEmby数据库.tar.gz ./emby
-        if [[ "$?" -eq 0 ]]; then
-            # clear
-            echoContent green "LibEmby数据库备份完成"
-        else
-            echoContent red "LibEmby数据库备份失败"
-            systemctl start emby-server
-            exit 1
-        fi
+        while true; do
+            targz ${backto_dir}/${DATE}/LibEmby数据库.tar.gz ./emby
+            if [[ "$?" -eq 0 ]]; then
+                # clear
+                echoContent green "LibEmby数据库备份完成"
+                break
+            else
+                echoContent red "LibEmby数据库备份失败,开始重试······"
+            fi
+        done
         if [[ $baksys == "Y" ]]||[[ $baksys == "y" ]]; then
             cd $sys_dir
             echoContent yellow "Emby-server主程序备份中，请耐心等待······"
-            targz ${backto_dir}/${DATE}/Emby-server主程序.tar.gz ./
-            if [[ "$?" -eq 0 ]]; then
-                # clear
-                echoContent green "Emby-server主程序备份完成"
-                sleep 5s
-            else
-                echoContent red "Emby-server主程序备份失败"
-                systemctl start emby-server
-                exit 1
-            fi
+            while true; do
+                targz ${backto_dir}/${DATE}/Emby-server主程序.tar.gz ./
+                if [[ "$?" -eq 0 ]]; then
+                    # clear
+                    echoContent green "Emby-server主程序备份完成"
+                    break
+                else
+                    echoContent red "Emby-server主程序备份失败,开始重试······"
+                fi
+            done
         fi
         echoContent yellow "恭喜，所有备份均已完成。"
         systemctl start emby-server
