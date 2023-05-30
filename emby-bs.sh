@@ -74,7 +74,7 @@ untar(){
 }
 
 backup_emby(){
-    mkdir -p $backto_dir/$DATE
+    mkdir -p ${backto_dir}/${DATE}
     echoContent white "即将开始对Emby Server进行备份，需要一定的时间，请耐心等待······"
     sleep 3s
     if [[ ${xuegua_dir} == "" ]]; then
@@ -89,6 +89,7 @@ backup_emby(){
                 echoContent green "Emby削刮包和LibEmby数据库备份完成"
                 break
             else
+                rm ${backto_dir}/${DATE}/Emby削刮包和LibEmby数据库.tar.gz
                 echoContent red "Emby削刮包和LibEmby数据库备份失败,开始重试······"
             fi
         done
@@ -119,6 +120,7 @@ backup_emby(){
                 echoContent green "Emby削刮包备份完成"
                 break
             else
+                rm ${backto_dir}/${DATE}/Emby削刮包.tar.gz
                 echoContent red "Emby削刮包备份失败,开始重试······"
             fi
         done
