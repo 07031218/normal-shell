@@ -33,7 +33,7 @@ do
 	-H 'sec-ch-ua-mobile: ?0' \
 	-H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36 Edg/98.0.1108.43' \
 	-H 'sec-ch-ua-platform: "macOS"' \
-	-H 'Accept: */*' \
+	-H 'Accept: */*' \ 
 	-H 'Origin: '"${embyurl}" \
 	-H 'Sec-Fetch-Site: same-origin' \
 	-H 'Sec-Fetch-Mode: cors' \
@@ -41,7 +41,7 @@ do
 	-H 'Referer: '"${embyurl}"'/web/index.html' \
 	-H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
 	-H 'Cookie: _ga=GA1.1.1511214678.1654738055; _ga_P1E9Z5LRRK=GS1.1.1684834693.201.0.1684834693.0.0.0' \
-	--compressed
+	--compressed # 37、41行要保留格式不变
 	sleep 20
 	curl ${fullurl1} \
 	-X 'POST' \
@@ -60,7 +60,7 @@ do
 	-H 'Referer: '"${embyurl}"'/web/index.html' \
 	-H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
 	-H 'Cookie: _ga=GA1.1.1511214678.1654738055; _ga_P1E9Z5LRRK=GS1.1.1684834693.201.0.1684834693.0.0.0' \
-	--compressed
+	--compressed # 56、60行要保留格式不变
 	sleep 1000
 	echo "`date +%Y-%m-%d\ %H:%M:%S` ${name}追新刷新媒体库完成。" >> /root/sync-zhuixin.log
 	curl "https://api.telegram.org/bot${bot_token}/sendMessage?chat_id=${chat_id}&text=`date +%Y-%m-%d\ %H:%M:%S` ${name}追新刷新媒体库完成。"
