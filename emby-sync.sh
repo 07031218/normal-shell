@@ -1,9 +1,9 @@
 #!/bin/bash
 # set -x
 declare -A items=(
-	["oumeiju"]="欧美剧,687156" # 
-	["guochanju"]="国产剧,682089"
-	["rihanju"]="日韩剧,720395"
+	["oumeiju"]="欧美剧,687156" # []里填写媒体分类的字母代号(可自定义)，欧美剧为媒体库名称，687156为该媒体库emby对应的parentId,
+	["guochanju"]="国产剧,682089" # 同上
+	["rihanju"]="日韩剧,720395" # 同上
 )
 rcloneconfig="" # 填写GD网盘的rclone配置名称
 gddir="" # 填写GD盘媒体目录名称，最后不带/
@@ -11,13 +11,14 @@ apikey="" # 填写EMBY的APIKEY
 embyurl="http://ip:8096" # 填写EMBY的网址，最后不加/
 bot_token="" # 填写telegram bot的Token
 chat_id="" # 填写接收机器人消息的群组或者用户的TG_ID
+Device_Id="" # 此处填写刷新媒体库时抓取到的curl指令中的Device-Id的对应编号
 for key in "${!items[@]}"
 do
 	value="${items[$key]}"
 	name="${value%,*}"
 	id="${value#*,}"
-	fullurl="${embyurl}/emby/Items/${id}"'/Refresh?Recursive=true&ImageRefreshMode=Default&MetadataRefreshMode=Default&ReplaceAllImages=false&ReplaceAllMetadata=false&X-Emby-Client=Emby%20Web&X-Emby-Device-Name=Microsoft%20Edge%20macOS&X-Emby-Device-Id=86cf3104-6abd-452a-8485-bd71b890999d&X-Emby-Client-Version=4.8.0.37&X-Emby-Token='"${apikey}"
-	fullurl1="${embyurl}/emby/Items/${id}"'/Refresh?Recursive=true&ImageRefreshMode=FullRefresh&MetadataRefreshMode=FullRefresh&ReplaceAllImages=false&ReplaceAllMetadata=false&X-Emby-Client=Emby%20Web&X-Emby-Device-Name=Microsoft%20Edge%20macOS&X-Emby-Device-Id=86cf3104-6abd-452a-8485-bd71b890999d&X-Emby-Client-Version=4.8.0.37&X-Emby-Token='"${apikey}"
+	fullurl="${embyurl}/emby/Items/${id}"'/Refresh?Recursive=true&ImageRefreshMode=Default&MetadataRefreshMode=Default&ReplaceAllImages=false&ReplaceAllMetadata=false&X-Emby-Client=Emby%20Web&X-Emby-Device-Name=Microsoft%20Edge%20macOS&X-Emby-Device-Id='"${Device_Id}"'&X-Emby-Client-Version=4.8.0.37&X-Emby-Token='"${apikey}"
+	fullurl1="${embyurl}/emby/Items/${id}"'/Refresh?Recursive=true&ImageRefreshMode=FullRefresh&MetadataRefreshMode=FullRefresh&ReplaceAllImages=false&ReplaceAllMetadata=false&X-Emby-Client=Emby%20Web&X-Emby-Device-Name=Microsoft%20Edge%20macOS&X-Emby-Device-Id='"${Device_Id}"'&X-Emby-Client-Version=4.8.0.37&X-Emby-Token='"${apikey}"
 	if [[ ! -f /root/.${key}.txt ]]; then
 	rclone size ${rcloneconfig}:${gddir}/${name}|sed -n "2p"|awk -F "(" '{print $2}'|awk '{print $1}' > /root/.${key}.txt
 	fi
