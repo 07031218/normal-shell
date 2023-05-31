@@ -1,4 +1,5 @@
 #!/bin/bash
+# 脚本适配Emby 4.8.0.37版本，如果非该版本，请自行抓取刷新媒体库时获取到的curl指令进行替换。
 # set -x
 declare -A items=(
 	["oumeiju"]="欧美剧,687156" # []里填写媒体分类的字母代号(可自定义)，欧美剧为媒体库名称，687156为该媒体库emby对应的parentId,
@@ -41,7 +42,7 @@ do
 	-H 'Referer: '"${embyurl}"'/web/index.html' \
 	-H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
 	-H 'Cookie: _ga=GA1.1.1511214678.1654738055; _ga_P1E9Z5LRRK=GS1.1.1684834693.201.0.1684834693.0.0.0' \
-	--compressed # 37、41行要保留格式不变
+	--compressed # 38、42行要保留格式不变
 	sleep 20
 	curl ${fullurl1} \
 	-X 'POST' \
@@ -60,7 +61,7 @@ do
 	-H 'Referer: '"${embyurl}"'/web/index.html' \
 	-H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
 	-H 'Cookie: _ga=GA1.1.1511214678.1654738055; _ga_P1E9Z5LRRK=GS1.1.1684834693.201.0.1684834693.0.0.0' \
-	--compressed # 56、60行要保留格式不变
+	--compressed # 57、61行要保留格式不变
 	sleep 1000
 	echo "`date +%Y-%m-%d\ %H:%M:%S` ${name}追新刷新媒体库完成。" >> /root/sync-zhuixin.log
 	curl "https://api.telegram.org/bot${bot_token}/sendMessage?chat_id=${chat_id}&text=`date +%Y-%m-%d\ %H:%M:%S` ${name}追新刷新媒体库完成。"
