@@ -62,8 +62,8 @@ do
 	-H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
 	-H 'Cookie: _ga=GA1.1.1511214678.1654738055; _ga_P1E9Z5LRRK=GS1.1.1684834693.201.0.1684834693.0.0.0' \
 	--compressed # 57、61行要保留格式不变
-	sleep 1000
 	echo "`date +%Y-%m-%d\ %H:%M:%S` ${name}追新刷新媒体库完成。" >> /root/sync-zhuixin.log
 	curl "https://api.telegram.org/bot${bot_token}/sendMessage?chat_id=${chat_id}&text=`date +%Y-%m-%d\ %H:%M:%S` ${name}追新刷新媒体库完成。"
+	sleep 1000
 	fi
 done
