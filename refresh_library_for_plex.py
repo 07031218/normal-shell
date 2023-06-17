@@ -24,7 +24,7 @@ plex = PlexServer(PLEX_BASEURL, PLEX_TOKEN)
 # 遍历所有要监视的目录
 for media_dir in MEDIA_DIRS:
     # 打开要写入的 txt 文件，如果文件不存在则创建它
-    txt_file = open(f'.{MEDIA_DIRS[media_dir]}.txt', 'w+')
+    txt_file = open(f'.{MEDIA_DIRS[media_dir]}.txt', 'a+')
     
     # 将文件指针移动到文件开头
     txt_file.seek(0)
