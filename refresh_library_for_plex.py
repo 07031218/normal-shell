@@ -7,7 +7,7 @@ from plexapi.server import PlexServer
 RCLONE_REMOTE_PATH = 'nongjiale:'
 
 # Plex 服务器配置
-PLEX_BASEURL = 'http://plex.20120714.xyz:32400'
+PLEX_BASEURL = 'http://plexurl:32400'
 PLEX_TOKEN = ''
 
 # rclone网盘目录名和对应媒体库名的映射关系
