@@ -32,9 +32,6 @@ for media_dir in MEDIA_DIRS:
     # 读取本地保存的目录大小，如果文件为空则默认为 0
     local_size = int(txt_file.read() or 0)
     
-    # 将文件的操作模式从追加模式变更为覆写模式
-    txt_file = open(f'.{MEDIA_DIRS[media_dir]}.txt', 'w') 
-    
     # 构建 rclone 命令行
     cmd = ['rclone', 'size', '--json', os.path.join(RCLONE_REMOTE_PATH, media_dir)]
     
@@ -47,6 +44,8 @@ for media_dir in MEDIA_DIRS:
     
     # 如果目录大小发生变化，则刷新媒体库并更新本地保存的目录大小
     if rc_size != local_size:
+        # 将文件的操作模式从追加模式变更为覆写模式
+        txt_file = open(f'.{MEDIA_DIRS[media_dir]}.txt', 'w') 
         # 将目录大小写入 txt 文件
         txt_file.seek(0)
         txt_file.write(str(rc_size) + "\n")
