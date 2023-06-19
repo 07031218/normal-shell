@@ -32,6 +32,9 @@ for media_dir in MEDIA_DIRS:
     # 读取本地保存的目录大小，如果文件为空则默认为 0
     local_size = int(txt_file.read() or 0)
     
+    # 将文件的操作模式从追加模式变更为覆写模式
+    txt_file = open(f'.{MEDIA_DIRS[media_dir]}.txt', 'w') 
+    
     # 构建 rclone 命令行
     cmd = ['rclone', 'size', '--json', os.path.join(RCLONE_REMOTE_PATH, media_dir)]
     
