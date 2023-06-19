@@ -46,7 +46,7 @@ for media_dir in MEDIA_DIRS:
     if rc_size != local_size:
         # 将目录大小写入 txt 文件
         txt_file.seek(0)
-        txt_file.write(str(rc_size))
+        txt_file.write(str(rc_size) + "\n")
         txt_file.truncate()
         
         # 获取要刷新的媒体库对象，并刷新它
