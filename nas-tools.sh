@@ -112,7 +112,7 @@ version: "3"
 services: 
 #自动追剧必备
   nas-tools:
-    image: jxxghp/nas-tools:latest
+    image: nastool/nas-tools:latest
     ports:
       - 3000:3000
     volumes:
@@ -142,48 +142,47 @@ services:
     volumes:
       - /home/qbittorrent/config:/config
       - /downloads:/downloads
-      - /mnt/video:/mnt/video
       - /home/qbittorrent/watch:/watch  
     restart: unless-stopped
-  jackett:
-    image: lscr.io/linuxserver/jackett
-    container_name: jackett
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Asia/Shanghai
-      - AUTO_UPDATE=true 
-    volumes:
-      - /home/jackett:/config
-      - /downloads:/downloads
-    ports:
-      - 9117:9117
-    restart: always
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    container_name: flaresolverr
-    environment:
-      - LOG_LEVEL=info
-      - LOG_HTML=false
-      - CAPTCHA_SOLVER=none
-      - TZ=Asia/Shanghaiœ
-    ports:
-      - "8191:8191"
-    restart: unless-stopped
-  chinesesubfinder:
-    container_name: chinesesubfinder
-    image: allanpk716/chinesesubfinder:latest
-    volumes:
-      - /home/chinesesubfinder:/config
-      - /mnt/video:/mnt/video
-      - /home/chinesesubfinder/cache:/app/cache
-    environment:
-      - PUID=0
-      - PGID=0
-      - TZ=Asia/Shanghai
-    ports:
-      - 19035:19035
-    restart: unless-stopped
+  # jackett:
+  #   image: lscr.io/linuxserver/jackett
+  #   container_name: jackett
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Asia/Shanghai
+  #     - AUTO_UPDATE=true 
+  #   volumes:
+  #     - /home/jackett:/config
+  #     - /downloads:/downloads
+  #   ports:
+  #     - 9117:9117
+  #   restart: always
+  # flaresolverr:
+  #   image: ghcr.io/flaresolverr/flaresolverr:latest
+  #   container_name: flaresolverr
+  #   environment:
+  #     - LOG_LEVEL=info
+  #     - LOG_HTML=false
+  #     - CAPTCHA_SOLVER=none
+  #     - TZ=Asia/Shanghaiœ
+  #   ports:
+  #     - "8191:8191"
+  #   restart: unless-stopped
+  # chinesesubfinder:
+  #   container_name: chinesesubfinder
+  #   image: allanpk716/chinesesubfinder:latest
+  #   volumes:
+  #     - /home/chinesesubfinder:/config
+  #     - /mnt/video:/mnt/video
+  #     - /home/chinesesubfinder/cache:/app/cache
+  #   environment:
+  #     - PUID=0
+  #     - PGID=0
+  #     - TZ=Asia/Shanghai
+  #   ports:
+  #     - 19035:19035
+  #   restart: unless-stopped
 EOF
   echoContent yellow `echo -ne "请问是否安装Emby到本机[y/n]"`
   read embyyn
