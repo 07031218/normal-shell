@@ -375,8 +375,7 @@ Restart=on-failure
 RestartSec=5
 User = root
 ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --umask 0000  --allow-other  --allow-non-empty --attr-timeout 1h --buffer-size 512M --dir-cache-time 5000h
-ExecStop=${fusermountsrc} -u ${path}
-Restart = on-abort
+ExecStop= ${fusermountsrc} -qzu ${path}
 
 [Install]
 WantedBy = multi-user.target" > /usr/lib/systemd/system/rclone-${list[rclone_config_name]}.service
@@ -798,5 +797,4 @@ menu(){
         menu_go_on
         menu
 }
-
 menu
