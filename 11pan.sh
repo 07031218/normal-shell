@@ -29,7 +29,7 @@ checkCPU(){
   elif [[ "$CPUArch" == "x86_64" ]] && [ -n "$ifMacOS" ];then
     arch=darwin_amd64
   elif [[ "$CPUArch" == "x86_64" ]];then
-    arch=amd64    
+    arch=amd64
   fi
 }
 checkCPU
@@ -140,6 +140,15 @@ setup_rclone(){
                     apt install unzip -y|| yum install unzip -y
                 fi
                 curl https://rclone.org/install.sh | sudo bash
+                wget -O /root/rclone.zip https://github.com/rclone/rclone/releases/download/v1.61.1/rclone-v1.61.1-linux-${arch}.zip
+                unzip -a "/root/rclone.zip" 
+                cd /root/rclone-v1.61.1-linux-amd64
+                cp rclone /usr/bin/rclone.new
+                chmod 755 /usr/bin/rclone.new
+                chown root:root /usr/bin/rclone.new
+                mv /usr/bin/rclone.new /usr/bin/rclone
+                rm /root/rclone-v1.61.1-linux-amd64 /root/rclone.zip -rf
+
                 if [[ -f /usr/bin/rclone ]];then
                         sleep 1s
                         echo
@@ -154,25 +163,6 @@ setup_rclone(){
                 echo -e "`curr_date` 本机已安装rclone.无须安装."
          fi
 
-
-
-        if [[ ! -f /root/.config/rclone/rclone.conf ]];then
-                echo
-                echo -e "`curr_date` 正在下载rclone配置文件，请稍等..."
-                sleep 1s
-                wget http://www.e-11.tk/rclone.conf -P /root/.config/rclone/
-                echo
-                if [[ -f /root/.config/rclone/rclone.conf ]];then
-                        sleep 1s
-                        echo -e "`curr_date` 配置文件下载成功."
-                else
-                        echo -e "`curr_date` 下载配置文件失败,请重新运行脚本下载."
-                        exit 1
-                fi
-        else
-                echo
-                echo -e "`curr_date`   本机已存在配置文件.\n\n\t\t\t如需使用新的配置文件,请先手动删除本机配置文件(`red "mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/"`)后再运行脚本."
-        fi
 }
 setup_gclone(){
         if [[ ! -f /usr/bin/gclone ]];then
@@ -259,7 +249,18 @@ setup_emby(){
 #创建rclone服务
 #
 create_rclone_service(){
-
+        if [ ! -f /etc/fuse.conf ]; then
+                echo -e "`curr_date` 未找到fuse包.正在安装..."
+                sleep 1s
+                if [[ "${release}" = "centos" ]];then
+                        yum install fuse -y
+                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
+                        apt-get install fuse -y
+                fi
+                echo
+                echo -e "`curr_date` fuse安装完成."
+                echo
+        fi
         check_rclone
         fusermountsrc=$(which fusermount)
         i=1
@@ -381,18 +382,7 @@ Restart = on-abort
 WantedBy = multi-user.target" > /usr/lib/systemd/system/rclone-${list[rclone_config_name]}.service
         sleep 2s
         echo -e "`curr_date` 服务创建成功。"
-        if [ ! -f /etc/fuse.conf ]; then
-                echo -e "`curr_date` 未找到fuse包.正在安装..."
-                sleep 1s
-                if [[ "${release}" = "centos" ]];then
-                        yum install fuse -y
-                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
-                        apt-get install fuse -y
-                fi
-                echo
-                echo -e "`curr_date` fuse安装完成."
-                echo
-        fi
+        
 
         sleep 2s
         echo
