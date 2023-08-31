@@ -7,10 +7,16 @@ if [[ `iptables -L FORWARD -n|grep 'MAC48:98:ca:05:16:27'` == "" ]]; then
 	iptables -I FORWARD -m mac --mac-source A8:82:00:C9:C0:E0 -j DROP # 客厅电视有线
 	iptables -I FORWARD -m mac --mac-source B0:E4:D5:9B:0B:4A -j DROP # Google TV
 	iptables -I FORWARD -m mac --mac-source 48:98:CA:05:16:27 -j DROP # 客厅电视无线
+	iptables -I INPUT -m mac --mac-source A8:82:00:C9:C0:E0 -j DROP # 客厅电视有线
+	iptables -I INPUT -m mac --mac-source B0:E4:D5:9B:0B:4A -j DROP # Google TV
+	iptables -I INPUT -m mac --mac-source 48:98:CA:05:16:27 -j DROP # 客厅电视无线
 	echo "`date "+%Y-%m-%d %H:%M:%S"` 查询发现当前防火墙中无针对家里电视对互联网的访问的防火墙规则，所以本次操作是屏蔽家里电视对互联网的访问！" > /root/log.txt
 else
 	iptables -D FORWARD -m mac --mac-source A8:82:00:C9:C0:E0 -j DROP # 客厅电视有线
 	iptables -D FORWARD -m mac --mac-source B0:E4:D5:9B:0B:4A -j DROP # Google TV
 	iptables -D FORWARD -m mac --mac-source 48:98:CA:05:16:27 -j DROP # 客厅电视无线
+	iptables -D INPUT -m mac --mac-source A8:82:00:C9:C0:E0 -j DROP # 客厅电视有线
+	iptables -D INPUT -m mac --mac-source B0:E4:D5:9B:0B:4A -j DROP # Google TV
+	iptables -D INPUT -m mac --mac-source 48:98:CA:05:16:27 -j DROP # 客厅电视无线
 	echo "`date "+%Y-%m-%d %H:%M:%S"` 查询发现当前防火墙中存在针对家里电视对互联网的访问的防火墙规则，所以本次操作是放行家里电视对互联网的访问！" > /root/log.txt
 fi
