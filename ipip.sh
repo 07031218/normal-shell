@@ -355,6 +355,20 @@ PersistentKeepalive = 25" > /etc/wireguard/wg0.conf
 	fi
 
 }
+keep_alive(){
+	read -p "请输入对端ipip隧道IP：" remoteip_1
+	echo "#!/bin/bash
+while  true; do
+	ping ${remoteip_1} -c 1
+	sleep 2s
+done
+" > /root/keepalive.sh
+	sed -i '$d' /etc/rc.local
+	echo -e "nohup bash /root/keepalive.sh>/dev/null 2>&1 &\nexit 0" >> /etc/rc.local
+	nohup bash /root/keepalive.sh>/dev/null 2>&1 &
+	echo -e "${yellow}IPIP隧道保活配置完成${plain}"
+}
+
 copyright(){
     clear
     echo -e "
@@ -374,6 +388,7 @@ ${green}————————————————————————
 ${green}1.${plain}  一键部署IPIP隧道
 ${green}2.${plain}  一键部署${red}IPIPv6${plain}隧道
 ${green}3.${plain}  一键部署wireguard
+${green}4.${plain}  IPIP隧道保活
 "
     echo -e "${yellow}请选择你要使用的功能${plain}"
     read -p "请输入数字 :" num   
@@ -389,6 +404,9 @@ ${green}3.${plain}  一键部署wireguard
             ;;
         3)
             install_wg
+            ;;
+        4)
+            keep_alive
             ;;
         *)
     clear
