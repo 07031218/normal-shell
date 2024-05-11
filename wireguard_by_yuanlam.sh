@@ -28,6 +28,12 @@ _yellow() {
     printf '\033[1;31;33m%b\033[0m' "$1"
 }
 
+# 定义默认输出函数
+_echo() {
+    printf '\033[1;31;33m%b\033[0m' "$1"
+    printf "\n"
+}
+
 # 打印带有日期的参数
 _printargs() {
     printf -- "%s" "[$(date)] "
@@ -263,22 +269,25 @@ _os_ver() {
 # 输出提示信息并等待用户确认
 if ! _is_installed; then
     # 如果 WireGuard 没有安装，则输出提示信息并等待用户确认
-    echo "WireGuard依赖于内核，某些VPS机器需自行更换内核后再进行安装，输入回车确认并继续"
+    _warn "WireGuard依赖于内核，某些VPS机器需自行更换内核后再进行安装，输入回车确认并继续"
     read -p ""
 fi
 
 initialize_config() {
-    CONFIG_FILE="$cur_dir/wg_setup_config.conf"
+    CONFIG_FILE="$cur_dir/wg_default_config.conf"
 
     if [ ! -f "$CONFIG_FILE" ]; then
-        echo "首次执行脚本，需进行初始化配置。"
+        _echo "首次执行脚本，需进行初始化配置。"
         while true; do
-            echo "请选择本机网络环境："
-            echo "1. 拥有公网IP"
-            echo "2. 处于内网环境"
+            _echo "请根据本机网络环境，选择 Wireguard 运行模式："
+            _echo "1. 拥有公网IP（1接口多peers）"
+            _echo "2. 处于内网环境（1接口1peer）"
             read -p "输入选择 (1 或 2): " role_choice
 
             if [ "$role_choice" = "1" ]; then
+                read -p "请自定义本机的WireGuard接口名称 [默认: vps]: " default_server_suffix
+                DEFAULT_SERVER_SUFFIX=${default_server_suffix:-vps}
+
                 read -p "请输入本机的WireGuard接口地址 [默认: 10.88.88.1]: " server_wg_ipv4
                 SERVER_WG_IPV4=${server_wg_ipv4:-10.88.88.1}
 
@@ -288,33 +297,38 @@ initialize_config() {
                 # read -p "请输入WireGuard接口使用的DNS服务器 [默认: 1.1.1.1]: " client_dns
                 # CLIENT_DNS=${client_dns:-1.1.1.1}
 
-                read -p "请自定义对端的WireGuard接口名称 [默认使用服务器接口名称 ${SERVER_WG_NIC}]: " default_client_suffix
-                DEFAULT_CLIENT_SUFFIX=${default_client_suffix:-$SERVER_WG_NIC}
+                read -p "请自定义对端Peer的接口名称 [默认使用服务器接口名称：home]: " default_client_suffix
+                DEFAULT_CLIENT_SUFFIX=${default_client_suffix:-home}
 
-                read -p "请输入对端的WireGuard接口地址 [默认: 10.88.88.2]: " client_wg_ipv4
+                read -p "请输入对端Peer的起始地址 [默认: 10.88.88.2]: " client_wg_ipv4
                 CLIENT_WG_IPV4=${client_wg_ipv4:-10.88.88.2}
 
-                read -p "请输入对端的内网IP地址 [默认: 192.168.1.0]: " client_lan_ipv4
-                CLIENT_LAN_IPV4=${client_lan_ipv4:-192.168.1.0}
+                read -p "请输入对端Peer的内网IP地址 [默认: 留空]: " client_lan_ipv4
+                CLIENT_LAN_IPV4=${client_lan_ipv4:-}
 
                 cat > "$CONFIG_FILE" << EOF
 # 自定义变量
 ROLE_CHOICE="$role_choice"
+# 本机WireGuard接口名称
+DEFAULT_SERVER_SUFFIX="$DEFAULT_SERVER_SUFFIX"
 # 本机WireGuard接口的隧道地址
 SERVER_WG_IPV4="$SERVER_WG_IPV4"
 # WireGuard端口
 SERVER_WG_PORT="$SERVER_WG_PORT"
-# 客户端DNS服务器
-# CLIENT_DNS="$CLIENT_DNS"
 # 对端WireGuard接口名称
 DEFAULT_CLIENT_SUFFIX="${DEFAULT_CLIENT_SUFFIX}"
 # 对端WireGuard接口地址
 CLIENT_WG_IPV4="$CLIENT_WG_IPV4"
 # 对端内网IP地址
 CLIENT_LAN_IPV4="$CLIENT_LAN_IPV4"
+# WireGuard服务器网络接口卡名称
+SERVER_WG_NIC="server_$DEFAULT_SERVER_SUFFIX"
 EOF
                 break
             elif [ "$role_choice" = "2" ]; then
+                read -p "请自定义本机的WireGuard接口名称 [默认使用服务器接口名称：home]: " default_client_suffix
+                DEFAULT_CLIENT_SUFFIX=${default_client_suffix:-home}
+
                 read -p "请输入本机的WireGuard接口地址 [默认: 10.88.88.2]: " client_wg_ipv4
                 CLIENT_WG_IPV4=${client_wg_ipv4:-10.88.88.2}
 
@@ -327,14 +341,14 @@ EOF
                 read -p "请输入对端的WireGuard服务端口 [默认: 51820]: " server_wg_port
                 SERVER_WG_PORT=${server_wg_port:-51820}
 
+                read -p "请自定义对端的WireGuard接口名称 [默认使用服务器接口名称：ROS]: " default_server_suffix
+                DEFAULT_SERVER_SUFFIX=${default_client_suffix:-ROS}
+
                 read -p "请输入对端的WireGuard接口地址 [默认: 10.88.88.1]: " server_wg_ipv4
                 SERVER_WG_IPV4=${server_wg_ipv4:-10.88.88.1}
 
                 read -p "请输入对端的WireGuard接口公钥 [默认: 空]: " server_pub_key
                 SERVER_PUB_KEY=${server_pub_key:-}
-
-                read -p "请自定义对端的WireGuard接口名称 [默认使用服务器接口名称 ROS]: " default_client_suffix
-                DEFAULT_CLIENT_SUFFIX=${default_client_suffix:-ROS}
 
                 # read -p "请输入WireGuard接口使用的DNS服务器 [默认: 1.1.1.1]: " client_dns
                 # CLIENT_DNS=${client_dns:-1.1.1.1}
@@ -342,6 +356,8 @@ EOF
                 cat > "$CONFIG_FILE" << EOF
 # 自定义变量
 ROLE_CHOICE="$role_choice"
+# 本机WireGuard接口名称
+DEFAULT_CLIENT_SUFFIX="$DEFAULT_CLIENT_SUFFIX"
 # 本机WireGuard接口的隧道地址
 CLIENT_WG_IPV4="$CLIENT_WG_IPV4"
 # 本机内网IP地址
@@ -350,14 +366,14 @@ CLIENT_LAN_IPV4="$CLIENT_LAN_IPV4"
 SERVER_PUB_ADDR="$SERVER_PUB_ADDR"
 # 对端WireGuard端口
 SERVER_WG_PORT="$SERVER_WG_PORT"
+# 对端WireGuard接口名称
+DEFAULT_SERVER_SUFFIX="${DEFAULT_SERVER_SUFFIX}"
 # 对端的WireGuard接口地址
 SERVER_WG_IPV4="$SERVER_WG_IPV4"
 # 对端的WireGuard接口公钥
 SERVER_PUB_KEY="$SERVER_PUB_KEY"
-# 对端WireGuard接口名称
-DEFAULT_CLIENT_SUFFIX="${DEFAULT_CLIENT_SUFFIX}"
-# 客户端DNS服务器
-# CLIENT_DNS="$CLIENT_DNS"
+# WireGuard服务器网络接口卡名称
+SERVER_WG_NIC="client_$DEFAULT_CLIENT_SUFFIX"
 EOF
                 break
             else
@@ -365,8 +381,6 @@ EOF
             fi
         done
     fi
-
-    source "$CONFIG_FILE"
 }
 
 # 从源码安装wireguard模块
@@ -545,35 +559,39 @@ create_server_if() {
     SERVER_PUBLIC_KEY="$(echo ${SERVER_PRIVATE_KEY} | wg pubkey)"
     CLIENT_PRIVATE_KEY="$(wg genkey)"
     CLIENT_PUBLIC_KEY="$(echo ${CLIENT_PRIVATE_KEY} | wg pubkey)"
-    _info "创建本机wireguard接口: /etc/wireguard/${SERVER_WG_NIC}.conf"
+    if [ -z "$CLIENT_LAN_IPV4" ]; then
+        AllowedIPs=${NEW_CLIENT_WG_IPV4}/32
+    else
+        AllowedIPs=${NEW_CLIENT_WG_IPV4}/32,${CLIENT_LAN_IPV4}/24
+    fi 
+    _info "创建本机wireguard接口: /etc/wireguard/server_${DEFAULT_SERVER_SUFFIX}.conf"
     [ ! -d "/etc/wireguard" ] && mkdir -p "/etc/wireguard"
-    cat > /etc/wireguard/${SERVER_WG_NIC}.conf <<EOF
-# 服务器接口 ${SERVER_WG_NIC}
+    cat > /etc/wireguard/server_${DEFAULT_SERVER_SUFFIX}.conf <<EOF
+# 服务器接口 server_${DEFAULT_SERVER_SUFFIX}
 [Interface]
 Address = ${SERVER_WG_IPV4}/24
 ListenPort = ${SERVER_WG_PORT}
 MTU = 1420
-# DNS = ${CLIENT_DNS}
 PrivateKey = ${SERVER_PRIVATE_KEY}
 
-# 客户端接口 ${DEFAULT_CLIENT_SUFFIX}
+# 客户端接口 client_${DEFAULT_CLIENT_SUFFIX}
 [Peer]
 PublicKey = ${CLIENT_PUBLIC_KEY}
-AllowedIPs = ${CLIENT_WG_IPV4}/32,${CLIENT_LAN_IPV4}/24
+AllowedIPs = ${AllowedIPs}
 PersistentKeepalive = 25
 EOF
-    chmod 600 /etc/wireguard/${SERVER_WG_NIC}.conf
+    chmod 600 /etc/wireguard/server_${DEFAULT_SERVER_SUFFIX}.conf
 }
 
 # 创建对端接口信息供客户端使用，本机作为服务端
 create_client_config() {
     _info "创建客户端接口配置: /etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX}"
     cat > /etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX} <<EOF
+# 以下信息填在对端客户端上
 [Interface]
 PrivateKey = ${CLIENT_PRIVATE_KEY}
 Address = ${CLIENT_WG_IPV4}/24
 MTU = 1420
-DNS = ${CLIENT_DNS}
 
 [Peer]
 PublicKey = ${SERVER_PUBLIC_KEY}
@@ -588,27 +606,26 @@ EOF
 create_client_if() {
     CLIENT_PRIVATE_KEY="$(wg genkey)"
     CLIENT_PUBLIC_KEY="$(echo ${CLIENT_PRIVATE_KEY} | wg pubkey)"
-    _info "创建本机wireguard接口: /etc/wireguard/${SERVER_WG_NIC}.conf"
+    _info "创建本机wireguard接口: /etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX}.conf"
     [ ! -d "/etc/wireguard" ] && mkdir -p "/etc/wireguard"
-    cat > /etc/wireguard/${SERVER_WG_NIC}.conf <<EOF
-# 本机接口 ${SERVER_WG_NIC}
+    cat > /etc/wireguard/${DEFAULT_CLIENT_SUFFIX}.conf <<EOF
+# 本机接口 client_${DEFAULT_CLIENT_SUFFIX}
 [Interface]
 Address = ${CLIENT_WG_IPV4}/24
 ListenPort = ${SERVER_WG_PORT}
 MTU = 1420
-# DNS = ${CLIENT_DNS}
 PrivateKey = ${CLIENT_PRIVATE_KEY}
 
-# 对端接口 ${DEFAULT_CLIENT_SUFFIX}
+# 对端接口 server_${DEFAULT_SERVER_SUFFIX}
 [Peer]
 PublicKey = ${SERVER_PUB_KEY}
 AllowedIPs = 0.0.0.0/0
 Endpoint = ${SERVER_PUB_ADDR}:${SERVER_WG_PORT}
 PersistentKeepalive = 25
 EOF
-    chmod 600 /etc/wireguard/${SERVER_WG_NIC}.conf
-    _info "正在创建对端信息: /etc/wireguard/server_${DEFAULT_CLIENT_SUFFIX}"
-    cat > /etc/wireguard/server_${DEFAULT_CLIENT_SUFFIX} <<EOF
+    chmod 600 /etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX}.conf
+    _info "正在创建对端信息: /etc/wireguard/server_${DEFAULT_SERVER_SUFFIX}"
+    cat > /etc/wireguard/server_${DEFAULT_SERVER_SUFFIX} <<EOF
 对端服务器填入以下信息
 PublicKey = ${CLIENT_PUBLIC_KEY=}
 AllowedIPs = ${CLIENT_WG_IPV4}/32,${CLIENT_LAN_IPV4}/24
@@ -631,6 +648,7 @@ enable_ip_forward() {
 
 # 设置防火墙规则
 set_firewall() {
+    source "$cur_dir/wg_default_config.conf" # 确保最新的配置被加载
     _info "设置防火墙规则"
     if _exists "firewall-cmd"; then
         if firewall-cmd --state > /dev/null 2>&1; then
@@ -669,6 +687,7 @@ EOF
 
 # WireGuard 安装完成
 install_completed() {
+    source "$cur_dir/wg_default_config.conf" # 确保最新的配置被加载
     _info "通过 wg-quick 启动 WireGuard 服务 ${SERVER_WG_NIC}"
     _error_detect "systemctl daemon-reload"
     _error_detect "systemctl start wg-quick@${SERVER_WG_NIC}"
@@ -726,39 +745,66 @@ check_version() {
 
 # 添加客户端
 add_peers() {
+    source "$cur_dir/wg_default_config.conf" # 确保最新的配置被加载
     if ! _is_installed; then
         _red "WireGuard 未安装，请先安装后重试\n" && exit 1
     fi
+    if [ "$ROLE_CHOICE" = "2" ]; then
+        _red "当前为1对1模式，请使用安装功能新增 Wireguard 接口\n" && exit 1
+    fi
+
     default_server_if="/etc/wireguard/${SERVER_WG_NIC}.conf"
     default_client_if="/etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX}"
     [ ! -s "${default_server_if}" ] && echo "默认服务器接口不存在 ($(_red ${default_server_if}))" && exit 1
     [ ! -s "${default_client_if}" ] && echo "默认客户端接口不存在，当前不是服务端模式，无法添加客户端" && exit 1
     while true; do
-        read -p "请输入客户端名称 (例如: wg1):" client
+        read -p "请输入新的Peer名称 (例如: wg1):" client
         if [ -z "${client}" ]; then
-            _red "客户端名称不能为空\n"
+            _red "Peer名称不能为空\n"
         else
             new_client_if="/etc/wireguard/client_${client}"
-            if [ "${client}" = "${SERVER_WG_NIC}" ]; then
-                echo "默认客户端 ($(_yellow ${client})) 已存在，请重新输入"
+            if [ "${client}" = "${DEFAULT_CLIENT_SUFFIX}" ]; then
+                echo "默认Peer ($(_yellow ${client})) 已存在，请重新输入"
             elif [ -s "${new_client_if}" ]; then
-                echo "客户端 ($(_yellow ${client})) 已存在，请重新输入"
+                echo "Peer ($(_yellow ${client})) 已存在，请重新输入"
             else
+                # 一旦用户输入有效的 Peer 名称，立即请求输入内网 IP 地址
+                read -p "请输入对端Peer的内网IP地址 [默认: 留空]: " new_client_lan_ipv4
+                NEW_CLIENT_LAN_IPV4=${new_client_lan_ipv4:-}
                 break
             fi
         fi
-    done
-    CLIENT_PRIVATE_KEY="$(wg genkey)"
-    CLIENT_PUBLIC_KEY="$(echo ${CLIENT_PRIVATE_KEY} | wg pubkey)"
+    done   
+    NEW_CLIENT_PRIVATE_KEY="$(wg genkey)"
+    NEW_CLIENT_PUBLIC_KEY="$(echo ${NEW_CLIENT_PRIVATE_KEY} | wg pubkey)"
     SERVER_PUBLIC_KEY="$(grep -w "PublicKey" ${default_client_if} | awk '{print $3}')"
     CLIENT_ENDPOINT="$(grep -w "Endpoint" ${default_client_if} | awk '{print $3}')"
-    CLIENT_WG_IPV4="${ipv4_comm}.${issue_ip_last}"
+    # 获取客户端 IP 地址
+    client_files=($(find /etc/wireguard/ -name "client_*" | sort))
+    client_ipv4=()
+    for ((i=0; i<${#client_files[@]}; i++)); do
+        tmp_ipv4="$(grep -w "Address" ${client_files[$i]} | awk '{print $3}' | cut -d\/ -f1 )"
+        client_ipv4=(${client_ipv4[@]} ${tmp_ipv4})
+    done
+    # Sort array
+    client_ipv4_sorted=($(printf '%s\n' "${client_ipv4[@]}" | sort -V))
+    index=$(expr ${#client_ipv4[@]} - 1)
+    last_ip=$(echo ${client_ipv4_sorted[$index]} | cut -d. -f4)
+    issue_ip_last=$(expr ${last_ip} + 1)
+    [ ${issue_ip_last} -gt 254 ] && _red "Too many clients, IP addresses might be not enough\n" && exit 1
+    ipv4_comm=$(echo ${client_ipv4[$index]} | cut -d. -f1-3)  
+    NEW_CLIENT_WG_IPV4="${ipv4_comm}.${issue_ip_last}"
+    if [ -z "$NEW_CLIENT_LAN_IPV4" ]; then
+        AllowedIPs=${NEW_CLIENT_WG_IPV4}/32
+    else
+        AllowedIPs=${NEW_CLIENT_WG_IPV4}/32,${NEW_CLIENT_LAN_IPV4}/24
+    fi   
     cat > ${new_client_if} <<EOF
+# 以下信息填在对端客户端上
 [Interface]
-PrivateKey = ${CLIENT_PRIVATE_KEY}
-Address = ${CLIENT_WG_IPV4}/24
+PrivateKey = ${NEW_CLIENT_PRIVATE_KEY}
+Address = ${NEW_CLIENT_WG_IPV4}/24
 MTU = 1420
-DNS = ${CLIENT_DNS}
 
 [Peer]
 PublicKey = ${SERVER_PUBLIC_KEY}
@@ -767,10 +813,10 @@ Endpoint = ${CLIENT_ENDPOINT}
 EOF
     cat >> ${default_server_if} <<EOF
 
-# 客户端接口 ${client}
+# 客户端接口 client_${client}
 [Peer]
-PublicKey = ${CLIENT_PUBLIC_KEY}
-AllowedIPs = ${CLIENT_WG_IPV4}/32
+PublicKey = ${NEW_CLIENT_PUBLIC_KEY}
+AllowedIPs = ${AllowedIPs}
 PersistentKeepalive = 25
 EOF
     chmod 600 ${new_client_if}
@@ -789,17 +835,21 @@ EOF
 }
 
 remove_peers() {
+    source "$cur_dir/wg_default_config.conf" # 确保最新的配置被加载
     if ! _is_installed; then
         _red "WireGuard 未安装，请先安装后重试\n" && exit 1
+    fi
+    if [ "$ROLE_CHOICE" = "2" ]; then
+        _red "当前为1对1模式，无法删除\n" && exit 1
     fi
     default_server_if="/etc/wireguard/${SERVER_WG_NIC}.conf"
     [ ! -s "${default_server_if}" ] && echo "默认服务器接口不存在 ($(_red ${default_server_if}))" && exit 1
     while true; do
-        read -p "请输入要删除的客户端名称 (例如: wg1):" client
+        read -p "请输入要删除的Peer名称 (例如: wg1):" client
         if [ -z "${client}" ]; then
-            _red "客户端名称不能为空\n"
+            _red "Peer名称不能为空\n"
         else
-            if [ "${client}" = "${SERVER_WG_NIC}" ]; then
+            if [ "${client}" = "${DEFAULT_CLIENT_SUFFIX}" ]; then
                 echo "默认客户端 ($(_yellow ${client})) 不能被删除"
             else
                 break
@@ -820,11 +870,15 @@ remove_peers() {
 # 列出客户端
 list_peers() {
     # 检查是否安装了WireGuard
+    source "$cur_dir/wg_default_config.conf" # 确保最新的配置被加载
     if ! _is_installed; then
         _red "WireGuard 未安装，请先安装后重试\n" && exit 1
     fi
-    default_server_if="/etc/wireguard/${SERVER_WG_NIC}.conf"
-    [ ! -s "${default_server_if}" ] && echo "默认服务器接口 ($(_red ${default_server_if})) 不存在" && exit 1
+    if [ "$ROLE_CHOICE" = "2" ]; then
+        _red "当前为1对1模式，请前往 /etc/wireguard/ 文件夹查看\n" && exit 1
+    fi
+    default_server_if="/etc/wireguard/server_${DEFAULT_SERVER_SUFFIX}.conf"
+    [ ! -s "${default_server_if}" ] && echo "默认服务器接口 ($(_red server_${DEFAULT_SERVER_SUFFIX})) 不存在" && exit 1
     local line="+-------------------------------------------------------------------------+\n"
     local string=%-35s
     printf "${line}|${string} |${string} |\n${line}" " 客户端接口" " 客户端IP"
@@ -896,7 +950,7 @@ install_from_source() {
         install_wg_2
     fi
     initialize_config
-    source "$CONFIG_FILE" # 确保最新的配置被加载
+    source "$cur_dir/wg_default_config.conf" # 确保最新的配置被加载
     if [ "$ROLE_CHOICE" = "1" ]; then
         create_server_if
         create_client_config
@@ -994,9 +1048,9 @@ show_help() {
 用法  : $0 [选项]
 选项:
         -h, --help       打印此帮助文本并退出
-        -r, --repo       从仓库安装WireGuard
-        -s, --source     从源码安装WireGuard
-        -u, --update     从源码升级WireGuard
+        -r, --repo       从仓库安装WireGuard（建议本地环境使用）
+        -s, --source     从源码安装WireGuard（建议外网环境使用）
+        -u, --update     从源码升级WireGuard（建议外网环境使用）
         -v, --version    如果已安装，打印WireGuard版本
         -a, --add        添加WireGuard Peer
         -d, --del        删除WireGuard Peer
