@@ -608,7 +608,7 @@ create_client_if() {
     CLIENT_PUBLIC_KEY="$(echo ${CLIENT_PRIVATE_KEY} | wg pubkey)"
     _info "创建本机wireguard接口: /etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX}.conf"
     [ ! -d "/etc/wireguard" ] && mkdir -p "/etc/wireguard"
-    cat > /etc/wireguard/${DEFAULT_CLIENT_SUFFIX}.conf <<EOF
+    cat > /etc/wireguard/client_${DEFAULT_CLIENT_SUFFIX}.conf <<EOF
 # 本机接口 client_${DEFAULT_CLIENT_SUFFIX}
 [Interface]
 Address = ${CLIENT_WG_IPV4}/24
