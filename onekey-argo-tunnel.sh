@@ -53,7 +53,7 @@ file1="/usr/bin/cloudflared"
 sudo ${InstallMethod} install  wget  supervisor -y > /dev/null 2>&1 
 #开始拉取cloudflared tunnel
 if [ ! -f "$file1" ]; then
-wget  "https://ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
+wget  "https://mirror.ghproxy.com/https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-${arch}" -O cloudflared
 sudo chmod +x cloudflared && sudo cp cloudflared /usr/bin
 fi
 file="./.cloudflared/cert.pem"
