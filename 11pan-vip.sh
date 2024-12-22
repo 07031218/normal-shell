@@ -396,7 +396,7 @@ WantedBy = multi-user.target" > /usr/lib/systemd/system/rclone-${list[rclone_con
         systemctl enable rclone-${list[rclone_config_name]}.service &> /dev/null
         if [[ $? ]];then
                 echo
-                echo -e "已为网盘 ${RED}${list[rclone_config_name]}${END} 创建服务 ${RED}reclone-${list[rclone_config_name]}.service${END}.并已添加开机挂载.\n您可以通过 ${RED}systemctl [start|stop|status]${END} 进行挂载服务管理。"
+                echo -e "已为网盘 ${RED}${list[rclone_config_name]}${END} 创建服务 ${RED}rclone-${list[rclone_config_name]}.service${END}.并已添加开机挂载.\n您可以通过 ${RED}systemctl [start|stop|status]${END} 进行挂载服务管理。"
                 echo
                 echo
                 sleep 2s
