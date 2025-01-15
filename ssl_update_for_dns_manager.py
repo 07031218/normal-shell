@@ -68,8 +68,35 @@ DB_CONFIG = {
     'db': '',
     'charset': 'utf8mb4'
 }
-cert_dir = f"/certs"
-os.makedirs(cert_dir, exist_ok=True)
+
+# 证书目录
+CERT_DIR = "/certs"
+
+def check_cert_dir_permissions() -> bool:
+    """检查证书目录权限"""
+    try:
+        if not os.path.exists(CERT_DIR):
+            os.makedirs(CERT_DIR, mode=0o755)
+        elif not os.access(CERT_DIR, os.W_OK):
+            print_colored(f"错误：无权限写入证书目录 {CERT_DIR}", Colors.RED)
+            return False
+        return True
+    except Exception as e:
+        print_colored(f"检查证书目录权限时出错: {e}", Colors.RED)
+        return False
+
+def restart_nginx() -> bool:
+    """重启 nginx 服务"""
+    try:
+        subprocess.check_call(["service", "nginx", "restart"])
+        print_colored("nginx 服务重启完成", Colors.GREEN)
+        return True
+    except subprocess.CalledProcessError as e:
+        print_colored(f"nginx 重启失败: {e}", Colors.RED)
+        return False
+    except Exception as e:
+        print_colored(f"重启 nginx 时发生错误: {e}", Colors.RED)
+        return False
 
 def clear_screen():
     """清屏"""
@@ -113,19 +140,29 @@ def get_certificate(domain: str) -> Optional[Tuple[str, str]]:
 def save_certificate(domain: str, cert_data: Tuple[str, str]) -> bool:
     """保存证书到文件"""
     try:
+        domain_cert_dir = f"{CERT_DIR}/{domain}/certificate"
+        os.makedirs(domain_cert_dir, mode=0o755, exist_ok=True)
+        
         fullchain, privatekey = cert_data
         
         # 保存完整证书链
-        with open(f"{cert_dir}/{domain}/certificate/chained.pem", "w") as f:
+        with open(f"{domain_cert_dir}/chained.pem", "w") as f:
             f.write(fullchain)
         
         # 保存私钥
-        with open(f"{cert_dir}/{domain}/certificate/domain.key", "w") as f:
+        with open(f"{domain_cert_dir}/domain.key", "w") as f:
             f.write(privatekey)
+            
+        # 设置适当的文件权限
+        os.chmod(f"{domain_cert_dir}/chained.pem", 0o644)
+        os.chmod(f"{domain_cert_dir}/domain.key", 0o600)
             
         return True
     except IOError as e:
         print_colored(f"保存证书文件时出错: {e}", Colors.RED)
+        return False
+    except Exception as e:
+        print_colored(f"处理证书文件时出错: {e}", Colors.RED)
         return False
 
 def process_domain(domain: str) -> Optional[str]:
@@ -145,6 +182,11 @@ def process_domain(domain: str) -> Optional[str]:
 def main():
     """主函数"""
     try:
+        # 检查证书目录权限
+        if not check_cert_dir_permissions():
+            input("\n按回车键退出...")
+            return
+
         # 测试数据库连接
         if not test_db_connection():
             input("\n按回车键退出...")
@@ -158,7 +200,7 @@ def main():
             try:
                 # 获取用户输入
                 print_colored("\n请输入要查询的域名 (输入 'q' 退出):", Colors.YELLOW)
-                print_colored("例如: www.example.com 将会查询 example.com", Colors.YELLOW)
+                print_colored("例如: www.example.com 将会查询 *.example.com", Colors.YELLOW)
                 domain = input("> ").strip()
                 
                 if domain.lower() == 'q':
@@ -171,28 +213,32 @@ def main():
                     continue
 
                 # 处理域名
-                processed_domain = f'*.' + process_domain(domain)
+                processed_domain = process_domain(domain)
                 if not processed_domain:
                     input("\n按回车键继续...")
                     continue
                 
-                print_colored(f"\n将查询域名: {processed_domain}", Colors.YELLOW)
+                # 添加通配符
+                wildcard_domain = f"*.{processed_domain}"
+                print_colored(f"\n将查询域名: {wildcard_domain}", Colors.YELLOW)
                 print_colored("正在查询数据库...", Colors.YELLOW)
                 
                 # 查询证书
-                cert_data = get_certificate(processed_domain)
+                cert_data = get_certificate(wildcard_domain)
                 if not cert_data:
-                    print_colored(f"未找到域名 '{processed_domain}' 的证书信息", Colors.RED)
+                    print_colored(f"未找到域名 '{wildcard_domain}' 的证书信息", Colors.RED)
                     input("\n按回车键继续...")
                     continue
                     
                 # 保存证书
                 if save_certificate(domain, cert_data):
                     print_colored("\n证书已成功保存：", Colors.GREEN)
-                    print_colored(f"完整证书链: {cert_dir}/{domain}/certificate/chained.pem", Colors.YELLOW)
-                    print_colored(f"私钥: {cert_dir}/{domain}/certificate/domain.key", Colors.YELLOW)
-                    subprocess.check_call(["service", "nginx", "restart"])
-                    print_colored(f"nginx服务重启完成", Colors.GREEN)
+                    print_colored(f"完整证书链: {CERT_DIR}/{domain}/certificate/chained.pem", Colors.YELLOW)
+                    print_colored(f"私钥: {CERT_DIR}/{domain}/certificate/domain.key", Colors.YELLOW)
+                    
+                    # 重启 nginx
+                    if not restart_nginx():
+                        print_colored("请手动重启 nginx 服务", Colors.YELLOW)
                 
                 # 询问是否继续
                 print_colored("\n是否继续查询其他域名？(y/n)", Colors.YELLOW)
