@@ -23,8 +23,13 @@ def install_pymysql():
     try:
         # 尝试使用 python3 安装
         try:
-            subprocess.check_call(["python3", "-m", "pip", "install", "--user", "pymysql"])
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", "pymysql"])
             print_colored("PyMySQL 安装成功！", Colors.GREEN)
+            
+            # 重新加载 sys.path 以包含新安装的包
+            import site
+            import importlib
+            importlib.reload(site)
             
             # 重新导入
             global pymysql
@@ -34,8 +39,13 @@ def install_pymysql():
             # 如果用户级安装失败，尝试使用 sudo
             print_colored("尝试使用 sudo 安装...", Colors.YELLOW)
             try:
-                subprocess.check_call(["sudo", "python3", "-m", "pip", "install", "pymysql"])
+                subprocess.check_call(["sudo", sys.executable, "-m", "pip", "install", "pymysql"])
                 print_colored("PyMySQL 安装成功！", Colors.GREEN)
+                
+                # 重新加载 sys.path 以包含新安装的包
+                import site
+                import importlib
+                importlib.reload(site)
                 
                 # 重新导入
                 global pymysql
@@ -44,12 +54,13 @@ def install_pymysql():
             except subprocess.CalledProcessError as e:
                 print_colored(f"安装失败: {e}", Colors.RED)
                 print_colored("\n请手动尝试以下命令：", Colors.YELLOW)
-                print_colored("1. python3 -m pip install --user pymysql", Colors.GREEN)
-                print_colored("2. sudo python3 -m pip install pymysql", Colors.GREEN)
+                print_colored(f"1. {sys.executable} -m pip install --user pymysql", Colors.GREEN)
+                print_colored(f"2. sudo {sys.executable} -m pip install pymysql", Colors.GREEN)
                 return False
                 
     except Exception as e:
         print_colored(f"安装过程出错: {e}", Colors.RED)
+        print_colored("请尝试重新运行脚本", Colors.YELLOW)
         return False
 
 # 检查并安装 PyMySQL
@@ -58,6 +69,7 @@ try:
 except ImportError:
     print_colored("检测到未安装 PyMySQL 模块", Colors.YELLOW)
     if not install_pymysql():
+        print_colored("请安装完成后重新运行脚本", Colors.YELLOW)
         sys.exit(1)
 
 # 数据库配置
