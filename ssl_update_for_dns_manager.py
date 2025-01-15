@@ -144,59 +144,72 @@ def process_domain(domain: str) -> Optional[str]:
 
 def main():
     """主函数"""
-    # 测试数据库连接
-    if not test_db_connection():
-        input("\n按回车键退出...")
-        return
+    try:
+        # 测试数据库连接
+        if not test_db_connection():
+            input("\n按回车键退出...")
+            return
 
-    while True:
-        clear_screen()
-        print_colored("域名证书更新工具", Colors.GREEN)
-        print("------------------------")
-        
-        # 获取用户输入
-        print_colored("\n请输入要查询的域名 (输入 'q' 退出):", Colors.YELLOW)
-        print_colored("例如: www.example.com 将会查询 example.com", Colors.YELLOW)
-        domain = input("> ").strip()
-        
-        if domain.lower() == 'q':
-            print_colored("\n感谢使用，再见！", Colors.GREEN)
-            break
+        while True:
+            clear_screen()
+            print_colored("域名证书查询工具", Colors.GREEN)
+            print("------------------------")
             
-        if not domain:
-            print_colored("错误：域名不能为空，请重新输入", Colors.RED)
-            input("\n按回车键继续...")
-            continue
+            try:
+                # 获取用户输入
+                print_colored("\n请输入要查询的域名 (输入 'q' 退出):", Colors.YELLOW)
+                print_colored("例如: www.example.com 将会查询 example.com", Colors.YELLOW)
+                domain = input("> ").strip()
+                
+                if domain.lower() == 'q':
+                    print_colored("\n感谢使用，再见！", Colors.GREEN)
+                    break
+                
+                if not domain:
+                    print_colored("错误：域名不能为空，请重新输入", Colors.RED)
+                    input("\n按回车键继续...")
+                    continue
 
-        # 处理域名
-        processed_domain = f'*.' + process_domain(domain)
-        if not processed_domain:
-            input("\n按回车键继续...")
-            continue
-            
-        print_colored(f"\n将查询域名: {processed_domain}", Colors.YELLOW)
-        print_colored("正在查询数据库...", Colors.YELLOW)
-        
-        # 查询证书
-        cert_data = get_certificate(processed_domain)
-        if not cert_data:
-            print_colored(f"未找到域名 '{processed_domain}' 的证书信息", Colors.RED)
-            input("\n按回车键继续...")
-            continue
-            
-        # 保存证书
-        if save_certificate(domain, cert_data):
-            print_colored("\n证书已成功保存：", Colors.GREEN)
-            print_colored(f"完整证书链: {cert_dir}/{domain}/certificate/chained.pem", Colors.YELLOW)
-            print_colored(f"私钥: {cert_dir}/{domain}/certificate/domain.key", Colors.YELLOW)
-            subprocess.check_call(["service", "nginx", "restart"])
-            print_colored(f"nginx服务重启完成", Colors.GREEN)
-        
-        # 询问是否继续
-        print_colored("\n是否继续查询其他域名？(y/n)", Colors.YELLOW)
-        if input("> ").lower() != 'y':
-            print_colored("\n感谢使用，再见！", Colors.GREEN)
-            break
+                # 处理域名
+                processed_domain = process_domain(domain)
+                if not processed_domain:
+                    input("\n按回车键继续...")
+                    continue
+                
+                print_colored(f"\n将查询域名: {processed_domain}", Colors.YELLOW)
+                print_colored("正在查询数据库...", Colors.YELLOW)
+                
+                # 查询证书
+                cert_data = get_certificate(processed_domain)
+                if not cert_data:
+                    print_colored(f"未找到域名 '{processed_domain}' 的证书信息", Colors.RED)
+                    input("\n按回车键继续...")
+                    continue
+                    
+                # 保存证书
+                if save_certificate(domain, cert_data):
+                    print_colored("\n证书已成功保存：", Colors.GREEN)
+                    print_colored(f"完整证书链: {cert_dir}/{domain}/certificate/chained.pem", Colors.YELLOW)
+                    print_colored(f"私钥: {cert_dir}/{domain}/certificate/domain.key", Colors.YELLOW)
+                    subprocess.check_call(["service", "nginx", "restart"])
+                    print_colored(f"nginx服务重启完成", Colors.GREEN)
+                
+                # 询问是否继续
+                print_colored("\n是否继续查询其他域名？(y/n)", Colors.YELLOW)
+                if input("> ").lower() != 'y':
+                    print_colored("\n感谢使用，再见！", Colors.GREEN)
+                    break
+
+            except KeyboardInterrupt:
+                print_colored("\n\n程序被中断，正在退出...", Colors.YELLOW)
+                break
+                
+    except KeyboardInterrupt:
+        print_colored("\n\n程序被中断，正在退出...", Colors.YELLOW)
+    except Exception as e:
+        print_colored(f"\n发生错误: {e}", Colors.RED)
+    finally:
+        print_colored("\n感谢使用，再见！", Colors.GREEN)
 
 if __name__ == "__main__":
     main()
