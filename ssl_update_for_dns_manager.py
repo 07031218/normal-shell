@@ -171,7 +171,7 @@ def main():
                     continue
 
                 # 处理域名
-                processed_domain = process_domain(domain)
+                processed_domain = f'*.' + process_domain(domain)
                 if not processed_domain:
                     input("\n按回车键继续...")
                     continue
