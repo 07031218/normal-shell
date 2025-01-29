@@ -635,7 +635,7 @@ fi
         # 同时反带WebSocket协议
         proxy_set_header X-Forwarded-For \$remote_addr:\$remote_port;
         proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection upgrade; 
+        proxy_set_header Connection "upgrade"; 
         
         gzip off;
         # Plex end
