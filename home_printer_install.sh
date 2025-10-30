@@ -49,7 +49,7 @@ read yn
 if [[ $yn == "y" ]]||[[ $yn == "y" ]]; then
 $InstallMethod install gcc g++ -y
 $InstallMethod install --reinstall make -y
-wget https://ghproxy.com/https://github.com/apple/cups/releases/download/v2.3.3/cups-2.3.3-source.tar.gz -O cups-2.3.3-source.tar.gz && tar xzvf cups-2.3.3-source.tar.gz && cd /root/cups-2.3.3 && ./configure && make && make install
+wget https://ghfast.top/https://github.com/apple/cups/releases/download/v2.3.3/cups-2.3.3-source.tar.gz -O cups-2.3.3-source.tar.gz && tar xzvf cups-2.3.3-source.tar.gz && cd /root/cups-2.3.3 && ./configure && make && make install
 cp /usr/lib64/* /usr/lib/
 echo -n -e "${blue}请输入当前设备的网段，比如192.168.2.1则输入192.168.2.0，请正确输入：${end}"
 read ipduan
