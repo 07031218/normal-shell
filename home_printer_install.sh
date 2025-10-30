@@ -53,8 +53,8 @@ wget https://ghproxy.com/https://github.com/apple/cups/releases/download/v2.3.3/
 cp /usr/lib64/* /usr/lib/
 echo -n -e "${blue}请输入当前设备的网段，比如192.168.2.1则输入192.168.2.0，请正确输入：${end}"
 read ipduan
-sed -i '27c Allow ${ipduan}/24' /etc/cups/cupsd.conf
-sed -i '32c Allow ${ipduan}/24' /etc/cups/cupsd.conf
+sed -i "27c Allow ${ipduan}/24" /etc/cups/cupsd.conf
+sed -i "32c Allow ${ipduan}/24" /etc/cups/cupsd.conf
 sed -i '12c Listen 0.0.0.0:631' /etc/cups/cupsd.conf
 /etc/init.d/cups start
 echo -e "${green}Cups服务安装完毕，相关打印机对应驱动请自行从官网下载安装······${end}"
