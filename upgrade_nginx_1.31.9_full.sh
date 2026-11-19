@@ -31,7 +31,7 @@ echo "旧程序已备份至: $BACKUP_BIN"
 echo "=== 2. 检查系统并安装编译依赖 ==="
 # 仅在 Debian 11 下处理失效的 bullseye-security 源
 if grep -q "bullseye" /etc/os-release 2>/dev/null; then
-    sed -i '/bullseye-security/s/^/#/' /etc/apt/sources.list 2>/dev/null || true
+    sed -i -E '/bullseye-(security|backports)/s/^/#/' /etc/apt/sources.list /etc/apt/sources.list.d/*.list 2>/dev/null || true
 fi
 
 apt update || true
