@@ -49,7 +49,9 @@ curl -fSLO "https://nginx.org/download/nginx-${TARGET_VER}.tar.gz"
 tar -zxf "nginx-${TARGET_VER}.tar.gz"
 cd "nginx-${TARGET_VER}"
 
-eval ./configure $FINAL_ARGS
+curl -fSLO "https://github.com/openssl/openssl/releases/download/openssl-3.0.15/openssl-3.0.15.tar.gz"
+tar -zxf openssl-3.0.15.tar.gz
+eval ./configure $FINAL_ARGS --with-openssl="$BUILD_DIR/nginx-${TARGET_VER}/openssl-3.0.15"
 make -j"$(nproc)"
 
 echo "=== 5. 自动修正旧版 SSL 语法与不兼容模块加载 ==="
