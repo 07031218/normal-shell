@@ -48,7 +48,7 @@ cd "$BUILD_DIR"
 curl -fSLO "https://nginx.org/download/nginx-${TARGET_VER}.tar.gz"
 tar -zxf "nginx-${TARGET_VER}.tar.gz"
 cd "nginx-${TARGET_VER}"
-
+apt install -y libpcre2-dev
 curl -fSLO "https://github.com/openssl/openssl/releases/download/openssl-3.0.15/openssl-3.0.15.tar.gz"
 tar -zxf openssl-3.0.15.tar.gz
 eval ./configure $FINAL_ARGS --with-openssl="$BUILD_DIR/nginx-${TARGET_VER}/openssl-3.0.15"
