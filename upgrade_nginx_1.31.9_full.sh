@@ -2,12 +2,13 @@
 set -e
 
 TARGET_VER="1.31.9"
+OPENSSL_VER="3.0.15"
 NGINX_BIN="/usr/sbin/nginx"
-CONF_DIR="/etc/nginx/conf.d"
 BUILD_DIR="/tmp/nginx_build_${TARGET_VER}"
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_CONF="/root/nginx_conf_backup_${TIMESTAMP}"
 BACKUP_BIN="${NGINX_BIN}.bak.${TIMESTAMP}"
+USE_STATIC_OPENSSL=0
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "错误: 请使用 root 用户运行此脚本。"
@@ -27,17 +28,28 @@ fi
 cp -a "$NGINX_BIN" "$BACKUP_BIN"
 echo "旧程序已备份至: $BACKUP_BIN"
 
-echo "=== 2. 处理失效源并安装编译依赖 ==="
-sed -i '/bullseye-security/s/^/#/' /etc/apt/sources.list 2>/dev/null || true
+echo "=== 2. 检查系统并安装编译依赖 ==="
+# 仅在 Debian 11 下处理失效的 bullseye-security 源
+if grep -q "bullseye" /etc/os-release 2>/dev/null; then
+    sed -i '/bullseye-security/s/^/#/' /etc/apt/sources.list 2>/dev/null || true
+fi
+
 apt update || true
-apt install -y build-essential curl libpcre2-dev libpcre3-dev zlib1g-dev libssl-dev || \
-apt install -y build-essential curl libpcre3-dev zlib1g-dev libssl-dev
+
+# 安装基础编译工具、PCRE 和 zlib（兼容 PCRE2 / PCRE3）
+apt install -y build-essential curl zlib1g-dev
+apt install -y libpcre2-dev || apt install -y libpcre3-dev
+
+# 尝试安装系统 libssl-dev，如果因 EOL 或版本冲突失败，自动切换为静态编译 OpenSSL
+if ! apt install -y libssl-dev; then
+    echo "警告: 系统 libssl-dev 安装失败，将自动采用静态编译 OpenSSL ${OPENSSL_VER}..."
+    USE_STATIC_OPENSSL=1
+fi
 
 echo "=== 3. 提取并清理当前 Nginx 编译参数 ==="
 RAW_ARGS=$($NGINX_BIN -V 2>&1 | grep "configure arguments:" | sed 's/configure arguments://')
-# 剔除 Debian 打包机上的第三方模块路径以及 =dynamic 动态模块，避免缺少依赖或 .so 不兼容
+# 剔除 Debian/Ubuntu 打包机残留的第三方模块路径和 =dynamic 动态模块参数
 CLEAN_ARGS=$(echo "$RAW_ARGS" | sed -E 's/--add-(dynamic-)?module=[^ ]+//g' | sed -E 's/--with-[^ ]+=dynamic//g')
-# 补上常用的静态模块（如 stream 四层转发、SSL、HTTP/2）
 FINAL_ARGS="$CLEAN_ARGS --with-http_ssl_module --with-http_v2_module --with-stream --with-stream_ssl_module"
 echo "清理后的编译参数: $FINAL_ARGS"
 
@@ -45,29 +57,39 @@ echo "=== 4. 下载并编译 Nginx ${TARGET_VER} ==="
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
+
 curl -fSLO "https://nginx.org/download/nginx-${TARGET_VER}.tar.gz"
 tar -zxf "nginx-${TARGET_VER}.tar.gz"
+
+if [ "$USE_STATIC_OPENSSL" -eq 1 ]; then
+    echo "正在下载 OpenSSL ${OPENSSL_VER} 源码..."
+    curl -fSLO "https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL_VER}/openssl-${OPENSSL_VER}.tar.gz"
+    tar -zxf "openssl-${OPENSSL_VER}.tar.gz"
+    FINAL_ARGS="$FINAL_ARGS --with-openssl=${BUILD_DIR}/openssl-${OPENSSL_VER}"
+fi
+
 cd "nginx-${TARGET_VER}"
-apt install -y libpcre2-dev libssl1.1=1.1.1w-0+deb11u1 libssl-dev=1.1.1w-0+deb11u1 --allow-downgrades
-curl -fSLO "https://github.com/openssl/openssl/releases/download/openssl-3.0.15/openssl-3.0.15.tar.gz"
-tar -zxf openssl-3.0.15.tar.gz
-eval ./configure $FINAL_ARGS --with-openssl="$BUILD_DIR/nginx-${TARGET_VER}/openssl-3.0.15"
+eval ./configure $FINAL_ARGS
 make -j"$(nproc)"
 
 echo "=== 5. 自动修正旧版 SSL 语法与不兼容模块加载 ==="
-# 5.1 注释掉 /etc/nginx/nginx.conf 中旧版动态模块的加载，防止版本不兼容报错
+# 5.1 注释掉旧版动态模块加载，防止 .so 版本不兼容导致启动失败
 if [ -f "/etc/nginx/nginx.conf" ]; then
     sed -i 's/^\(\s*\)include \/etc\/nginx\/modules-enabled\/\*\.conf;/\1# include \/etc\/nginx\/modules-enabled\/*.conf;/g' /etc/nginx/nginx.conf
 fi
 
-# 5.2 修正 conf.d 下的 ssl on; 和 listen 443;
-if [ -d "$CONF_DIR" ]; then
-    for conf in "$CONF_DIR"/*.conf; do
-        [ -e "$conf" ] || continue
+# 5.2 同时扫描 conf.d 和 sites-enabled（兼容 Ubuntu 20.04 与 Debian 11）
+for DIR in /etc/nginx/conf.d /etc/nginx/sites-enabled; do
+    [ -d "$DIR" ] || continue
+    for conf in "$DIR"/*; do
+        [ -f "$conf" ] || continue
+        # 注释掉已废弃的 ssl on;
         sed -i 's/^\(\s*\)ssl on;/\1# ssl on;/g' "$conf"
+        # 给未带 ssl 的 443 端口监听行自动补上 ssl
         sed -i -E '/^\s*#/! { /listen\s+([^;]*:)?443\b/ { /\bssl\b/! s/(listen\s+([^;]*:)?443)\b/\1 ssl/ } }' "$conf"
     done
-fi
+done
+echo "已完成配置文件 SSL 语法检查与修正。"
 
 echo "=== 6. 替换二进制文件并校验配置 ==="
 systemctl stop nginx || true
@@ -85,7 +107,7 @@ fi
 systemctl start nginx
 
 echo "=== 7. 锁定 APT 版本并清理临时文件 ==="
-apt-mark hold nginx
+dpkg -l 'nginx*' 2>/dev/null | awk '/^ii/{print $2}' | xargs -r apt-mark hold
 rm -rf "$BUILD_DIR"
 
 echo "=== 升级完成 ==="
